@@ -1,0 +1,13 @@
+{
+  "name": "web3deploy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "deploy": ""
+  },
+  "dependencies": {
+    "solc": "^0.5.12",
+    "web3": "^1.2.11"
+  }
+}

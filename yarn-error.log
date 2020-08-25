@@ -1,0 +1,38 @@
+Arguments: 
+  /usr/local/Cellar/node/12.10.0/bin/node /usr/local/bin/yarn add solc
+
+PATH: 
+  /Users/lisheng/.cargo/bin:/usr/local/opt/binutils/bin:/Users/lisheng/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware:/usr/local/go/bin:/Users/lisheng/go/bin:/Users/lisheng/Downloads/apache-maven-3.6.3/bin:/Users/lisheng/mygit/eth/openethereum/target/release
+
+Yarn version: 
+  1.22.4
+
+Node version: 
+  12.10.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  SyntaxError: /Users/lisheng/Downloads/web3deploycontracts/package.json: Unexpected string in JSON at position 89
+      at JSON.parse (<anonymous>)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/usr/local/lib/node_modules/yarn/lib/cli.js:310:30)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "web3deploy",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT"
+  "scripts": {
+  "deploy":""}
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
