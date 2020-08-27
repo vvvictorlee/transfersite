@@ -8,10 +8,9 @@ const web3 = new Web3(new Web3.providers.WebsocketProvider("ws://192.168.38.227:
 
 let abi = require("/Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/BFactory.json").abi;
 let contract = new web3.eth.Contract(abi, "0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63");
-if(undefined==contract)
-{
-        console.log("un");
-return;
+if (undefined == contract) {
+    console.log("un");
+    return;
 }
 
 // 0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63
@@ -33,12 +32,12 @@ return;
 const START_BLOCK = 7700000;
 const END_BLOCK = 7701000;
 contract.getPastEvents("allEvents",
-    {                               
-        fromBlock: 578042,     
+    {
+        fromBlock: 578042,
         toBlock: 'latest' // You can also specify 'latest'          
-    })                              
-.then(events => console.log(events))
-.catch((err) => console.error(err));
+    })
+    .then(events => console.log(events))
+    .catch((err) => console.error(err));
 
 
 
