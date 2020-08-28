@@ -61,7 +61,7 @@ const token2 = "0x0cEeD9D6CFD5558f0dA79FA21644E4c7Ff106c8F";
 
 
     const claimBalance1 = web3.utils.toWei("1000");
-    const elements1 = [web3.utils.soliditySha3(user1, token1, claimBalance1)];
+    const elements1 = [web3.utils.soliditySha3(user1, token1, claimBalance1),web3.utils.soliditySha3(user1, token1, claimBalance1)];
     const merkleTree1 = new MerkleTree(elements1);
     const root1 = merkleTree1.getHexRoot();
     console.log(root1);
@@ -80,8 +80,8 @@ const token2 = "0x0cEeD9D6CFD5558f0dA79FA21644E4c7Ff106c8F";
 
     let epoch2Block = (await web3.eth.getBlock(epochblocks * 5));
 
-    // await Redeem.methods.finishEpoch(5, epoch2Block.timestamp, epoch2Block.hash).send({ from: admin });
-    // await Redeem.methods.seedAllocations(5, root2).send({ from: admin });
+    await Redeem.methods.finishEpoch(5, epoch2Block.timestamp, epoch2Block.hash).send({ from: admin });
+    await Redeem.methods.seedAllocations(5, root2).send({ from: admin });
 
 
     // //step7
@@ -99,10 +99,10 @@ const token2 = "0x0cEeD9D6CFD5558f0dA79FA21644E4c7Ff106c8F";
     // await Redeem.methods.claimEpoch(user1, 2,token1, claimedBalance2, proof2  ).send({ from: user1 });
 
 
-    let result = await Redeem.methods.verifyClaim(user1, 1, token1, claimedBalance1, proof1).call({ from: user1 });
-    console.log(result);
-    let result1 = await Redeem.methods.merkleRoots(1, 3).call({ from: user1 });
-    console.log(result1);
+    // let result = await Redeem.methods.verifyClaim(user1, 1, token1, claimedBalance1, proof1).call({ from: user1 });
+    // console.log(result);
+    // let result1 = await Redeem.methods.merkleRoots(1, 3).call({ from: user1 });
+    // console.log(result1);
 
 
     // //step8

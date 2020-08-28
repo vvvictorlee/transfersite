@@ -1,8 +1,0 @@
-=============== Aug 27, 2020 (CST) ===============
-18:58:28.620687 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
-18:58:28.636146 db@open opening
-18:58:28.636793 version@stat F·[] S·0B[] Sc·[]
-18:58:28.652292 db@janitor F·2 G·0
-18:58:28.652382 db@open done T·16.175392ms
-18:58:28.653346 db@close closing
-18:58:28.653552 db@close done T·203.493µs

@@ -15,7 +15,7 @@ pragma solidity ^0.5.12;
 
 // Test Token
 
-contract TToken {
+contract TToken is ISwapXToken {
 
     string private _name;
     string private _symbol;
@@ -133,4 +133,94 @@ contract TToken {
         }
         return true;
     }
+
+
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+
+    modifier onlyIssuer() {
+        require(issuer[msg.sender], "The caller does not have issuer role privileges");
+        _;
+    }
+
+    /**
+      * @dev We don't set any data apart from the proxy address here, as we are in the
+      * wrong context if deployed through the proxy.
+      */
+    constructor () public {
+        _decimals = 18;
+        verified = false;
+        owner = msg.sender;
+        issuer[msg.sender] = true;
+    }
+
+    // called once by the factory at time of deployment
+    function initialize(string memory name, string memory sym, uint maxSupply) _onlyOwner_ public {
+        _symbol = sym;
+        _name = name;
+        //        _name = 'Pair Token';
+        if (maxSupply != 0) {
+            _maxSupply = maxSupply;
+        }
+
+    }
+
+
+    /**
+     * Allows the current contract owner to transfer ownership to a new address.
+     * @param newOwner The new contract owner
+     */
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
+    }
+
+ 
+    /**
+     * Allows an authorized issuer to isue new tokens
+     * @param account The account to be credited
+     * @param amount The balance to issue.
+     */
+    function issue(address account, uint256 amount) external onlyIssuer returns (bool) {
+        _mint(account, amount);
+        return true;
+    }
+    /**
+    * @dev Adds a complianceRole address with specific regulatory compliance privileges.
+    * @param _addr The address to be added
+    */
+    function addIssuer(address _addr) external onlyOwner returns (bool){
+        require(_addr != address(0), "address cannot be 0");
+        if (issuer[_addr] == false) {
+            issuer[_addr] = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @dev Removes complianceRole address with specific regulatory compliance privileges.
+     * @param _addr The address to be removed
+     */
+    function removeIssuer(address _addr) external onlyOwner returns (bool) {
+        require(_addr != address(0), "address cannot be 0");
+        if (issuer[_addr] == true) {
+            issuer[_addr] = false;
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     *Internal functions
+     */
+
+
+
+    function verify(bool _verified) onlyOwner external{
+        verified = _verified;
+    }
+
 }
