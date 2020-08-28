@@ -1,136 +1,248 @@
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+pragma solidity ^0.6.0;
 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+import '../SafeMath.sol';
+import "../ISwapXToken.sol";
+import "../IERC20.sol";
 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import '../SwapXPTStorage.sol';
 
-pragma solidity 0.6.0;
+contract TToken is SwapXPTStorage, IERC20, ISwapXToken {
 
-// Test Token
+    using SafeMath for uint;
 
-contract TToken {
+    bool public verifiedStatus;
 
-    string private _name;
-    string private _symbol;
-    uint8   private _decimals;
+    /*
+     * Non-Standard Events
+     */
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-    address private _owner;
-
-    uint internal _totalSupply;
-
-    mapping(address => uint)                   private _balance;
-    mapping(address => mapping(address=>uint)) private _allowance;
-
-    modifier _onlyOwner_() {
-        require(msg.sender == _owner, "ERR_NOT_OWNER");
+    /*
+     * Modifyiers
+     */
+    modifier onlyOwner() {
+        require(_isOwner(), "Caller is not the owner");
         _;
     }
 
-    event Approval(address indexed src, address indexed dst, uint amt);
-    event Transfer(address indexed src, address indexed dst, uint amt);
-
-    // Math
-    function add(uint a, uint b) internal pure returns (uint c) {
-        require((c = a + b) >= a);
-    }
-    function sub(uint a, uint b) internal pure returns (uint c) {
-        require((c = a - b) <= a);
+    modifier onlyIssuer() {
+        require(issuer[msg.sender], "The caller does not have issuer role privileges");
+        _;
     }
 
-    constructor(
-        string memory name,
-        string memory symbol,
-        uint8 decimals
-    ) public {
+    /**
+      * @dev We don't set any data apart from the proxy address here, as we are in the
+      * wrong context if deployed through the proxy.
+      */
+    constructor () public {
+        _decimals = 18;
+        verifiedStatus = false;
+        owner = msg.sender;
+        issuer[msg.sender] = true;
+    }
+
+    // called once by the factory at time of deployment
+    function initialize(string memory name, string memory sym, uint maxSupply) onlyOwner public override{
+        _symbol = sym;
         _name = name;
-        _symbol = symbol;
-        _decimals = decimals;
-        _owner = msg.sender;
+        //        _name = 'Pair Token';
+        if (maxSupply != 0) {
+            _maxSupply = maxSupply;
+        }
+
     }
 
-    function name() public view returns (string memory) {
+    /**
+     * Checks if the caller of an transaction is the owner of the contract
+     * @return true or false
+     */
+    function isOwner() external view returns (bool) {
+        return _isOwner();
+    }
+
+    function _isOwner() internal view returns (bool) {
+        return msg.sender == owner;
+    }
+    /**
+     * Allows the current contract owner to transfer ownership to a new address.
+     * @param newOwner The new contract owner
+     */
+    function transferOwnership(address newOwner) external onlyOwner override {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
+    }
+
+    /**
+     * Returns the name of the token
+     */
+    function name() external view returns (string memory) {
         return _name;
     }
 
-    function symbol() public view returns (string memory) {
+    /**
+     * Returns the symbol of the token
+     */
+    function symbol() external view returns (string memory) {
         return _symbol;
     }
 
-    function decimals() public view returns(uint8) {
+    /**
+     * Returns the number of decimals
+     */
+    function decimals() external view returns (uint8) {
         return _decimals;
     }
 
-    function _move(address src, address dst, uint amt) internal {
-        require(_balance[src] >= amt, "ERR_INSUFFICIENT_BAL");
-        _balance[src] = sub(_balance[src], amt);
-        _balance[dst] = add(_balance[dst], amt);
-        emit Transfer(src, dst, amt);
-    }
-
-    function _push(address to, uint amt) internal {
-        _move(address(this), to, amt);
-    }
-
-    function _pull(address from, uint amt) internal {
-        _move(from, address(this), amt);
-    }
-
-    function _mint(address dst, uint amt) internal {
-        _balance[dst] = add(_balance[dst], amt);
-        _totalSupply = add(_totalSupply, amt);
-        emit Transfer(address(0), dst, amt);
-    }
-
-    function allowance(address src, address dst) external view returns (uint) {
-        return _allowance[src][dst];
-    }
-
-    function balanceOf(address whom) external view returns (uint) {
-        return _balance[whom];
-    }
-
-    function totalSupply() public view returns (uint) {
+    /**
+     * Returns the total supply
+     */
+    function totalSupply() external view override returns (uint256) {
         return _totalSupply;
     }
 
-    function approve(address dst, uint amt) external returns (bool) {
-        _allowance[msg.sender][dst] = amt;
-        emit Approval(msg.sender, dst, amt);
+    /**
+     * Returns the balance of an address.
+     * @param account The address to check the balance of
+     */
+    function balanceOf(address account) public view override returns (uint256) {
+        return _balances[account];
+    }
+
+    /**
+     * Transfers balance from the message sender to the recipient
+     * @param recipient The address to send the balance to
+     * @param amount The balance to transfer
+     */
+    function transfer(address recipient, uint256 amount) external override returns (bool)  {
+        _transfer(msg.sender, recipient, amount);
         return true;
     }
 
-    function mint(address dst, uint256 amt) public _onlyOwner_ returns (bool) {
-        _mint(dst, amt);
+    /**
+     * Returns the allowance that the owner has given to a spender.
+     * @param _owner The address that is giving the allowance.
+     * @param spender The address that is granted the allowance.
+     */
+    function allowance(address _owner, address spender) external view override returns (uint256) {
+        return _allowances[_owner][spender];
+    }
+
+    /**
+     * Grants an allowance to the spender.
+     * @param spender The address that is granted the allowance.
+     * @param value The amount that is granted to the spender.
+     */
+    function approve(address spender, uint256 value) external override returns (bool) {
+        _approve(msg.sender, spender, value);
         return true;
     }
 
-    function burn(uint amt) public returns (bool) {
-        require(_balance[address(this)] >= amt, "ERR_INSUFFICIENT_BAL");
-        _balance[address(this)] = sub(_balance[address(this)], amt);
-        _totalSupply = sub(_totalSupply, amt);
-        emit Transfer(address(this), address(0), amt);
+    /**
+     * Transfers balance from the address that has granted allowance.
+     * @param sender The address that has granted the allowance.
+     * @param recipient The address to transfer the balance to.
+     * @param amount The amount that is transfered.
+     */
+    function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {
+        _transfer(sender, recipient, amount);
+        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount));
         return true;
     }
 
-    function transfer(address dst, uint amt) external returns (bool) {
-        _move(msg.sender, dst, amt);
+    /**
+     * Decreases the allowance to the spender.
+     * @param spender The address that is granted the allowance.
+     * @param subtractedValue The amount that is reduced.
+     */
+    function decreaseAllowance(address spender, uint256 subtractedValue) external  returns (bool) {
+        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue));
         return true;
     }
 
-    function transferFrom(address src, address dst, uint amt) external returns (bool) {
-        require(msg.sender == src || amt <= _allowance[src][msg.sender], "ERR_BTOKEN_BAD_CALLER");
-        _move(src, dst, amt);
-        if (msg.sender != src && _allowance[src][msg.sender] != uint256(-1)) {
-            _allowance[src][msg.sender] = sub(_allowance[src][msg.sender], amt);
-            emit Approval(msg.sender, dst, _allowance[src][msg.sender]);
+    /**
+     * Allows an authorized issuer to isue new tokens
+     * @param account The account to be credited
+     * @param amount The balance to issue.
+     */
+    function issue(address account, uint256 amount) external onlyIssuer override returns (bool)  {
+        _mint(account, amount);
+        return true;
+    }
+    /**
+    * @dev Adds a complianceRole address with specific regulatory compliance privileges.
+    * @param _addr The address to be added
+    */
+    function addIssuer(address _addr) external onlyOwner override returns (bool) {
+        require(_addr != address(0), "address cannot be 0");
+        if (issuer[_addr] == false) {
+            issuer[_addr] = true;
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    /**
+     * @dev Removes complianceRole address with specific regulatory compliance privileges.
+     * @param _addr The address to be removed
+     */
+    function removeIssuer(address _addr) external onlyOwner override returns (bool) {
+        require(_addr != address(0), "address cannot be 0");
+        if (issuer[_addr] == true) {
+            issuer[_addr] = false;
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     *Internal functions
+     */
+
+    /**
+     * Transfers balance from the sender to the recipient.
+     * @param sender The sender to reduce balance from
+     * @param recipient The recipient to increase balance
+     * @param amount The amount to transfer
+     */
+    function _transfer(address sender, address recipient, uint256 amount) internal {
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
+
+        _balances[sender] = _balances[sender].sub(amount);
+        _balances[recipient] = _balances[recipient].add(amount);
+        emit Transfer(sender, recipient, amount);
+    }
+
+    /**
+     * Increases the balance of the account.
+     * @param account The account to increase balance from
+     * @param amount The amount to mint
+     */
+    function _mint(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: mint to the zero address");
+
+        _totalSupply = _totalSupply.add(amount);
+
+        require(_totalSupply <= _maxSupply, "ERC20: supply amount cannot over maxSupply");
+
+        _balances[account] = _balances[account].add(amount);
+        emit Transfer(address(0), account, amount);
+    }
+
+    function _approve(address _owner, address spender, uint256 value) internal {
+        require(_owner != address(0), "ERC20: approve from the zero address");
+        require(spender != address(0), "ERC20: approve to the zero address");
+
+        _allowances[_owner][spender] = value;
+        emit Approval(_owner, spender, value);
+    }
+
+    function verify(bool _verified) onlyIssuer  external override{
+        verifiedStatus = _verified;
+    }
+
+    function verified() external override returns (bool){
+            return verifiedStatus;
     }
 }

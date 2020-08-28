@@ -47,6 +47,11 @@ const gasPrice = 3000000000;
 module.exports = {
   networks: {
     development: {
+      host: "127.0.0.1", // Localhost (default: none)
+      port: 8545, // Standard Ethereum port (default: none)
+      network_id: "*" // Any network (default: none)
+    },
+    testnet: {
       host: "192.168.38.227", // Localhost (default: none)
       port: 18045, // Standard Ethereum port (default: none)
       network_id: "*" // Any network (default: none)
@@ -54,7 +59,7 @@ module.exports = {
     dockerGanache: {
       provider: new HDWalletProvider(
         ganacheMnemonic,
-        "http://ganache:8545",
+        "http://127.0.0.1:8545",
         0,
         3
       ),

@@ -7,17 +7,18 @@ contract Redeem {
   IERC20 public token;
   address public owner;
 
-  event Allocated(address _claimant, uint256 _week, uint256 _balance);
+  event Allocated(address _claimant, uint256 _time, uint256 _balance);
   event Claimed(address _claimant, uint256 _balance);
 
-  // the outstanding balances for each user (by week)
-  mapping(address => uint[]) public weeksWithBenefits;
+  // the outstanding balances for each user (by time)
+  mapping(address => uint[]) public timesWithBenefits;
   
-  // Recorded weeks
-  uint latestWeek;
-  uint latestWeekTimestamp;
-  bytes32 latestWeekBlockHash;
-
+  // Recorded times
+  uint latestTime;
+  uint latestTimeTimestamp;
+  bytes32 latestTimeBlockHash;
+  mapping(address => mapping(address => uint)) vestedTokenBalances;
+  mapping(address => mapping(address => uint)) vestedTokenBalances;
   mapping(address => uint) vestedBalances;
   mapping(address => uint) pendingBalances;
   address[] usersWithPendingBalances;
@@ -34,14 +35,14 @@ contract Redeem {
     _;
   }
 
-  modifier requireWeekInPast(uint week) {
-    require(week <= latestWeek, "Week cannot be in the future");
+  modifier requireTimeInPast(uint time) {
+    require(time <= latestTime, "Time cannot be in the future");
     _;
   }
 
-  modifier requireWeekRecorded(uint _week) {
-    require(latestWeek != 0);
-    require(latestWeekBlockHash != 0);
+  modifier requireTimeRecorded(uint _time) {
+    require(latestTime != 0);
+    require(latestTimeBlockHash != 0);
     _;
   }
 
@@ -56,9 +57,9 @@ contract Redeem {
 
 
   function offsetRequirementMet(address user) view public returns (bool){
-      uint offsetSeconds = userWeekOffset(user, latestWeekBlockHash);
+      uint offsetSeconds = userTimeOffset(user, latestTimeBlockHash);
 
-      uint earliestClaimableTimestamp = latestWeekTimestamp + offsetSeconds;
+      uint earliestClaimableTimestamp = latestTimeTimestamp + offsetSeconds;
       return earliestClaimableTimestamp < block.timestamp;
   }
 
@@ -68,8 +69,8 @@ contract Redeem {
     uint balance = vestedBalances[msg.sender];
     delete vestedBalances[msg.sender];
 
-    bool disburseCurrentWeek = offsetRequirementMet(msg.sender);
-    if (disburseCurrentWeek) {
+    bool disburseCurrentTime = offsetRequirementMet(msg.sender);
+    if (disburseCurrentTime) {
       balance += pendingBalances[msg.sender];
       delete pendingBalances[msg.sender];
     }
@@ -77,27 +78,27 @@ contract Redeem {
     disburse(msg.sender, balance);
   }
 
-  function userWeekOffset(address _liquidityProvider, bytes32 _weekBlockHash) pure public returns (uint offset) {
-    bytes32 hash = keccak256(abi.encodePacked(_liquidityProvider, _weekBlockHash));
+  function userTimeOffset(address _liquidityProvider, bytes32 _timeBlockHash) pure public returns (uint offset) {
+    bytes32 hash = keccak256(abi.encodePacked(_liquidityProvider, _timeBlockHash));
     assembly {
       offset :=
         mod(
           hash,
-          604800 // seconds in a week
+          86400 // seconds in a time
         )
     }
     return offset;
   }
 
 
-  function finishWeek(uint _week, uint _timestamp, bytes32 _blockHash) public
+  function finishTime(uint _time, uint _timestamp, bytes32 _blockHash) public
   onlyOwner
   {
-    if (_week > latestWeek) { // just in case we get these out of order
-      latestWeekTimestamp = _timestamp;
-      latestWeekBlockHash = _blockHash;
+    if (_time > latestTime) { // just in case we get these out of order
+      latestTimeTimestamp = _timestamp;
+      latestTimeBlockHash = _blockHash;
 
-      latestWeek = _week;
+      latestTime = _time;
 
       address lp;
       for(uint i = 0; i < usersWithPendingBalances.length; i += 1) {
@@ -113,8 +114,8 @@ contract Redeem {
     return pendingBalances[_liquidityProvider] + vestedBalances[_liquidityProvider];
   }
 
-  function seedAllocations(uint _week, address[] calldata _liquidityProviders, uint[] calldata _balances) external
-  requireWeekRecorded(_week)
+  function seedAllocations(uint _time, address[] calldata _liquidityProviders, uint[] calldata _balances) external
+  requireTimeRecorded(_time)
   onlyOwner
   {
     require(_liquidityProviders.length == _balances.length, "must be an equal number of liquidityProviders and balances");
@@ -124,19 +125,19 @@ contract Redeem {
       lp = _liquidityProviders[i];
       pendingBalances[lp] = _balances[i];
 
-      emit Allocated(lp, _week, _balances[i]);
+      emit Allocated(lp, _time, _balances[i]);
     }
     usersWithPendingBalances = _liquidityProviders;
   }
 
-  function seedAllocation(uint _week, address _liquidityProvider, uint _bal) external
-  requireWeekRecorded(_week)
+  function seedAllocation(uint _time, address _liquidityProvider, uint _bal) external
+  requireTimeRecorded(_time)
   onlyOwner
   {
     pendingBalances[_liquidityProvider] = _bal;
     usersWithPendingBalances.push(_liquidityProvider);
 
-    emit Allocated(_liquidityProvider, _week, _bal);
+    emit Allocated(_liquidityProvider, _time, _bal);
   }
 
 }

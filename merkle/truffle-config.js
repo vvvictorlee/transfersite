@@ -46,6 +46,15 @@ const gasPrice = 3000000000;
 
 module.exports = {
   networks: {
+    testnet: {
+      //host: "127.0.0.1", // Localhost (default: none)
+      host: "192.168.38.227", // Localhost (default: none)
+      port: 18045, // Standard Ethereum port (default: none)
+      from:"0x922b5be55dfc704904c5ba8880cc19904108e94d",
+      gas:4000000,
+      network_id: "*" // Any network (default: none)
+
+    },
     development: {
       //host: "127.0.0.1", // Localhost (default: none)
       host: "localhost", // Localhost (default: none)
