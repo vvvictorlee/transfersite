@@ -17,6 +17,11 @@ const password = "123456";
 const REDEEM = "0x2a103D4F9d64B4124F0a2Dd556DEee0926A92527";//redeem.address;
 const TTOKEN_ = "0x609dbeE878452065E4d5bB8A2578b4BD5b399be6";
 
+const {getJsonFileList} = require("./getJsonFileList.js")
+
+const s = getJsonFileList("/Users/lisheng/mygit/vvvictorlee/transfersite1");
+console.log(s);
+
 // let TToken = {};
 // function instanceToken() {
 //     let tabi = require("./TToken.json").abi;///Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/BFactory.json
