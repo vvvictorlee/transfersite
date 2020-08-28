@@ -32,7 +32,6 @@ let TToken = new web3.eth.Contract(tabi, TTOKEN_);//0x54e92B8C0a7Ea8DE6404A0F43D
 // console.log(TToken.methods)
 
 
-
 let abi = require("./MerkleRedeem.json").abi;///Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/BFactory.json
 let Redeem = new web3.eth.Contract(abi, REDEEM);//0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63
 // console.log(Redeem.methods)
@@ -41,7 +40,7 @@ const token1 = "0x431D57Fa1dAe7cf0bB64D8aAA94f371962434e59";
 
 const token2 = "0x0cEeD9D6CFD5558f0dA79FA21644E4c7Ff106c8F";
 let token = "";
-// transferToken(REDEEM, );
+
 (async function () {
 
     ////step 3    
