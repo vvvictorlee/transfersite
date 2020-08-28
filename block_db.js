@@ -205,31 +205,20 @@ WHERE block=8573463 AND p_awards>0
 GROUP BY cycle, block, s_token, p_token
 ON DUPLICATE KEY UPDATE p_awards=VALUES(p_awards)
  */
-
-function sleep(time = 0) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve();
-        }, time);
-    })
-};
-
 function miningPairToken(block, awards, max_supply) {
     let sql_P = "UPDATE mining_data m LEFT JOIN token_supply s ON m.s_token=s.token and m.block=s.block " +
-        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+?<=?, ?, IF(?-SUM(p_awards)<=0,0,?-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
-        "SET m.p_awards = IF(supply IS NULL, 0, FLOOR(s_balance/supply*IF(curr_award IS NULL, ?, curr_award)*0.85)) " +
+        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
+        "SET m.p_awards = IF(supply IS NULL, 0, FLOOR(s_balance/supply*IF(curr_award IS NULL, "+awards+", curr_award)*0.85)) " +
         "WHERE m.block=?";
     let sql_Sys = "INSERT INTO mining_data (cycle, block, addr, s_token, p_token, p_awards)  " +
-        "SELECT cycle, block, ?, s_token, p_token,(IF(curr_award IS NULL, ?, curr_award)-sum(p_awards)) awards FROM mining_data " +
-        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+?<=?, ?, IF(?-SUM(p_awards)<=0,0,?-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
+        "SELECT cycle, block, ?, s_token, p_token,(IF(curr_award IS NULL, "+awards+", curr_award)-sum(p_awards)) awards FROM mining_data " +
+        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
         "WHERE block=? AND p_awards>0 GROUP BY cycle, block, s_token, p_token " +
         "ON DUPLICATE KEY UPDATE p_awards=VALUES(p_awards)";
-    query = querySQL(sql_P, [awards, max_supply, awards, max_supply, max_supply, block, awards, block], function (error, results, fields) {
+    query = querySQL(sql_P, [block, block], function (error, results, fields) {
         if (error) throw error;
-
-        console.log("miningPairToken : e1 block=", block, results.message);
         // 修正每次的数量，余额全部转入管理账户
-        query = querySQL(sql_Sys, [global.ADDRESS_COMMUNITY, awards, awards, max_supply, awards, max_supply, max_supply, block, block], function (error, results, fields) {
+        query = querySQL(sql_Sys, [global.ADDRESS_COMMUNITY, block, block], function (error, results, fields) {
             if (error) throw error;
             console.log("miningPairToken : e2 block=", block, results.message);
             // resolve("");
@@ -237,40 +226,30 @@ function miningPairToken(block, awards, max_supply) {
     });
 }
 
-function miningSWP(block, awards) {
+/*
+SELECT addr, s_token, p_balance,p_awards, pool_usdt, swp_awards,all_pool, FLOOR(curr_award*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/(supply+new_p_totle)) aa, curr_award FROM mining_data m LEFT JOIN token_supply s ON m.p_token=s.token and m.block=s.block
+LEFT JOIN (SELECT SUM(pool_usdt) all_pool FROM token_supply WHERE block=8573463 AND verified = 1) t1 ON 1=1
+LEFT JOIN (SELECT SUM(p_awards) new_p_totle, p_token FROM mining_data WHERE block=8573463 GROUP BY p_token) t2 ON t2.p_token=m.p_token
+LEFT JOIN (SELECT IF(SUM(swp_awards)+2000<=3000, 2000, IF(3000-SUM(swp_awards)<=0,0,3000-SUM(swp_awards))) curr_award FROM mining_data WHERE block<8573463) t3 ON 1=1
+WHERE m.block=8573463 AND s.verified = 1
+
+UPDATE mining_data m LEFT JOIN token_supply s ON m.p_token=s.token and m.block=s.block
+LEFT JOIN (SELECT SUM(pool_usdt) all_pool FROM token_supply WHERE block=8573463 AND verified = 1) t1 ON 1=1
+LEFT JOIN (SELECT SUM(p_awards) new_p_totle, p_token FROM mining_data WHERE block=8573463 GROUP BY p_token) t2 ON t2.p_token=m.p_token
+LEFT JOIN (SELECT IF(SUM(swp_awards)+2000<=3000, 2000, IF(3000-SUM(swp_awards)<=0,0,3000-SUM(swp_awards))) curr_award FROM mining_data WHERE block<8573463) t3 ON 1=1
+SET m.swp_awards = FLOOR(curr_award*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/(supply+new_p_totle))
+WHERE m.block=8573463 AND s.verified = 1
+ */
+function miningSWP(block, awards, max_supply) {
+    // 直接拼入字符串中，否则有精度问题
     let sql_SWP = "UPDATE mining_data m LEFT JOIN token_supply s ON m.p_token=s.token and m.block=s.block " +
         "LEFT JOIN (SELECT SUM(pool_usdt) all_pool FROM token_supply WHERE block=? AND verified = 1) t1 ON 1=1 " +
         "LEFT JOIN (SELECT SUM(p_awards) new_p_totle, p_token FROM mining_data WHERE block=? GROUP BY p_token) t2 ON t2.p_token=m.p_token " +
-        "SET m.swp_awards = IF(supply IS NULL, 0, FLOOR(?*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/(supply+new_p_totle))) " +
+        "LEFT JOIN (SELECT IF(SUM(swp_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(swp_awards)<=0,0,"+max_supply+"-SUM(swp_awards))) curr_award FROM mining_data WHERE block<?) t3 ON 1=1 " +
+        "SET m.swp_awards = FLOOR(curr_award*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/(supply+new_p_totle)) " +
         "WHERE m.block=? AND s.verified = 1";
-    let sql_Sys = "INSERT INTO mining_data (block, addr, s_token, p_token, p_awards) " +
-        "SELECT cycle, block, ?, s_token, p_token, (?-sum(p_awards)) awards FROM mining_data " +
-        "WHERE block=? AND p_awards>0 GROUP BY cycle, block, s_token, p_token " +
-        "ON DUPLICATE KEY UPDATE p_awards=VALUES(p_awards)";
-    query = querySQL(sql_SWP, [block, block, awards, block], function (error, results, fields) {
+    query = querySQL(sql_SWP, [block, block, block, block], function (error, results, fields) {
         if (error) throw error;
-
-        // query = querySQL(sql_Sys, [global.ADDRESS_COMMUNITY, awards, block], function (error, results, fields) {
-        //     if (error) throw error;
-        // });
+        console.log("miningSWP block : "+block);
     });
-    // console.log(query.sql);
 }
-
-//
-// //添加
-// function add_token_list2(block, sToken, pToken, token0, token1) {
-//     var post = {
-//         block: block,
-//         sToken: sToken,
-//         pToken: pToken,
-//         token0: token0,
-//         token1: token1
-//     };
-//     console.log(post);
-//     //  querySQL   connection.query
-//     query = querySQL("INSERT IGNORE INTO "+TABLE_TOKEN_LIST+" SET ?", post, function (error, results, fields) {
-//         if (error) throw error;
-//         // console.log(query.sql); //INSERT INTO posts 'id'=1, 'title'='Hello MySQL'
-//     });
-// }

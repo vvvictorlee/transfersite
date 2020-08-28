@@ -1,4 +1,4 @@
-var {addSnapshotBlock, miningPairToken, updatPoolUSDT} = require('./block_db');
+var block_db = require('./block_db');
 var util = require('./util');
 require('./conf/const');
 
@@ -52,13 +52,15 @@ syncBlock = 0;
 async function mining(block_list) {
     block_list.forEach(await function (item, index) {
         // 挖铺子币
-        setTimeout(function(){miningPairToken(item, global.BLOCK_AWARDS, global.MAX_SUPPLY)},index*2000);
+        setTimeout(function(){block_db.miningPairToken(item, global.BLOCK_AWARDS, global.MAX_SUPPLY)},index*2000);
         // miningPairToken(item, 2000, 5000);
 
         // 挖SWP
-        // block_db.miningSWP(item,2000);
+        setTimeout(function(){block_db.miningSWP(item, global.BLOCK_AWARDS, global.MAX_SUPPLY)},index*2000+4000);
+        // block_db.miningSWP(item, 2000, 3000);
     });
 }
 
-mining(curr_cycle.snapshot);
-// miningPairToken(8573463,2000,5000);
+// mining(curr_cycle.snapshot);
+// block_db.miningPairToken(8573463,2000,5000);
+// block_db.miningSWP(8573463, global.BLOCK_AWARDS, global.MAX_SUPPLY);
