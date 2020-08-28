@@ -10,4 +10,10 @@ global.BLOCK_AWARDS =  '2000000000000000000000';
 global.MAX_SUPPLY = '5760000000000000000000000'; // *1000000000000000000
 
 global.ADDRESS_COMMUNITY = "0xAdmin";
- 
+
+global.db_config = {
+    host: 'localhost',
+    user: 'root',
+    password: 'p@ssw0rd',
+    database: 'eth_data'
+};

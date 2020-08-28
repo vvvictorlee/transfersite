@@ -2,28 +2,27 @@ var Web3 = require("web3");
 var fs = require('fs');
 var util = require('./util');
 var block_db = require('./block_db');
-
 require('./conf/const');
 
 var web3 = new Web3();
 web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 
-// 合约地址
+// 合约abi
 var factory_abi= util.loadJson('abi/Factory.json');
 var factory = new web3.eth.Contract(factory_abi, global.CONTRACT_FACTORY);
 
 var stoken_abi= util.loadJson('abi/SToken.json');
-
 var erc20_abi= util.loadJson('abi/ERC20.json');
-// var erc20 = new web3.eth.Contract(stoken_abi);
 
 var file_tokens = './data/token_list.json';
+
 // -------------------------------
 
 // Get All S-Token、Pair Token List
-function getAllToken() {
-    // 获取事件：PairCreated, allEvents
+function getAllTokenList() {
     factory.getPastEvents('PairCreated', {fromBlock: 0, toBlock: 'latest'}, function(error, result){
+        if (error) console.log('getAllTokenList :', error);
+
         let dataList = [];
         let tokenList = {
             sTokens: [],
@@ -35,11 +34,12 @@ function getAllToken() {
             tokenList.sTokens.push(info.pair.toLowerCase());
             tokenList.pTokens.push(info.ptoken.toLowerCase());
         }
-        block_db.add_token_list(dataList);
+        // 存入数据库
+        block_db.addTokenList(dataList);
+        // 写入文件
+        // util.writeFile(file_tokens, tokenList);
 
-        util.writeFile(file_tokens, tokenList);
-
-        console.log('getAllToken() : '+dataList.length);
+        console.log('getAllTokenList :', dataList.length, error);
     })
 }
 
@@ -47,14 +47,13 @@ function getAllToken() {
 function getAllTransfer(token, startBlock) {
     let erc20 = new web3.eth.Contract(erc20_abi, token);
     erc20.getPastEvents('Transfer', {fromBlock: startBlock, toBlock: 'latest'}, function(error, result){
-
         let dataList = [];
         for (var i = 0; i < result.length; i++) {
             let info = result[i].returnValues;
             dataList.push([result[i].blockNumber, result[i].transactionHash.toLowerCase(), info.from.toLowerCase(), info.to.toLowerCase(), info.value, result[i].event, result[i].address.toLowerCase()]);
         }
-        console.log(token+" : "+dataList.length);
-        block_db.add_block_data(dataList);
+        console.log(token, ':', dataList.length);
+        block_db.addBlockDataList(dataList);
     })
 }
 
@@ -72,7 +71,7 @@ function getAllTokenBlockData(syncBlock, token_list) {
     });
 
     // 从DB加载币种列表
-    // block_db.get_all_Tokens(function (token_list) {
+    // block_db.getAllTokens(function (token_list) {
     //     token_list.forEach(function(item, index){
     //         getAllTransfer(item, syncBlock);
     //     });
@@ -90,7 +89,7 @@ function getPoolSync(token, startBlock) {
             dataList.push([result[i].blockNumber, result[i].transactionHash.toLowerCase(), info.reserve0, info.reserve1, result[i].event, result[i].address.toLowerCase()]);
         }
         console.log(token+" Sync : "+dataList.length);
-        block_db.add_pool_block_data(dataList);
+        block_db.addPoolBlockData(dataList);
     })
 }
 
@@ -103,7 +102,7 @@ function getAllPoolReserve(syncBlock, token_list) {
 // ================
 
 // #1 ---- 获取所有Token
-// getAllToken();
+// getAllTokenList();
 
 // TODO 设置Token认证状态
 // 获取认证的Pair Token列表
@@ -117,7 +116,7 @@ var token_list= util.loadJson(file_tokens);
 
 
 // 3# ---- 获取流动池SToken的存量
-getAllPoolReserve(conf.lastBlocker, token_list);
+// getAllPoolReserve(conf.lastBlocker, token_list);
 
 
 // 4# ---- 获取 挖矿合约中 的所有交易
