@@ -11,8 +11,8 @@ global.CONTRACT_USDT = "0xd4956ae41ca6587aa050da6a63c425d1fc87f116"; // USDT
 global.BLOCK_AWARDS =  '2000000000000000000000';
 global.MAX_SUPPLY = '5760000000000000000000000'; // *1000000000000000000
 
-// 奖励代币的社区收取地址
-global.ADDRESS_COMMUNITY = "0xAdmin";
+global.ADDRESS_COMMUNITY = '0xAdmin';   // 社区收款账户，用于获取挖矿奖励
+global.ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
 global.db_config = {
     host: 'localhost',

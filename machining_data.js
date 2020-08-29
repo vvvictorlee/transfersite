@@ -38,11 +38,10 @@ function miningCycle(cycle) {
         yield block_db.miningToken(curr_cycle.snapshot, global.BLOCK_AWARDS, global.MAX_SUPPLY);
 
         // #4 ---- 计算周期奖励
+        // 同时更新地址类型
         yield block_db.creatCycleReward(curr_cycle.cycle);
 
-        // TODO #5 ---- 检查并屏蔽合约地址
-
-        // TODO #6 ---- 结果检查
+        console.log('---- finished! ----');
     });
 }
 

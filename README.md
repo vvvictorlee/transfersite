@@ -103,14 +103,14 @@ createReport(cycle);	// cycle为奖励周期
 根据 `cycle_reward` 表可以获取奖励指定周期的所有数据
 
 ```sql
-SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND flag=0
+SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND type=0
 ```
 
-其中 `flag=0` 用于屏蔽部分地址的奖励：
+其中 `type=0` 为地址的类型，用于屏蔽部分地址的奖励：
 
 1、如果奖励的地址为合约地址，则奖励应不发放，否则该合约无法领取奖励
 
-2、不发放的奖励将会放回待分配池中
+2、不发放的奖励，将会暂停处理，等待社区决议
 
 
 

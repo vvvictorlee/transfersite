@@ -10,7 +10,8 @@ global.CONTRACT_USDT = "0x25a88be96e581390bfede7bf20cd3a4817e5b597"; // USDT合�
 global.BLOCK_AWARDS =  '2000000000000000000000';
 global.MAX_SUPPLY = '5760000000000000000000000'; // 精度18位*1000000000000000000
 
-global.ADDRESS_COMMUNITY = "0xAdmin";   // 社区收款账户，用于获取挖矿奖励
+global.ADDRESS_COMMUNITY = '0xAdmin';   // 社区收款账户，用于获取挖矿奖励
+global.ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
 // 数据配置
 global.db_config = {

@@ -156,9 +156,9 @@ async function chaeckAllAddr() {
         var type = await getAddrType(list[i].addr);
         type_list.push([list[i].addr, type]);
     }
-    console.log(type_list);
-
     await block_db.updateAddrTypeList(type_list);
+
+    console.log('chaeckAllAddr :', type_list.length);
 }
 // ================
 
@@ -191,7 +191,7 @@ function getBlockData() {
         getAllClaim(conf.lastBlocker);
 
         // 5# 获取所有的地址，并判断类型
-        yield block_db.addAllAddr();
+        yield chaeckAllAddr();
 
         // 更新同步区块记录
         conf.updatedBlocks.push(conf.lastBlocker);
@@ -200,12 +200,4 @@ function getBlockData() {
     });
 }
 
-// getBlockData();
-(async function () {
-    // var a = getAddrType('0xAdmin');
-    // var a = await getAddrType(global.CONTRACT_FACTORY);
-    // var a = await getAddrType('0x9842495d6bab5cb632777ff25b5b4c1e1d595f24');
-    // console.log(a);
-
-    chaeckAllAddr();
-})();
+getBlockData();

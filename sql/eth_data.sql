@@ -11,7 +11,7 @@
  Target Server Version : 50610
  File Encoding         : 65001
 
- Date: 30/08/2020 00:35:40
+ Date: 30/08/2020 01:40:49
 */
 
 SET NAMES utf8mb4;
@@ -84,8 +84,9 @@ CREATE TABLE `cycle_reward` (
   `addr` varchar(50) COLLATE utf8_bin NOT NULL,
   `token` varchar(50) COLLATE utf8_bin NOT NULL,
   `amount` decimal(50,0) NOT NULL DEFAULT '0',
+  `type` int(1) NOT NULL DEFAULT '9' COMMENT '0-normal, 1-contract, 9-unknow',
   `flag` int(1) NOT NULL DEFAULT '0' COMMENT '0-reward,1-claim',
-  PRIMARY KEY (`cycle`,`addr`,`token`)
+  PRIMARY KEY (`cycle`,`addr`,`token`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
