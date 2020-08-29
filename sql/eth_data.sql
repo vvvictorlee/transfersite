@@ -11,11 +11,21 @@
  Target Server Version : 50610
  File Encoding         : 65001
 
- Date: 29/08/2020 20:21:50
+ Date: 30/08/2020 00:35:40
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for addr_type
+-- ----------------------------
+DROP TABLE IF EXISTS `addr_type`;
+CREATE TABLE `addr_type` (
+  `addr` varchar(50) COLLATE utf8_bin NOT NULL,
+  `type` int(1) NOT NULL DEFAULT '9' COMMENT '0-normal, 1-contract, 9-unknow',
+  PRIMARY KEY (`addr`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Table structure for block_chain_claim

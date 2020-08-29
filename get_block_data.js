@@ -49,32 +49,32 @@ async function getAllTokenList() {
 }
 
 // get All Transfer for ERC20
-function getAllTransfer(token, startBlock) {
+async function getAllTransfer(token, startBlock) {
     let erc20 = new web3.eth.Contract(erc20_abi, token);
-    erc20.getPastEvents('Transfer', {fromBlock: startBlock, toBlock: 'latest'}, function (error, result) {
-        let dataList = [];
-        for (var i = 0; i < result.length; i++) {
-            let info = result[i].returnValues;
-            dataList.push([result[i].blockNumber, result[i].transactionHash.toLowerCase(), info.from.toLowerCase(), info.to.toLowerCase(), info.value, result[i].event, result[i].address.toLowerCase()]);
-        }
-        // console.log(token, ':', result);
-        console.log('getAllTransfer :', token, dataList.length);
-        // block_db.addBlockDataList(dataList);
-    })
+    let result = await erc20.getPastEvents('Transfer', {fromBlock: startBlock, toBlock: 'latest'});
+
+    let dataList = [];
+    for (var i = 0; i < result.length; i++) {
+        let info = result[i].returnValues;
+        dataList.push([result[i].blockNumber, result[i].transactionHash.toLowerCase(), info.from.toLowerCase(), info.to.toLowerCase(), info.value, result[i].event, result[i].address.toLowerCase()]);
+    }
+    // console.log(token, ':', result);
+    await block_db.addBlockDataList(dataList);
+    console.log('getAllTransfer :', token, dataList.length);
 }
 
 // 获取Token的转账记录
-function getAllTokenBlockData(syncBlock, token_list) {
+async function getAllTokenBlockData(syncBlock, token_list) {
     // 获取SWP的转账记录
-    getAllTransfer(global.CONTRACT_SWP, syncBlock);
+    await getAllTransfer(global.CONTRACT_SWP, syncBlock);
 
     // 从文件加载币种列表
-    token_list.sTokens.forEach(function (item, index) {
-        getAllTransfer(item, syncBlock);
-    });
-    token_list.pTokens.forEach(function (item, index) {
-        getAllTransfer(item, syncBlock);
-    });
+    for (let i=0; i<token_list.sTokens.length; i++) {
+        await getAllTransfer(token_list.sTokens[i], syncBlock);
+    }
+    for (let i=0; i<token_list.pTokens.length; i++) {
+        await getAllTransfer(token_list.pTokens[i], syncBlock);
+    }
 
     // 从DB加载币种列表
     // block_db.getAllTokens(function (token_list) {
@@ -132,6 +132,34 @@ function getAllClaim(startBlock) {
     })
 }
 
+// 判断地址类型
+async function getAddrType(addr) {
+    try {
+        var code = await web3.eth.getCode(addr);
+        if (code === '0x') return 0;
+        return 1;
+    } catch(e) {
+        console.log('getAddrType Err :',e.message);
+        return 7;
+    }
+}
+// 获取所有的地址，并判断类型
+async function chaeckAllAddr() {
+    // 获取所有的地址，并入库
+    await block_db.addAllAddr();
+
+    // 获取所有未校验地址
+    let list = await block_db.getUncheckAddr();
+
+    var type_list = [];
+    for (let i=0; i<list.length; i++) {
+        var type = await getAddrType(list[i].addr);
+        type_list.push([list[i].addr, type]);
+    }
+    console.log(type_list);
+
+    await block_db.updateAddrTypeList(type_list);
+}
 // ================
 
 function getBlockData() {
@@ -154,13 +182,16 @@ function getBlockData() {
 
         // #2 ---- 获取Token的转账记录
         // var token_list = util.loadJson(file_tokens);
-        getAllTokenBlockData(conf.lastBlocker, token_list);
+        yield getAllTokenBlockData(conf.lastBlocker, token_list);
 
         // 3# ---- 获取流动池SToken的存量
         getAllPoolReserve(conf.lastBlocker, token_list);
 
         // 4# 获取所有奖励提取记录
         getAllClaim(conf.lastBlocker);
+
+        // 5# 获取所有的地址，并判断类型
+        yield block_db.addAllAddr();
 
         // 更新同步区块记录
         conf.updatedBlocks.push(conf.lastBlocker);
@@ -169,6 +200,12 @@ function getBlockData() {
     });
 }
 
-getBlockData();
+// getBlockData();
+(async function () {
+    // var a = getAddrType('0xAdmin');
+    // var a = await getAddrType(global.CONTRACT_FACTORY);
+    // var a = await getAddrType('0x9842495d6bab5cb632777ff25b5b4c1e1d595f24');
+    // console.log(a);
 
-
+    chaeckAllAddr();
+})();

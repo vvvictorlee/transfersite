@@ -11,6 +11,9 @@ module.exports = {
     addBlockDataList,
     addPoolBlockData,
     addClaimBlockDataList,
+    addAllAddr,
+    getUncheckAddr,
+    updateAddrTypeList,
     getAllTokens,
     addSnapshotBlock,
     addAllTokenSupply,
@@ -158,6 +161,33 @@ async function updatVerified(startBlock) {
         console.log("updatVerified :", rows.message);
     });
 }
+
+// 添加所有有交易记录的地址
+async function addAllAddr() {
+    let sql = "INSERT IGNORE INTO addr_type (addr) SELECT DISTINCT * FROM ( " +
+        "SELECT fromAddr FROM block_chain_data GROUP BY fromAddr UNION ALL " +
+        "SELECT toAddr FROM block_chain_data GROUP BY toAddr UNION ALL " +
+        "SELECT ? ) t";
+
+    await conn.query(sql, [global.ADDRESS_COMMUNITY]).then(function (rows) {
+        console.log("addAllAddr :", rows.message);
+    });
+}
+// 获取未检查的地址
+async function getUncheckAddr() {
+    let sql = "SELECT addr FROM addr_type WHERE type=9";
+
+    var list = await conn.query(sql, null);
+
+    return list;
+}
+// 更新地址类型列表
+async function updateAddrTypeList(list) {
+    let sql = "INSERT INTO addr_type (addr, type) VALUES ? ON DUPLICATE KEY UPDATE type=VALUES(type)";
+
+    await conn.query(sql, [list]);
+}
+
 
 // ----- Mining -----
 // 初始化挖矿数据
