@@ -13,8 +13,8 @@ module.exports = (deployer, network, accounts) => {
     const token1 = await TToken.deployed();
     await token1.mint(admin, utils.toWei("145000"));
 
-    // await deployer.deploy(Redeem);
-    // const redeem = await Redeem.deployed();
+    await deployer.deploy(Redeem);
+    const redeem = await Redeem.deployed();
 
     // await token.transfer(redeem.address, utils.toWei("20000"));
   });

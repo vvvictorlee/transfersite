@@ -185,24 +185,30 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.0+commit.26b70077\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"whom\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/data/mining/erc20-redeemable/merkle/contracts/IERC20.sol\":\"IERC20\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/data/mining/erc20-redeemable/merkle/contracts/IERC20.sol\":{\"keccak256\":\"0xaeaf34e50f1c59d81752ac832e3992272ae1803e4824a54dbdb3930b02cd4f99\",\"urls\":[\"bzz-raw://2fbbe06278367ba15e69e1c97032c3715694bace120719ca467c7f0054bc975d\",\"dweb:/ipfs/QmPBExMV5V9wQ8vC4Yc6K2WwsgvNmot8d7j6oEp3rWr4D3\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.0+commit.26b70077\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"whom\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"src\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"dst\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amt\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/lisheng/Downloads/defi/balancer/erc20-redeemable-master/merkle/contracts/IERC20.sol\":\"IERC20\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/lisheng/Downloads/defi/balancer/erc20-redeemable-master/merkle/contracts/IERC20.sol\":{\"keccak256\":\"0xaeaf34e50f1c59d81752ac832e3992272ae1803e4824a54dbdb3930b02cd4f99\",\"urls\":[\"bzz-raw://2fbbe06278367ba15e69e1c97032c3715694bace120719ca467c7f0054bc975d\",\"dweb:/ipfs/QmPBExMV5V9wQ8vC4Yc6K2WwsgvNmot8d7j6oEp3rWr4D3\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity 0.6.0;\n\ninterface IERC20 {\n  event Approval(address indexed src, address indexed dst, uint amt);\n  event Transfer(address indexed src, address indexed dst, uint amt);\n\n  function totalSupply() external view returns (uint);\n  function balanceOf(address whom) external view returns (uint);\n  function allowance(address src, address dst) external view returns (uint);\n\n  function approve(address dst, uint amt) external returns (bool);\n  function transfer(address dst, uint amt) external returns (bool);\n  function transferFrom(\n    address src, address dst, uint amt\n  ) external returns (bool);\n}\n",
-  "sourcePath": "/data/mining/erc20-redeemable/merkle/contracts/IERC20.sol",
+  "sourcePath": "/Users/lisheng/Downloads/defi/balancer/erc20-redeemable-master/merkle/contracts/IERC20.sol",
   "ast": {
-    "absolutePath": "/data/mining/erc20-redeemable/merkle/contracts/IERC20.sol",
+    "absolutePath": "/Users/lisheng/Downloads/defi/balancer/erc20-redeemable-master/merkle/contracts/IERC20.sol",
     "exportedSymbols": {
-      "IERC20": [68]
+      "IERC20": [
+        68
+      ]
     },
     "id": 69,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 1,
-        "literals": ["solidity", "0.6", ".0"],
+        "literals": [
+          "solidity",
+          "0.6",
+          ".0"
+        ],
         "nodeType": "PragmaDirective",
         "src": "0:22:0"
       },
@@ -214,7 +220,9 @@
         "documentation": null,
         "fullyImplemented": false,
         "id": 68,
-        "linearizedBaseContracts": [68],
+        "linearizedBaseContracts": [
+          68
+        ],
         "name": "IERC20",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -1052,16 +1060,22 @@
     "src": "0:612:0"
   },
   "legacyAST": {
-    "absolutePath": "/data/mining/erc20-redeemable/merkle/contracts/IERC20.sol",
+    "absolutePath": "/Users/lisheng/Downloads/defi/balancer/erc20-redeemable-master/merkle/contracts/IERC20.sol",
     "exportedSymbols": {
-      "IERC20": [68]
+      "IERC20": [
+        68
+      ]
     },
     "id": 69,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 1,
-        "literals": ["solidity", "0.6", ".0"],
+        "literals": [
+          "solidity",
+          "0.6",
+          ".0"
+        ],
         "nodeType": "PragmaDirective",
         "src": "0:22:0"
       },
@@ -1073,7 +1087,9 @@
         "documentation": null,
         "fullyImplemented": false,
         "id": 68,
-        "linearizedBaseContracts": [68],
+        "linearizedBaseContracts": [
+          68
+        ],
         "name": "IERC20",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -1916,7 +1932,7 @@
   },
   "networks": {},
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-08-23T07:02:51.301Z",
+  "updatedAt": "2020-08-27T05:29:43.590Z",
   "devdoc": {
     "methods": {}
   },

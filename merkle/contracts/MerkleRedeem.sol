@@ -9,16 +9,18 @@ contract MerkleRedeem {
     address public tokenAddress;
     address public owner;
 
-    event Claimed(address _claimant,address _token, uint256 _balance);
+    event Claimed(address _claimant, address _token, uint256 _balance);
+    event VerifiedToken(address _token);
 
     // Recorded epochs
     uint256 latestEpoch;
     mapping(uint256 => bytes32) public epochMerkleRoots;
     mapping(uint256 => uint256) public epochTimestamps;
     mapping(uint256 => bytes32) public epochBlockHashes;
-    mapping(uint256 => mapping(address => mapping(address => bool))) public claimed;
+    mapping(uint256 => mapping(address => mapping(address => bool)))
+        public claimed;
 
-    address[] public tokens;
+    address[] public _verifiedTokens;
 
     constructor() public {
         owner = msg.sender;
@@ -50,23 +52,41 @@ contract MerkleRedeem {
         _;
     }
 
-
-
-    function verify(address _token) external onlyOwner requireUnverified(_token) {
+    function verify(address _token)
+        external
+        onlyOwner
+        requireUnverified(_token)
+    {
         ISwapXToken(_token).verify(true);
-        tokens.push(_token);
+        _verifiedTokens.push(_token);
+        emit VerifiedToken(_token);
     }
 
-    function verified(address _token) public returns (bool) {
-        for (uint256 i = 0; i < tokens.length; i++) {
-            if (_token == tokens[i]) {
+    function verified(address _token) public view returns (bool) {
+        for (uint256 i = 0; i < _verifiedTokens.length; i++) {
+            if (_token == _verifiedTokens[i]) {
                 return true;
             }
         }
         return false;
     }
 
-    function issue(address _token ,uint256 amount) external onlyOwner {
+    function verifiedTokens() public view returns (address[] memory) {
+        address[] memory result = new address[](1);
+        if (0 == _verifiedTokens.length) {
+            delete result;
+            return result;
+        }
+        uint256 len = _verifiedTokens.length;
+        address[] memory results = new address[](len);
+        for (uint256 i = 0; i < _verifiedTokens.length; i++) {
+            results[i] = _verifiedTokens[i];
+        }
+
+        return results;
+    }
+
+    function issue(address _token, uint256 amount) external onlyOwner {
         if (amount > 0) {
             ISwapXToken(_token).issue(address(this), amount);
         } else {
@@ -74,10 +94,14 @@ contract MerkleRedeem {
         }
     }
 
-    function disburse(address _liquidityProvider, address _token,uint256 _balance) private {
+    function disburse(
+        address _liquidityProvider,
+        address _token,
+        uint256 _balance
+    ) private {
         if (_balance > 0) {
             IERC20(_token).transfer(_liquidityProvider, _balance);
-            emit Claimed(_liquidityProvider, _token,_balance);
+            emit Claimed(_liquidityProvider, _token, _balance);
         } else {
             revert("No balance would be transfered - not gonna waste your gas");
         }
@@ -97,12 +121,12 @@ contract MerkleRedeem {
     }
 
     function claimEpoch(
+        address _liquidityProvider,
         uint256 _epoch,
         address _token,
         uint256 _claimedBalance,
         bytes32[] memory _merkleProof
     ) public requireEpochInPast(_epoch) requireEpochRecorded(_epoch) {
-        address _liquidityProvider = msg.sender;
         // if trying to claim for the current epoch
         if (_epoch == latestEpoch) {
             require(
@@ -124,7 +148,7 @@ contract MerkleRedeem {
         );
 
         claimed[_epoch][_liquidityProvider][_token] = true;
-        disburse(_liquidityProvider, _token,_claimedBalance);
+        disburse(_liquidityProvider, _token, _claimedBalance);
     }
 
     struct Claim {
@@ -134,12 +158,11 @@ contract MerkleRedeem {
         bytes32[] merkleProof;
     }
 
-    mapping(address => uint256) tokenTotalBalances;  //temp mapping
-  
-    function claimEpochs(Claim[] memory claims)
+    mapping(address => uint256) tokenTotalBalances; //temp mapping
+
+    function claimEpochs(address _liquidityProvider, Claim[] memory claims)
         public
     {
-        address _liquidityProvider = msg.sender;
         Claim memory claim;
         address[] memory _tokens;
         for (uint256 i = 0; i < claims.length; i++) {
@@ -172,7 +195,7 @@ contract MerkleRedeem {
             );
 
             if (tokenTotalBalances[claim.token] == uint256(0)) {
-                _tokens[_tokens.length]=claim.token;
+                _tokens[_tokens.length] = claim.token;
             }
 
             tokenTotalBalances[claim.token] += claim.balance;
@@ -227,7 +250,7 @@ contract MerkleRedeem {
         bytes32[] memory _merkleProof
     ) public view returns (bool valid) {
         bytes32 leaf = keccak256(
-            abi.encodePacked(_liquidityProvider, _token,_claimedBalance)
+            abi.encodePacked(_liquidityProvider, _token, _claimedBalance)
         );
         return MerkleProof.verify(_merkleProof, epochMerkleRoots[_epoch], leaf);
     }
