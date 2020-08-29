@@ -42,8 +42,10 @@ function miningCycle(cycle) {
         yield block_db.creatCycleReward(curr_cycle.cycle);
 
         console.log('---- finished! ----');
+
+        // #5 ---- 数据检查
+        yield block_db.checkCycleData();
     });
 }
 
 miningCycle(snapshot_list.length-1);
-

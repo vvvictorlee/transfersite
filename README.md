@@ -1,5 +1,7 @@
 # Mining Scripts V2
 
+> v1.1
+
 
 
 ## 0. 配置
@@ -72,7 +74,18 @@ miningCycle(cycle_index); // cycle_index是奖励周期的索引号，从0开始
 
 ## 4. 验证奖励周期的挖矿结果
 
-// TODO
+```
+node check_data.js
+```
+
+
+
+验证奖励结果可以在 `check_data.js` 中执行以下函数（该检查已包含在 `machining_data.js` 中）：
+
+```
+block_db.checkCycleData();
+```
+
 基本规则：
 1、每个币种的总奖励 <= 总发行量（570万）
 2、每个币种的本周期奖励 <= 本周期最大奖励（19.2万）

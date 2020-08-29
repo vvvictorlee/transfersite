@@ -24,6 +24,7 @@ module.exports = {
     miningToken,
     creatCycleReward,
     getCycleRewardReport,
+    checkCycleData
 };
 
 //实现本地链接
@@ -183,6 +184,8 @@ async function getUncheckAddr() {
 }
 // 更新地址类型列表
 async function updateAddrTypeList(list) {
+    if (list.length==0) return;
+
     let sql = "INSERT INTO addr_type (addr, type) VALUES ? ON DUPLICATE KEY UPDATE type=VALUES(type)";
 
     await conn.query(sql, [list]);
@@ -361,10 +364,30 @@ async function getCycleRewardReport(cycle) {
 
  */
 // 更新地址类型
-async function updateCycleType() {
-    let sql = "UPDATE cycle_reward c LEFT JOIN addr_type a ON a.addr=c.addr SET c.type=a.type";
+async function checkCycleData() {
+    var sql_list = [];
 
-    await conn.query(sql, null);
+    // 1、每个币种的总奖励 <= 总发行量（570万）
+    sql_list[0] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY+' assert FROM cycle_reward GROUP BY token';
+
+    // 2、每个币种的本周期奖励 <= 本周期最大奖励（19.2万）
+    sql_list[1] = 'SELECT cycle,token,SUM(amount)>('+global.MAX_SUPPLY+'/30) assert FROM cycle_reward GROUP BY cycle,token';
+
+    // 3、每个币种的总领取数量 <= 当前总发行量
+    sql_list[2] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY+' assert FROM block_chain_claim GROUP BY token';
+
+    for (let i=0; i<sql_list.length; i++) {
+        let sql = 'SELECT SUM(assert) assert FROM ( '+sql_list[i]+') t';
+        let rows = await conn.query(sql, null);
+        let assert = (rows[0].assert<=0);
+        console.log('checkCycleData : check ', i+1, assert);
+
+        if (!assert) {
+            sql = 'SELECT * FROM ( '+sql_list[i]+') t WHERE t.assert>0';
+            rows = await conn.query(sql);
+            console.log('checkCycleData : fail', rows.length,'\n', sql_list[i],'\n',rows);
+        }
+    }
 }
 
 
