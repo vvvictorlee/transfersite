@@ -34,12 +34,20 @@ function miningCycle(cycle) {
         // 更新待领取数量
         yield block_db.updateUnclaimed(curr_cycle.snapshot);
 
+        // TODO 删除挖矿表中的 REDEEM领取合约，防止持有Pair Token 重复计算？【需要根据真实数据测试影响】
+
         // 开始挖矿
         yield block_db.miningToken(curr_cycle.snapshot, global.BLOCK_AWARDS, global.MAX_SUPPLY);
 
         // #4 ---- 计算周期奖励
-        // 同时更新地址类型
+        // 计算周期奖励，同时更新地址类型
         yield block_db.creatCycleReward(curr_cycle.cycle);
+
+        // TODO 合约未领取的数据要如何处理？
+        //  【是否回到待分配池中（释放mining_data的数量）？
+        //  还是本次合约不计算合约的持有奖励，给社区（每区块先释放，然后分给社区）？
+        //  处理方式不同】
+
 
         console.log('---- finished! ----');
 
