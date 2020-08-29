@@ -31,10 +31,14 @@ function miningCycle() {
         // 初始化挖矿数据
         yield block_db.initMiningData(syncBlock);
 
-        // TODO 更新待领取数量
+        // 更新待领取数量
+        yield block_db.updateUnclaimed(curr_cycle.snapshot);
 
         // 开始挖矿
         yield block_db.miningToken(curr_cycle.snapshot, global.BLOCK_AWARDS, global.MAX_SUPPLY);
+
+        // #4 ---- 计算周期奖励
+        yield block_db.creatCycleReward(curr_cycle.cycle);
     });
 }
 

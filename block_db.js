@@ -7,15 +7,19 @@ require('./conf/const');
 
 module.exports = {
     addTokenList,
+    updateVerifiedToken,
     addBlockDataList,
     addPoolBlockData,
+    addClaimBlockDataList,
     getAllTokens,
     addSnapshotBlock,
     addAllTokenSupply,
     updatPoolUSDT,
     updatVerified,
     initMiningData,
-    miningToken
+    updateUnclaimed,
+    miningToken,
+    creatCycleReward
 };
 
 //实现本地链接
@@ -34,9 +38,24 @@ async function addTokenList(dataList) {
     });
 }
 
+// 更新币种认证状态
+async function updateVerifiedToken(dataList) {
+    if (dataList.length==0) return;
+
+    let sql = "UPDATE token_list SET verified=1,vBlock=? WHERE pToken=? AND verified=0";
+
+    await co(function*() {
+        for (let i = 0;i<dataList.length;i++) {
+            let info = dataList[i];
+            let rows = yield conn.query(sql, [info[0],info[1]]);
+        }
+        console.log("updateVerifiedToken : ", dataList.length);
+    });
+}
+
 async function getAllTokens(callback) {
     let sql = "SELECT sToken,pToken FROM token_list";
-    await conn.query(sql, null).then(function (rows) {
+    let rows = await conn.query(sql, null).then(function (rows) {
         let list = [];
         for (var i = 0; i < rows.length; i++) {
             list.push(rows[i].sToken);
@@ -63,6 +82,15 @@ async function addPoolBlockData(dataList) {
 
     await conn.query(sql, [dataList]).then(function (rows) {
         console.log("addPoolBlockData :", dataList.length, rows.message);
+    });
+}
+async function addClaimBlockDataList(dataList) {
+    if (dataList.length==0) return;
+
+    let sql = "INSERT IGNORE INTO block_chain_claim(block,txnHash,addr,token,amount,eventName) VALUES ? ";
+
+    await conn.query(sql, [dataList]).then(function (rows) {
+        console.log("addClaimBlockDataList :", dataList.length, rows.message);
     });
 }
 
@@ -149,6 +177,33 @@ async function initMiningData(block) {
         console.log("initMiningData 2: syncBlock=", block, rows.message);
     });
 }
+// 更新待领取数量
+/*
+UPDATE mining_data m LEFT JOIN (
+SELECT addr,token,SUM(amount) unclaimed FROM (
+SELECT addr,p_token token,SUM(p_awards) amount FROM mining_data WHERE block<8573463 GROUP BY addr,p_token
+UNION ALL
+SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<8573463 GROUP BY addr,token
+) x GROUP BY addr,token
+) t ON m.addr=t.addr AND m.p_token=t.token
+SET m.p_unclaimed=t.unclaimed
+WHERE m.block=8573463 AND t.unclaimed IS NOT NULL
+*/
+async function updateUnclaimed(block_list) {
+    let sql = "UPDATE mining_data m LEFT JOIN ( SELECT addr,token,SUM(amount) unclaimed FROM ( " +
+        "SELECT addr,p_token token,SUM(p_awards) amount FROM mining_data WHERE block<? GROUP BY addr,p_token UNION ALL " +
+        "SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<? GROUP BY addr,token ) x GROUP BY addr,token " +
+        ") t ON m.addr=t.addr AND m.p_token=t.token SET m.p_unclaimed=t.unclaimed WHERE m.block=? AND t.unclaimed IS NOT NULL";
+
+    await co(function*() {
+        for (let i = 0;i<block_list.length;i++) {
+            let block = block_list[i];
+            console.log("updateUnclaimed : block=", block, sql);
+            let rows = yield conn.query(sql, [block, block, block]);
+            console.log("updateUnclaimed : block=", block, rows.message);
+        }
+    });
+}
 
 /* --== mining Pair Token ==--
 SELECT cycle,m.block,addr,p_token,p_awards,IF(supply IS NULL, 0, FLOOR(s_balance/supply*IF(curr_award IS NULL, 2000, curr_award)*0.85)) aa, curr_award FROM
@@ -217,4 +272,26 @@ async function miningToken(block_list, awards, max_supply) {
         }
     });
 }
+// 创建周期奖励
+async function creatCycleReward(cycle) {
+    let sql_clean = "DELETE FROM cycle_reward WHERE cycle=?";
+    let sql_pToken = "INSERT INTO cycle_reward (cycle,addr,token,amount) " +
+        "SELECT cycle,addr,p_token,SUM(p_awards) FROM mining_data m WHERE cycle=? AND p_awards>0 GROUP BY cycle,addr,p_token";
+    let sql_swp = "INSERT INTO cycle_reward (cycle,addr,token,amount) " +
+        "SELECT cycle,addr,?,SUM(swp_awards) FROM mining_data m WHERE cycle=? AND swp_awards>0 GROUP BY cycle,addr";
+
+    await co(function*() {
+        // 清空本周期数据
+        let rows = yield conn.query(sql_clean, [cycle]);
+
+        // 计算PairToken奖励
+        rows = yield conn.query(sql_pToken, [cycle]);
+        console.log("creatCycleReward  PT: cycle=", cycle, rows.message);
+
+        // 计算SWP奖励
+        rows = yield conn.query(sql_swp, [global.CONTRACT_SWP, cycle]);
+        console.log("creatCycleReward SWP: cycle=", cycle, rows.message);
+    });
+}
+
 
