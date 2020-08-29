@@ -12,7 +12,6 @@ function miningCycle() {
     // #0 ---- 获取当前快照
     var curr_cycle = snapshot_list[snapshot_list.length-1];
     var syncBlock = curr_cycle.start;
-    syncBlock = 0;
 
     co(function*() {
         // #1 ---- 生成每个快照块，各个地址的持币情况

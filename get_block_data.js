@@ -11,6 +11,9 @@ web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 var factory_abi= util.loadJson('abi/Factory.json');
 var factory = new web3.eth.Contract(factory_abi, global.CONTRACT_FACTORY);
 
+vvar redeem_abi= util.loadJson('abi/MerkleRedeem.json');
+var redeem = new web3.eth.Contract(redeem_abi, global.CONTRACT_REDEEM);
+
 var stoken_abi= util.loadJson('abi/SToken.json');
 var erc20_abi= util.loadJson('abi/ERC20.json');
 
@@ -102,7 +105,7 @@ function getAllPoolReserve(syncBlock, token_list) {
 // ================
 
 // #1 ---- 获取所有Token
-// getAllTokenList();
+getAllTokenList();
 
 // TODO 设置Token认证状态
 // 获取认证的Pair Token列表
@@ -119,6 +122,6 @@ var token_list= util.loadJson(file_tokens);
 // getAllPoolReserve(conf.lastBlocker, token_list);
 
 
-// 4# ---- 获取 挖矿合约中 的所有交易
+// 4# TODO ---- 获取 挖矿合约中 的所有交易
 
 

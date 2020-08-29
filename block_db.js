@@ -25,6 +25,8 @@ var conn = wrapper(pool);
 // ----- Block Chain -----
 // Add Token List
 async function addTokenList(dataList) {
+    if (dataList.length==0) return;
+
     let sql = "INSERT IGNORE INTO token_list(block,sToken,pToken,token0,token1) VALUES ? ";
 
     await conn.query(sql, [dataList]).then(function (rows) {
