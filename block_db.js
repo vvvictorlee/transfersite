@@ -19,7 +19,8 @@ module.exports = {
     initMiningData,
     updateUnclaimed,
     miningToken,
-    creatCycleReward
+    creatCycleReward,
+    getCycleRewardReport,
 };
 
 //实现本地链接
@@ -293,5 +294,36 @@ async function creatCycleReward(cycle) {
         console.log("creatCycleReward SWP: cycle=", cycle, rows.message);
     });
 }
+
+// 获取奖励周期列表
+async function getCycleRewardReport(cycle) {
+    // 获取奖励周期每个币种的发行量，注意数量转为字符串：CONCAT
+    let sql_total = "SELECT token,CONCAT(SUM(amount)) total FROM cycle_reward WHERE cycle=? AND flag=0 GROUP BY token ORDER BY token";
+    // 获取奖励周期账户列表，注意使用相同的排序
+    let sql_detail = "SELECT token,addr,CONCAT(amount) amount FROM cycle_reward WHERE cycle=? AND flag=0 ORDER BY token,amount";
+
+    var tokens = await conn.query(sql_total, [cycle]);
+    var rows = await conn.query(sql_detail, [cycle]);
+
+    var token_list = [];
+    var n=0;
+    for (let i=0; i<tokens.length; i++) {
+        var ti = {
+            token: tokens[i].token,
+            total: tokens[i].total.toString(),
+            addrs: {}
+        };
+        while (n<rows.length && rows[n].token==ti.token) {
+            ti.addrs[rows[n].addr] = rows[n].amount.toString();
+            n++;
+        }
+        token_list.push(ti);
+    }
+    console.log('getCycleRewardReport :', rows.length);
+
+    return token_list;
+}
+
+
 
 

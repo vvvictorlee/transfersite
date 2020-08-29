@@ -11,11 +11,26 @@
  Target Server Version : 50610
  File Encoding         : 65001
 
- Date: 28/08/2020 19:32:28
+ Date: 29/08/2020 20:21:50
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for block_chain_claim
+-- ----------------------------
+DROP TABLE IF EXISTS `block_chain_claim`;
+CREATE TABLE `block_chain_claim` (
+  `block` int(11) NOT NULL,
+  `txnHash` varchar(70) COLLATE utf8_bin NOT NULL,
+  `addr` varchar(50) COLLATE utf8_bin NOT NULL,
+  `token` varchar(50) COLLATE utf8_bin NOT NULL,
+  `amount` decimal(50,0) NOT NULL,
+  `eventName` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`txnHash`,`addr`,`token`) USING BTREE,
+  KEY `idxBlock` (`block`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='流动池快照';
 
 -- ----------------------------
 -- Table structure for block_chain_data
@@ -49,6 +64,19 @@ CREATE TABLE `block_chain_pool` (
   PRIMARY KEY (`txnHash`,`token`) USING BTREE,
   KEY `idxBlock` (`block`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='流动池快照';
+
+-- ----------------------------
+-- Table structure for cycle_reward
+-- ----------------------------
+DROP TABLE IF EXISTS `cycle_reward`;
+CREATE TABLE `cycle_reward` (
+  `cycle` int(10) NOT NULL,
+  `addr` varchar(50) COLLATE utf8_bin NOT NULL,
+  `token` varchar(50) COLLATE utf8_bin NOT NULL,
+  `amount` decimal(50,0) NOT NULL DEFAULT '0',
+  `flag` int(1) NOT NULL DEFAULT '0' COMMENT '0-reward,1-claim',
+  PRIMARY KEY (`cycle`,`addr`,`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Table structure for mining_data

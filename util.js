@@ -2,7 +2,8 @@ var fs = require('fs');
 
 module.exports = {
     loadJson,
-    writeFile
+    writeFile,
+    checkPath
 };
 
 function loadJson(fileName){
@@ -13,4 +14,10 @@ function writeFile(fileName, json) {
     fs.writeFile(fileName, JSON.stringify(json), function (error) {
         if (error) console.log(error);
     });
+}
+// 检查并创建路径
+function checkPath(path) {
+    if (!fs.existsSync(path)) {
+        fs.mkdirSync(path);
+    }
 }

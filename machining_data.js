@@ -8,9 +8,9 @@ var snapshot_filename = 'data/snapshot.json';
 var snapshot_list = util.loadJson(snapshot_filename);
 
 // -------------------------------------
-function miningCycle() {
+function miningCycle(cycle) {
     // #0 ---- 获取当前快照
-    var curr_cycle = snapshot_list[snapshot_list.length-1];
+    var curr_cycle = snapshot_list[cycle];
     var syncBlock = curr_cycle.start;
 
     co(function*() {
@@ -39,9 +39,12 @@ function miningCycle() {
 
         // #4 ---- 计算周期奖励
         yield block_db.creatCycleReward(curr_cycle.cycle);
+
+        // TODO #5 ---- 检查并屏蔽合约地址
+
+        // TODO #6 ---- 结果检查
     });
 }
 
-miningCycle();
-
+miningCycle(snapshot_list.length-1);
 
