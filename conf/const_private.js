@@ -15,8 +15,8 @@ global.MAX_SUPPLY = '5760000000000000000000000'; // *1000000000000000000
 global.ADDRESS_COMMUNITY = "0xAdmin";
 
 global.db_config = {
-    host: 'localhost',
+    host: '127.0.0.1',
     user: 'root',
-    password: 'p@ssw0rd',
+    password: '1qazxsw2',
     database: 'eth_data'
 };

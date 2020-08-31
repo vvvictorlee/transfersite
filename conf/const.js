@@ -16,6 +16,6 @@ global.ADDRESS_COMMUNITY = "0xAdmin";   // 社区收款账户，用于获取挖�
 global.db_config = {
     host: 'localhost',
     user: 'root',
-    password: 'p@ssw0rd',
+    password: '1qazxsw2',
     database: 'eth_data'
 };

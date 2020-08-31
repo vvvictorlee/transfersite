@@ -24,6 +24,7 @@ module.exports = {
     miningToken,
     creatCycleReward,
     getCycleRewardReport,
+    getRewardListByAddress,
 };
 
 //实现本地链接
@@ -99,7 +100,7 @@ async function addClaimBlockDataList(dataList) {
 }
 
 // ----- Snapshot -----
-// 生成某个奖励周期的快照持币地址情况
+// 生成某个奖励周期的快照持币地址情况  ???
 async function addSnapshotBlock(cycle, block_list) {
     let sql = "INSERT INTO snapshot_block (cycle, block, addr, token, balance) SELECT ?, ?, Addr,token,sum(amount) balance2 FROM ( " +
         "(SELECT toAddr Addr, token,sum(amount) amount FROM block_chain_data WHERE block<=? GROUP BY toAddr,token) UNION ALL " +
@@ -116,7 +117,7 @@ async function addSnapshotBlock(cycle, block_list) {
     });
 }
 
-// 更新每个区块的发行量
+// 更新每个区块的发行量  
 async function addAllTokenSupply(startBlock) {
     let sql = "INSERT INTO token_supply (block, token, supply) " +
         "SELECT block, token, sum(balance) FROM snapshot_block WHERE block>=? GROUP BY cycle, block, token " +
@@ -350,6 +351,27 @@ async function getCycleRewardReport(cycle) {
         token_list.push(ti);
     }
     console.log('getCycleRewardReport :', rows.length);
+
+    return token_list;
+}
+
+
+
+// 获取指定账户地址奖励列表
+async function getRewardListByAddress(address) {
+    // 获取奖励周期每个币种的发行量，注意数量转为字符串：CONCAT
+    let sql_total = "SELECT token,CONCAT(SUM(amount)) total FROM cycle_reward WHERE addr=? AND flag=0 GROUP BY token ORDER BY token";
+
+    let tokens = await conn.query(sql_total, [address]);
+
+    let token_list = [];
+    for (let i=0; i<tokens.length; i++) {
+        let ti = { };
+         ti[tokens[i].token]= tokens[i].total.toString();
+       
+        token_list.push(ti);
+    }
+    console.log('getRewardListByAddress', token_list.length);
 
     return token_list;
 }
