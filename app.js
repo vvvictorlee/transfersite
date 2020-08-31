@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var block_db = require('./block_db');
+let claim_by_address = require("./claim_by_address");
 var app = express();
 
 app.use(bodyParser.json());
@@ -21,12 +22,17 @@ app.post('/', function (req, res) {
 
     }
     else if (req.body.method == "claim_all_rewards") {
-
+            
+        (async function () {
+            claim_by_address.claim_all(req.body.address);
+            res.json({"result":"success"});
+        })();
     }
 
 });
 
-app.listen(3004, function () {
-    console.log('mining redeem claim app listening on port 3000!');
+const PORT = 3005;
+app.listen(PORT, function () {
+    console.log('mining redeem claim app listening on port ',PORT);
 });
 

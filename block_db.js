@@ -25,6 +25,7 @@ module.exports = {
     creatCycleReward,
     getCycleRewardReport,
     getRewardListByAddress,
+    getCycleRewardsByAddress,
 };
 
 //实现本地链接
@@ -376,6 +377,27 @@ async function getRewardListByAddress(address) {
     return token_list;
 }
 
+
+// 获取奖励周期列表
+async function getCycleRewardsByAddress(address) {
+    let sql_detail = "SELECT cycle,token,CONCAT(addr) amount FROM cycle_reward WHERE addr=? AND flag=0 ORDER BY cycle,token";
+
+    var rows = await conn.query(sql_detail, [address]);
+
+    var token_list = [];
+    var n=0;
+    for (let i=0; i<rows.length; i++) {
+        var ti = {
+            cycle:rows[i].cycle,
+            token: rows[i].token,
+            balance: rows[i].amount.toString(),
+        };
+        token_list.push(ti);
+    }
+    console.log('getCycleRewardsByAddress :', rows.length);
+
+    return token_list;
+}
 
 
 
