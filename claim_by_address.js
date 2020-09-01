@@ -33,4 +33,3 @@ async function claim_all(addr) {
 module.exports = {
     claim_all,
 };
-};
