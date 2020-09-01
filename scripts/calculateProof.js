@@ -4,8 +4,6 @@
 const { MerkleTree } = require("../lib/merkleTree");
 const fs = require("fs");
 const { loadTrees } = require("./loadTrees");
-const admin = "";
-const REDEEM = "";
 module.exports = function (callback) {
     console.log("File Path Arg (must be absolute):", process.argv[4]);
 
@@ -42,7 +40,7 @@ module.exports = function (callback) {
     );
 };
 
-const calculateProofAndClaimEpoches = async (utils,address, balances) => {
+const calculateProofAndClaimEpoches = async (utils,admin,contract,address, balances) => {
 
     let list = [];
 

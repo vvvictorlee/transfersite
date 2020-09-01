@@ -123,7 +123,25 @@ SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND flag=0
 每个文件中是本币种获得奖励的地址和具体金额
 
 
+# 6 领取收益接口
 
-curl --url http://127.0.0.1:3004/  -H "Content-Type: application/json"  -d '{"method":"get_reward_list","address":"0xe1416eac451f41420a1d4575bb33bce3a1b3e941"}'
+## 获取指定账户收益列表
 
-curl --url http://127.0.0.1:3004/  -H "Content-Type: application/json"  -d '{"method":"claim_all_rewards","address":"0xe1416eac451f41420a1d4575bb33bce3a1b3e941"}'
+```
+curl --url http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{"method":"get_reward_list","address":"0xe1416eac451f41420a1d4575bb33bce3a1b3e941"}'
+```
+返回应答
+```
+[{"AETH":"1"},{"BETH":"2"},{"CETH":"3"},{"DETH":"4"}]  
+```
+
+## 提交领取收益
+
+```
+curl --url  http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{"method":"claim_all_rewards","address":"0xe1416eac451f41420a1d4575bb33bce3a1b3e941"}'
+```
+
+返回应答
+```
+{"result":"success"}
+```
