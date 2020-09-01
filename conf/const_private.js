@@ -16,7 +16,7 @@ global.ADDRESS_COMMUNITY = "0xAdmin";
 
 global.db_config = {
     host: 'localhost',
-    user: 'root',
+    user: 'swapxminer',
     password: 'p@ssw0rd',
     database: 'eth_data'
 };
