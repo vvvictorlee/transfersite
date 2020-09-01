@@ -17,8 +17,8 @@ module.exports = {
     getAllTokens,
     addSnapshotBlock,
     addAllTokenSupply,
-    updatPoolUSDT,
-    updatVerified,
+    updatePoolUSDT,
+    updateVerified,
     initMiningData,
     updateUnclaimed,
     miningToken,
@@ -130,7 +130,7 @@ async function addAllTokenSupply(startBlock) {
 }
 
 // 更新每个区块的USDT存量
-async function updatPoolUSDT(block_list, usdt_addr) {
+async function updatePoolUSDT(block_list, usdt_addr) {
     let sql = "INSERT INTO token_supply (block, token, pool_usdt) " +
         "SELECT ?, t.pToken, IF(t.token0=?, p.reserve0, IF(t.token1=?, p.reserve1, 0)) usdt FROM " +
         "(SELECT token, max(block) block FROM block_chain_pool WHERE block<=? GROUP BY token) m " +
@@ -143,7 +143,7 @@ async function updatPoolUSDT(block_list, usdt_addr) {
             let block = block_list[i];
             // 计算每个块的pToken奖励
             let rows = yield conn.query(sql, [block, usdt_addr, usdt_addr, block]);
-            console.log("updatPoolUSDT : block=", block, rows.message);
+            console.log("updatePoolUSDT : block=", block, rows.message);
         }
     });
 }
@@ -155,12 +155,12 @@ LEFT JOIN (SELECT pToken,verified,vBlock FROM token_list WHERE verified=1) t ON 
 SET s.verified=t.verified
 WHERE s.block>=t.vBlock
  */
-async function updatVerified(startBlock) {
+async function updateVerified(startBlock) {
     let sql = "UPDATE token_supply s LEFT JOIN (SELECT pToken,verified,vBlock FROM token_list WHERE verified=1) t ON s.token = t.pToken\n" +
         "SET s.verified=t.verified WHERE s.block>=t.vBlock";
 
     await conn.query(sql, null).then(function (rows) {
-        console.log("updatVerified :", rows.message);
+        console.log("updateVerified :", rows.message);
     });
 }
 
@@ -366,9 +366,13 @@ async function getRewardListByAddress(address) {
     let tokens = await conn.query(sql_total, [address]);
 
     let token_list = [];
+    const token_symbol = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
     for (let i=0; i<tokens.length; i++) {
-        let ti = { };
-         ti[tokens[i].token]= tokens[i].total.toString();
+            let ti = {
+            name:token_symbol[tokens[i].token],
+            address: tokens[i].token,
+            value: tokens[i].total.toString(),
+        };
        
         token_list.push(ti);
     }
@@ -389,8 +393,8 @@ async function getCycleRewardsByAddress(address) {
     for (let i=0; i<rows.length; i++) {
         var ti = {
             cycle:rows[i].cycle,
-            token: rows[i].token,
-            balance: rows[i].amount.toString(),
+            token:rows[i].token,
+            balance:rows[i].amount.toString(),
         };
         token_list.push(ti);
     }

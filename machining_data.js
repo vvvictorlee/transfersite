@@ -22,10 +22,10 @@ function miningCycle(cycle) {
         yield block_db.addAllTokenSupply(syncBlock);
 
         // 更新每个流动池的USDT数量（需要记录到pToken下）
-        yield block_db.updatPoolUSDT(curr_cycle.snapshot, global.CONTRACT_USDT);
+        yield block_db.updatePoolUSDT(curr_cycle.snapshot, global.CONTRACT_USDT);
 
         // 更新认证状态（需要记录到pToken下）
-        yield block_db.updatVerified();
+        yield block_db.updateVerified();
 
         // #3 ---- 计算挖矿
         // 初始化挖矿数据

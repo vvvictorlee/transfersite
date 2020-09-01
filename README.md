@@ -130,7 +130,7 @@ SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND flag=0
 - method  方法名称 get_reward_list
 - address 提供流动性的账户地址
 ```
-curl --url http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{"method":"get_reward_list","address":"0xe1416eac451f41420a1d4575bb33bce3a1b3e941"}'
+curl --url http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{"method":"get_reward_list","address":"0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"}'
 ```
 返回应答
 ```
@@ -142,7 +142,7 @@ curl --url http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d 
 - method  方法名称 claim_all_rewards
 - address 提供流动性的账户地址
 ```
-curl --url  http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{"method":"claim_all_rewards","address":"0xe1416eac451f41420a1d4575bb33bce3a1b3e941"}'
+curl --url  http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{"method":"claim_all_rewards","address":"0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"}'
 ```
 
 返回应答

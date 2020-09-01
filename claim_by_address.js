@@ -22,13 +22,27 @@ var erc20_abi = util.loadJson('abi/ERC20.json');
 var file_tokens = './data/token_list.json';
 var file_conf = './data/conf.json';
 
+var symbol_tokens = './data/token_symbols.json';
+var symbol_conf = './data/conf.json';
+
+
 
 const admin = "0x9842495d6bAB5Cb632777Ff25B5b4c1e1d595f24";
 
 async function claim_all(addr) {
-   let balances =  await block_db.getCycleRewardsByAddress(addr);
-    await calculateProofAndClaimEpoches(web3,redeem,addr,balances);
+    let balances = await block_db.getCycleRewardsByAddress(addr);
+    await calculateProofAndClaimEpoches(web3, redeem, addr, balances);
 }
+
+// async function get_token_symbol() {
+//     var token_list = util.loadJson(file_tokens);
+
+//     let token2symbol = {};
+//     let erc20 = new web3.eth.Contract(erc20_abi, token);
+//     let symbol = await erc20.methods.symbol().call();
+
+
+// }
 
 module.exports = {
     claim_all,

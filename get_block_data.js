@@ -144,7 +144,7 @@ async function getAddrType(addr) {
     }
 }
 // 获取所有的地址，并判断类型
-async function chaeckAllAddr() {
+async function checkAllAddr() {
     // 获取所有的地址，并入库
     await block_db.addAllAddr();
 
@@ -207,5 +207,5 @@ function getBlockData() {
     // var a = await getAddrType('0x9842495d6bab5cb632777ff25b5b4c1e1d595f24');
     // console.log(a);
 
-    chaeckAllAddr();
+    checkAllAddr();
 })();

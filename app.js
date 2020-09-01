@@ -22,17 +22,20 @@ app.post('/', function (req, res) {
 
     }
     else if (req.body.method == "claim_all_rewards") {
-            
+
         (async function () {
             claim_by_address.claim_all(req.body.address);
-            res.json({"result":"success"});
+            res.json({ "result": "success" });
         })();
+    }
+    else {
+        res.json({ "result": "unknown method or method is empty" });
     }
 
 });
 
 const PORT = 3536;
 app.listen(PORT, function () {
-    console.log('mining redeem claim app listening on port ',PORT);
+    console.log('mining redeem claim app listening on port ', PORT);
 });
 
