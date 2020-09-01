@@ -4,6 +4,7 @@
 const { MerkleTree } = require("../lib/merkleTree");
 const fs = require("fs");
 const { loadTrees } = require("./loadTrees");
+const { try } = require("bluebird");
 module.exports = function (callback) {
     console.log("File Path Arg (must be absolute):", process.argv[4]);
 
@@ -40,7 +41,7 @@ module.exports = function (callback) {
     );
 };
 
-const calculateProofAndClaimEpoches = async (utils,admin,contract,address, balances) => {
+const calculateProofAndClaimEpoches = async (utils, admin, contract, address, balances) => {
 
     let list = [];
 
@@ -54,11 +55,19 @@ const calculateProofAndClaimEpoches = async (utils,admin,contract,address, balan
         const proof = merkleTree.getHexProof(elements[0]);
         list.push([token.cycle, token.token, balance, proof]);
     });
+    // try {
+    //     await contract.methods.claimEpochs(
+    //         address,
+    //         list
+    //     ).send({ from: admin });
+    // } catch (error) {
+    // }
 
-    await contract.methods.claimEpochs(
+    return await contract.methods.claimEpochs(
         address,
         list
-    ).send({ from: admin });
+    ).encodeABI()
+    // myContract.methods.myMethod([param1[, param2[, ...]]]).encodeABI()
 
 }
 

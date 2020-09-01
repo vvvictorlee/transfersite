@@ -359,17 +359,17 @@ async function getCycleRewardReport(cycle) {
 
 
 // 获取指定账户地址奖励列表
-async function getRewardListByAddress(address) {
+async function getRewardListByAddress(address,token_symbols) {
     // 获取奖励周期每个币种的发行量，注意数量转为字符串：CONCAT
     let sql_total = "SELECT token,CONCAT(SUM(amount)) total FROM cycle_reward WHERE addr=? AND flag=0 GROUP BY token ORDER BY token";
 
     let tokens = await conn.query(sql_total, [address]);
 
     let token_list = [];
-    const token_symbol = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
+    // const token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
     for (let i=0; i<tokens.length; i++) {
             let ti = {
-            name:token_symbol[tokens[i].token],
+            name:token_symbols[tokens[i].token],
             address: tokens[i].token,
             value: tokens[i].total.toString(),
         };

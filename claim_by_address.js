@@ -5,6 +5,7 @@ var block_db = require('./block_db');
 // require('./conf/const');
 require('./conf/const_private');
 const { calculateProofAndClaimEpoches } = require("./scripts/calculateProof");
+const { fstat } = require("fs");
 
 var web3 = new Web3();
 web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
@@ -22,7 +23,7 @@ var erc20_abi = util.loadJson('abi/ERC20.json');
 var file_tokens = './data/token_list.json';
 var file_conf = './data/conf.json';
 
-var symbol_tokens = './data/token_symbols.json';
+var token_symols = './data/token_symbols.json';
 var symbol_conf = './data/conf.json';
 
 
@@ -31,19 +32,35 @@ const admin = "0x9842495d6bAB5Cb632777Ff25B5b4c1e1d595f24";
 
 async function claim_all(addr) {
     let balances = await block_db.getCycleRewardsByAddress(addr);
-    await calculateProofAndClaimEpoches(web3, redeem, addr, balances);
+   return  await calculateProofAndClaimEpoches(web3, redeem, addr, balances);
 }
 
-// async function get_token_symbol() {
-//     var token_list = util.loadJson(file_tokens);
+async function get_token_symbol() {
+    let token_list = util.loadJson(file_tokens);
 
-//     let token2symbol = {};
-//     let erc20 = new web3.eth.Contract(erc20_abi, token);
-//     let symbol = await erc20.methods.symbol().call();
+    let token2symbol = {};
+    try {
+        token2symbol = util.loadJson(token_symols);
+    } catch (error) {
 
+    }
 
-// }
+    token_list.pTokens.forEach(token => {
+        if (!token2symbol.hasOwnProperty(token)) {
+            let erc20 = new web3.eth.Contract(erc20_abi, token);
+            let symbol = await erc20.methods.symbol().call();
+            token2symbol[token] = symbol;
+        }
+    });
+
+    // 写入文件
+    util.writeFile(token_symols, token2symbol);
+
+    return token2symbol;
+
+}
 
 module.exports = {
     claim_all,
+    get_token_symbol,
 };

@@ -126,26 +126,65 @@ SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND flag=0
 ## 6 领取收益接口
 
 ### 6.1 获取指定账户收益列表
-#### 参数说明：
+#### 请求
+##### 参数说明：
 - method  方法名称 get_reward_list
 - address 提供流动性的账户地址
+##### 请求示例
 ```
-curl --url http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{"method":"get_reward_list","address":"0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"}'
+curl --url http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{
+	"method": "get_reward_list",
+	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
+}'
 ```
-返回应答
+#### 应答
+##### 数据说明
+- name  代币符号名称
+- address 代币合约地址
+- value   代币领取收益金额
+##### 应答示例
 ```
-[{"AETH":"1"},{"BETH":"2"},{"CETH":"3"},{"DETH":"4"}]  
+[{
+	"name": "BETH",
+	"address": "0x1df382c017c2aae21050d61a5ca8bc918772f419",
+	"value": "2000"
+}, {
+	"name": "CETH",
+	"address": "0x4cf4d866dcc3a615d258d6a84254aca795020a2b",
+	"value": "3000"
+}, {
+	"name": "DETH",
+	"address": "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199",
+	"value": "4000"
+}, {
+	"name": "AETH",
+	"address": "0x71805940991e64222f75cc8a907353f2a60f892e",
+	"value": "1000"
+}]
 ```
 
 ### 6.2 提交领取指定账户收益
-#### 参数说明：
+#### 请求
+##### 参数说明：
 - method  方法名称 claim_all_rewards
 - address 提供流动性的账户地址
+##### 请求示例
 ```
-curl --url  http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{"method":"claim_all_rewards","address":"0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"}'
+curl --url  http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{
+	"method": "claim_all_rewards",
+	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
+}'
 ```
 
-返回应答
+#### 应答
+##### 数据说明
+- result  执行结果 成功success
+- data  合约地址方法调用.编码ABI encodedABI（）获得用于sendTransaction data参数
+##### 应答示例
 ```
-{"result":"success"}
+{
+	"result": "success",
+	"data": "0x58cf5f1000000000000000000000000000000000000000000000000000000000000007B"
+}
+
 ```

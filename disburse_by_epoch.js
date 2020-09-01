@@ -25,7 +25,7 @@ var file_conf = './data/conf.json';
 
 
 const admin = "0x9842495d6bAB5Cb632777Ff25B5b4c1e1d595f24";
-const epoch_reports_path="/Users/lisheng/mygitddesk/mining-scripts-v2/reports/";
+const epoch_reports_path="/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
 const firstStartBlockNum = 1;
 const blocks = 64;
 // utils,admin,contract,path,epochNum, blockNum
