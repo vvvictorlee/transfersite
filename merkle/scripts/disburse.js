@@ -3,7 +3,7 @@
 
 const { MerkleTree } = require("../lib/merkleTree");
 const { utils } = web3;
-const { loadTree } = require("./loadTree");
+const { loadTrees } = require("./loadTrees");
 const fs = require("fs");
 
 module.exports = async function(callback) {
