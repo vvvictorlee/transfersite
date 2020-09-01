@@ -31,7 +31,7 @@ app.post('/', function (req, res) {
 
 });
 
-const PORT = 3005;
+const PORT = 3536;
 app.listen(PORT, function () {
     console.log('mining redeem claim app listening on port ',PORT);
 });
