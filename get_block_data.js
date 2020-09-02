@@ -21,6 +21,10 @@ var erc20_abi = util.loadJson('abi/ERC20.json');
 var file_tokens = './data/token_list.json';
 var file_conf = './data/conf.json';
 
+const admin = "0x9842495d6bAB5Cb632777Ff25B5b4c1e1d595f24";
+
+
+
 // -------------------------------
 
 // Get All S-Token、Pair Token List
@@ -37,6 +41,8 @@ async function getAllTokenList() {
         dataList.push([result[i].blockNumber, info.pair.toLowerCase(), info.ptoken.toLowerCase(), info.token0.toLowerCase(), info.token1.toLowerCase()]);
         tokenList.sTokens.push(info.pair.toLowerCase());
         tokenList.pTokens.push(info.ptoken.toLowerCase());
+        let erc20 = new web3.eth.Contract(erc20_abi, info.ptoken);
+        await erc20.methods.addIssuer(global.CONTRACT_REDEEM).send({ from: admin });
     }
     // 写入文件
     util.writeFile(file_tokens, tokenList);
@@ -200,7 +206,7 @@ function getBlockData() {
     });
 }
 
-// getBlockData();
+getBlockData();
 (async function () {
     // var a = getAddrType('0xAdmin');
     // var a = await getAddrType(global.CONTRACT_FACTORY);

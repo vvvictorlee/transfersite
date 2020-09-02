@@ -1,7 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var block_db = require('./block_db');
-let claim_by_address = require("./claim_by_address");
+let app_handler = require("./app_handler");
 var app = express();
 
 app.use(bodyParser.json());
@@ -14,23 +14,28 @@ app.use(function (req, res, next) {
 
 app.post('/', function (req, res) {
     console.log(JSON.stringify(req.body));
-    if (req.body.method == "get_reward_list") {
-        (async function () {
-            let rewardList = await block_db.getRewardListByAddress(req.body.address,claim_by_address.get_token_symbol());
+
+    let handlers = {
+        "get_reward_list": (async function () {
+            let rewardList = await app_handler.getRewardListByAddress(req.body.address);
             res.json(rewardList);
-        })();
+        }),
+        "claim_all_rewards": (async function () {
+            const data = app_handler.claim_all(req.body.address);
+            res.json({ "result": "success", "data": data });
+        }),
+        "disburse": (async function () {
+            app_handler.disburse_by_epoch(req.body.epoch);
+            res.json({ "result": "success"});
+        }),
+        "default": (async function () {
+            res.json({ "result": "unknown method or method is empty" });
+        })
 
-    }
-    else if (req.body.method == "claim_all_rewards") {
+    };
 
-        (async function () {
-            const data = claim_by_address.claim_all(req.body.address);
-            res.json({ "result": "success","data": data});
-        })();
-    }
-    else {
-        res.json({ "result": "unknown method or method is empty" });
-    }
+    const handler = handlers[req.body.method] || handlers["default"];
+    handler();
 
 });
 

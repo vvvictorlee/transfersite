@@ -33,10 +33,9 @@ module.exports = async function(callback) {
 
 const disburse = async (utils,admin,contract,path,epochNum, blockNum) => {
 
-  const merkleTree = loadTrees(utils, path);
-  const blockNum = process.argv[5];
+  const merkleTree = await loadTrees(utils, admin,contract,path);
 
-  const block = await web3.eth.getBlock(blockNum);
+  const block = await utils.eth.getBlock(blockNum);
   console.log("Block:\t", blockNum, block.hash, block.timestamp);
 
   const root = merkleTree.getHexRoot();
@@ -53,7 +52,6 @@ const disburse = async (utils,admin,contract,path,epochNum, blockNum) => {
       '")'
   );
   console.log('await redeem.seedAllocations(weekNum, "' + root + '")');
-
     await contract.methods.finishEpoch(
         block.timestamp,
         block.hash

@@ -359,7 +359,7 @@ async function getCycleRewardReport(cycle) {
 
 
 // 获取指定账户地址奖励列表
-async function getRewardListByAddress(address,token_symbols) {
+async function getRewardListByAddress(address,token_symbols,web3) {
     // 获取奖励周期每个币种的发行量，注意数量转为字符串：CONCAT
     let sql_total = "SELECT token,CONCAT(SUM(amount)) total FROM cycle_reward WHERE addr=? AND flag=0 GROUP BY token ORDER BY token";
 
@@ -371,7 +371,7 @@ async function getRewardListByAddress(address,token_symbols) {
             let ti = {
             name:token_symbols[tokens[i].token],
             address: tokens[i].token,
-            value: tokens[i].total.toString(),
+            value: web3.utils.fromWei(tokens[i].total.toString()),
         };
        
         token_list.push(ti);
