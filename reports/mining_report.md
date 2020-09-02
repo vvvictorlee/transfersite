@@ -8,18 +8,19 @@
 
 
 
-curl --url  http://127.0.0.1:3536/  -H "Content-Type: application/json"  -d '{
+curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "disburse",
-	"epoch": 2
+	"epoch": 3,
+    "step":0
 }'
 
-curl --url http://127.0.0.1:3536/  -H "Content-Type: application/json"  -d '{
+curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "get_reward_list",
-	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
+	"address": "0xb0b0d02d246dadb22f40133c2fb0fcf738b3337c"
 }'
 
 
-curl --url  http://127.0.0.1:3536/  -H "Content-Type: application/json"  -d '{
+curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "claim_all_rewards",
-	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
+	"address": "0xb0b0d02d246dadb22f40133c2fb0fcf738b3337c"
 }'

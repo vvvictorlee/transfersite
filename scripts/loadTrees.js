@@ -20,12 +20,14 @@ const loadTrees = async (para, filePath) => {
     let balance;
     let nextElements;
 
-    await asyncForEach(jsonFiles,async fileName => {
+    for( const fileName of jsonFiles){
             nextElements = await loadTreem(para, fileName);
-            elements.concat(nextElements);
-    });
+            console.log("====*(*****)==="+nextElements);
+            elements = elements.concat(nextElements);
+            console.log("======="+elements+"*********");
+    }
 
-    console.log(elements);
+    console.log("===loadtrees  elements====="+elements);
 
     return new MerkleTree(elements);
 

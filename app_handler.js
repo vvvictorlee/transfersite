@@ -5,8 +5,8 @@ var util = require('./util');
 var block_db = require('./block_db');
 // require('./conf/const');
 require('./conf/const_private');
-const { calculateProofAndClaimEpoches } = require("./scripts/calculateProof");
-const { disburse } = require("./scripts/disburse");
+const { claimProof } = require("./scripts/calculateProof");
+const disburse = require("./scripts/disburse");
 const { fstat } = require("fs");
 
 var web3 = new Web3();
@@ -25,11 +25,11 @@ var erc20_abi = util.loadJson('abi/ERC20.json');
 var file_tokens = './data/token_list.json';
 var file_conf = './data/conf.json';
 
-var token_symols = './data/token_symbols.json';
+var token_symbols = './data/token_symbols.json';
 var symbol_conf = './data/conf.json';
 
 
-const admin = "0x9842495d6bAB5Cb632777Ff25B5b4c1e1d595f24";
+const admin = "0x0DB1bB1097ac3b7e26B3A4Cf35E2f19E07d24568";
 
 async function getRewardListByAddress(addr) {
     return await block_db.getRewardListByAddress(addr, get_token_symbol(), web3);
@@ -40,7 +40,14 @@ async function claim_all(addr) {
     if (balances.length == 0) {
         return {};
     }
-    return await claimProof(web3, admin, redeem, addr, balances);
+    const para = {
+        web3: web3,
+        admin: admin,
+        contract: redeem,
+        password: "123456",
+    };
+
+    return await claimProof(para, addr, balances);
 }
 
 async function get_token_symbol() {
@@ -48,7 +55,7 @@ async function get_token_symbol() {
 
     let token2symbol = {};
     try {
-        token2symbol = util.loadJson(token_symols);
+        token2symbol = util.loadJson(token_symbols);
     } catch (error) {
 
     }
@@ -62,7 +69,7 @@ async function get_token_symbol() {
     });
 
     // 写入文件
-    util.writeFile(token_symols, token2symbol);
+    util.writeFile(token_symbols, token2symbol);
 
     return token2symbol;
 
@@ -72,14 +79,26 @@ const epoch_reports_path = "/Users/lisheng/mygitddesk/mining-scripts-v2/reports/
 const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 
-async function disburse_by_epoch(epochNum) {
+async function disburse_by_epoch(epochNum, step) {
     if (epochNum <= 0) {
         return "epoch must be larger than 0";
     }
     const epoch_path = epoch_reports_path + epochNum;
     blockNum = firstStartBlockNum + (epochNum - 1) * blocks;
-    const para = {};
-    await disburse(web3, admin, redeem, epoch_path, epochNum, blockNum);
+    const para = {
+        web3: web3,
+        admin: admin,
+        contract: redeem,
+        password: "123456",
+    };
+
+    // await disburse(para, epoch_path, epochNum, blockNum);
+    if (0 == step||0) {
+        await disburse.finishEpoch(para, epoch_path, epochNum, blockNum);
+    }
+    else {
+        await disburse.seedAllocations(para, epoch_path, epochNum, blockNum);
+    }
 }
 
 module.exports = {

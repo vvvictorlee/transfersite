@@ -23,29 +23,33 @@ const loadTreem = async (para, fullfileName) => {
     const token = items[2];
 
 
-    console.log("=============issue");
-    await para.utils.eth.personal.unlockAccount(para.admin, para.password);
-    console.log("=============issue");
-    let erc20 = new para.utils.eth.para.contract(erc20_abi, token);
-    await erc20.methods.addIssuer(global.para.contract_REDEEM).send({ from: para.admin });
-    console.log("============3333=issue");
-    await para.contract.methods.issue(token, supply).send({ from: para.admin });
-    console.log("=============issue");
+    // await para.web3.eth.personal.unlockAccount(para.admin, para.password);
+    // let erc20 = new para.web3.eth.Contract(erc20_abi, token);
+    // console.log("=============addissuer begin");
+    // await erc20.methods.addIssuer(global.CONTRACT_REDEEM).send({ from: para.admin });
+
+    // console.log("=============issue begin");
+
+    // await para.contract.methods.issue(token, supply).send({ from: para.admin });
+
+    // console.log("=============issue end");
 
     let elements = [];
     let balance;
     let leaf;
-
+    console.log(balances);
     Object.keys(balances).forEach(address => {
         // balance = para.utils.toWei(balances[address]);
         balance = (balances[address]);
-        if (address === "0xpara.admin") {
+        if (address === "0xAdmin") {
             address = para.admin;
         }
-        leaf = para.utils.soliditySha3(address, token, balance);
+        console.log(address, token, balance);
+        leaf = para.web3.utils.soliditySha3(address, token, balance);
+        console.log(leaf);
         elements.push(leaf);
     });
-
+    console.log("=============loadtreem====="+ elements);
     return elements;
 };
 

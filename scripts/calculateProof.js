@@ -41,29 +41,43 @@ module.exports = function (callback) {
     );
 };
 
-const claimProof = async (utils, admin, contract, address, balances) => {
+const claimProof = async (para, address, balances) => {
+    console.log("===claimProof==" + balances);
 
     let list = [];
 
-    balances.forEach(token => {
+    for (const token of balances) {
+        console.log("token===" + token);
         let elements = [];
         let balance = token.balance;
-        let leaf = utils.soliditySha3(address, token.token, balance);
+        console.log("====888==", address, token.token, balance, "===888 end====");
+        let leaf = para.web3.utils.soliditySha3(address, token.token, balance);
+        console.log("leaf=="+leaf);
         elements.push(leaf);
+        console.log("elements=="+elements);
         const merkleTree = new MerkleTree(elements);
-        const root = merkleTree.getHexRoot();
-        const proof = merkleTree.getHexProof(elements[0]);
-        list.push([token.cycle, token.token, balance, proof]);
-    });
-    try {
-        await contract.methods.claimEpochs(
-            address,
-            list
-        ).send({ from: admin });
-    } catch (error) {
-    }
 
-    return await contract.methods.claimEpochs(
+        const root = merkleTree.getHexRoot();
+        console.log("root===",root,"merkletree===",merkleTree);
+        console.log("elements[0]===",elements[0]);
+        const proof = merkleTree.getHexProof(elements[0]);
+        console.log("proof===",proof);
+        list.push([token.cycle, token.token, balance, proof]);
+    }
+    // try {
+
+    console.log(list);
+    await para.web3.eth.personal.unlockAccount(para.admin, para.password);
+
+    await para.contract.methods.claimEpochs(
+        address,
+        list
+    ).send({ from: para.admin });
+    // } catch (error) {
+    // }
+
+    console.log("===claimProof end==");
+    return await para.contract.methods.claimEpochs(
         address,
         list
     ).encodeABI()

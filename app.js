@@ -25,7 +25,7 @@ app.post('/claim/', function (req, res) {
             res.json({ "result": "success", "data": data });
         }),
         "disburse": (async function () {
-            app_handler.disburse_by_epoch(req.body.epoch);
+            app_handler.disburse_by_epoch(req.body.epoch,req.body.step);
             res.json({ "result": "success"});
         }),
         "default": (async function () {
