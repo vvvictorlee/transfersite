@@ -31,9 +31,9 @@ module.exports = async function(callback) {
 };
 
 
-const disburse = async (utils,admin,contract,path,epochNum, blockNum) => {
+const disburse = async (para,path,epochNum, blockNum) => {
 
-  const merkleTree = await loadTrees(utils, admin,contract,path);
+  const merkleTree = await loadTrees(para,path);
 
   const block = await utils.eth.getBlock(blockNum);
   console.log("Block:\t", blockNum, block.hash, block.timestamp);

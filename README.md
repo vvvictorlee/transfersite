@@ -132,7 +132,7 @@ SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND flag=0
 - address 提供流动性的账户地址
 ##### 请求示例
 ```
-curl --url http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{
+curl --url http://192.168.38.227:3536/claim  -H "Content-Type: application/json"  -d '{
 	"method": "get_reward_list",
 	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
 }'
@@ -170,7 +170,7 @@ curl --url http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d 
 - address 提供流动性的账户地址
 ##### 请求示例
 ```
-curl --url  http://192.168.38.227:3536/  -H "Content-Type: application/json"  -d '{
+curl --url  http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "claim_all_rewards",
 	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
 }'

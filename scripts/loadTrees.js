@@ -13,7 +13,7 @@ async function asyncForEach(array, callback) {
 }
 
 
-const loadTrees = async (utils, admin, contract, filePath) => {
+const loadTrees = async (para, filePath) => {
     const jsonFiles = getJsonFileList(filePath);
 
     let elements = [];
@@ -21,7 +21,7 @@ const loadTrees = async (utils, admin, contract, filePath) => {
     let nextElements;
 
     await asyncForEach(jsonFiles,async fileName => {
-            nextElements = await loadTreem(utils, admin, contract, fileName);
+            nextElements = await loadTreem(para, fileName);
             elements.concat(nextElements);
     });
 

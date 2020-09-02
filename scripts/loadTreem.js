@@ -5,7 +5,6 @@ var util = require('../util');
 const erc20_abi = util.loadJson('./abi/ERC20.json');
 require('../conf/const_private');
 
-const para.admin = "0x9842495d6bAB5Cb632777Ff25B5b4c1e1d595f24";
 
 const loadTreem = async (para, fullfileName) => {
     const rawdata = fs.readFileSync(fullfileName);
@@ -25,8 +24,7 @@ const loadTreem = async (para, fullfileName) => {
 
 
     console.log("=============issue");
-    const password = "123456";
-    await para.utils.eth.personal.unlockAccount(para.admin, password);
+    await para.utils.eth.personal.unlockAccount(para.admin, para.password);
     console.log("=============issue");
     let erc20 = new para.utils.eth.para.contract(erc20_abi, token);
     await erc20.methods.addIssuer(global.para.contract_REDEEM).send({ from: para.admin });
