@@ -12,7 +12,7 @@ app.use(function (req, res, next) {
     next()
 })
 
-app.post('/', function (req, res) {
+app.post('/claim/', function (req, res) {
     console.log(JSON.stringify(req.body));
 
     let handlers = {
