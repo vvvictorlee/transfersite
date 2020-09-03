@@ -269,15 +269,16 @@ LEFT JOIN (SELECT IF(SUM(swp_awards)+2000<=3000, 2000, IF(3000-SUM(swp_awards)<=
 SET m.swp_awards = IF(all_pool=0, 0, FLOOR(curr_award*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/(supply+new_p_totle)))
 WHERE m.block=8573463 AND s.verified = 1
  */
+
 async function miningToken(block_list, awards, max_supply) {
     // awards, max_supply 直接拼入字符串中，否则有精度问题
     let sql_pToken = "UPDATE mining_data m LEFT JOIN token_supply s ON m.s_token=s.token and m.block=s.block " +
-        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
-        "SET m.p_awards = IF(supply IS NULL, 0, FLOOR(s_balance/supply*IF(curr_award IS NULL, "+awards+", curr_award)*0.85)) " +
+        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<=? GROUP BY p_token) t ON p_token=t.token " +
+        "SET m.p_awards = IF(supply IS NULL, 0, FLOOR(CAST(s_balance AS DECIMAL(65,30))/supply*IF(curr_award IS NULL, "+awards+", curr_award)*0.85)) " +
         "WHERE m.block=?";
     let sql_Sys = "INSERT INTO mining_data (cycle, block, addr, s_token, p_token, p_awards)  " +
         "SELECT cycle, block, ?, s_token, p_token,(IF(sum(curr_award) IS NULL, "+awards+", sum(curr_award))-sum(p_awards)) awards FROM mining_data " +
-        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
+        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<=? GROUP BY p_token) t ON p_token=t.token " +
         "WHERE block=? AND p_awards>0 GROUP BY cycle, block, s_token, p_token " +
         "ON DUPLICATE KEY UPDATE p_awards=VALUES(p_awards)";
 
@@ -285,7 +286,7 @@ async function miningToken(block_list, awards, max_supply) {
         "LEFT JOIN (SELECT SUM(pool_usdt) all_pool FROM token_supply WHERE block=? AND verified = 1) t1 ON 1=1 " +
         "LEFT JOIN (SELECT SUM(p_awards) new_p_totle, p_token FROM mining_data WHERE block=? GROUP BY p_token) t2 ON t2.p_token=m.p_token " +
         "LEFT JOIN (SELECT IF((SUM(swp_awards)+"+awards+"<="+max_supply+" OR SUM(swp_awards) IS NULL), "+awards+", IF("+max_supply+"-SUM(swp_awards)<=0,0,"+max_supply+"-SUM(swp_awards))) curr_award FROM mining_data WHERE block<?) t3 ON 1=1 " +
-        "SET m.swp_awards = IF(all_pool=0, 0, FLOOR(curr_award*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/(supply+new_p_totle))) " +
+        "SET m.swp_awards = IF(all_pool=0, 0, FLOOR(CAST(curr_award AS DECIMAL(65,30))*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/(supply+new_p_totle))) " +
         "WHERE m.block=? AND s.verified = 1";
 
     await co(function*() {
