@@ -151,21 +151,21 @@ curl  -X POST --url https://swapx.99ss.ml/claim/  -H "Content-Type: application/
 ##### 应答示例
 ```
 [{
-	"name": "BETH",
+	"name": "TLTBTBTCX",
 	"address": "0x1df382c017c2aae21050d61a5ca8bc918772f419",
-	"value": "2000"
+	"value": "0.000000000000002"
 }, {
-	"name": "CETH",
+	"name": "TLTATBTCX",
 	"address": "0x4cf4d866dcc3a615d258d6a84254aca795020a2b",
-	"value": "3000"
+	"value": "0.000000000000003"
 }, {
-	"name": "DETH",
+	"name": "TLTDTBTCX",
 	"address": "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199",
-	"value": "4000"
+	"value": "0.000000000000004"
 }, {
-	"name": "AETH",
+	"name": "TLTCTBTCX",
 	"address": "0x71805940991e64222f75cc8a907353f2a60f892e",
-	"value": "1000"
+	"value": "0.000000000000001"
 }]
 ```
 

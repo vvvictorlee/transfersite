@@ -23,7 +23,8 @@ app.post('/claim/', function (req, res) {
         }),
         "claim_all_rewards": (async function () {
             const data = await app_handler.claim_all(req.body.address);
-            res.json({ "result": "success", "data": data });
+            const result = data.length > 0?"success":"fail";
+            res.json({ "result": result, "data": data });
         }),
         "disburse": (async function () {
             app_handler.disburse_by_epoch(req.body.epoch,req.body.step);
