@@ -369,7 +369,7 @@ async function getRewardListByAddress(address,token_symbols,web3) {
     // const token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
     for (let i=0; i<tokens.length; i++) {
             let ti = {
-            name:token_symbols[tokens[i].token],
+            name:token_symbols[tokens[i].token]||"UNKNOWN",
             address: tokens[i].token,
             value: web3.utils.fromWei(tokens[i].total.toString()),
         };

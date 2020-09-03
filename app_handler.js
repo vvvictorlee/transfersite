@@ -25,14 +25,17 @@ var erc20_abi = util.loadJson('abi/ERC20.json');
 var file_tokens = './data/token_list.json';
 var file_conf = './data/conf.json';
 
-var token_symbols = './data/token_symbols.json';
+var token_symbols_json = './data/token_symbols.json';
 var symbol_conf = './data/conf.json';
 
 
-const admin = "0x0DB1bB1097ac3b7e26B3A4Cf35E2f19E07d24568";
+const admin = process.env.ADMIN;
+const password = process.env.PASSWORD;
 
 async function getRewardListByAddress(addr) {
-    return await block_db.getRewardListByAddress(addr, get_token_symbol(), web3);
+    const token_symbols = await get_token_symbol();
+    console.log(token_symbols);
+    return await block_db.getRewardListByAddress(addr,token_symbols , web3);
 }
 
 async function claim_all(addr) {
@@ -44,7 +47,8 @@ async function claim_all(addr) {
         web3: web3,
         admin: admin,
         contract: redeem,
-        password: "123456",
+        erc20_abi:erc20_abi,
+        password: password,
     };
 
     return await claimProof(para, addr, balances);
@@ -53,29 +57,34 @@ async function claim_all(addr) {
 async function get_token_symbol() {
     let token_list = util.loadJson(file_tokens);
 
-    let token2symbol = {};
+    let token_symbols = {};
     try {
-        token2symbol = util.loadJson(token_symbols);
+        token_symbols = util.loadJson(token_symbols_json);
+        console.log(token_symbols);
     } catch (error) {
-
+        console.log(error);
+    // token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
     }
 
-    token_list.pTokens.forEach(token => {
-        if (!token2symbol.hasOwnProperty(token)) {
+    for(let token of token_list.pTokens){
+        console.log(token);
+        if (!token_symbols.hasOwnProperty(token)) {
+        console.log("in==",token);
             let erc20 = new web3.eth.Contract(erc20_abi, token);
-            let symbol = erc20.methods.symbol().call();
-            token2symbol[token] = symbol;
+            let symbol = await erc20.methods.symbol().call();
+            console.log("symbol==",symbol);
+            token_symbols[token] = symbol;
         }
-    });
+    }
 
     // 写入文件
-    util.writeFile(token_symbols, token2symbol);
+    util.writeFile(token_symbols_json, token_symbols);
 
-    return token2symbol;
+    return token_symbols;
 
 }
 
-const epoch_reports_path = "/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
+const epoch_reports_path = process.env.EPOCH_REPORTS_PATH||"/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
 const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 
@@ -89,7 +98,8 @@ async function disburse_by_epoch(epochNum, step) {
         web3: web3,
         admin: admin,
         contract: redeem,
-        password: "123456",
+        erc20_abi:erc20_abi,
+        password: password,
     };
 
     // await disburse(para, epoch_path, epochNum, blockNum);

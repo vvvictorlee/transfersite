@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var bodyParser = require('body-parser');
 var block_db = require('./block_db');
@@ -39,7 +40,7 @@ app.post('/claim/', function (req, res) {
 
 });
 
-const PORT = 3536;
+const PORT = process.env.APP_PORT;
 app.listen(PORT, function () {
     console.log('mining redeem claim app listening on port ', PORT);
 });

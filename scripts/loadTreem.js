@@ -35,6 +35,7 @@ const loadTreem = async (para, fullfileName) => {
     // console.log("=============issue end");
 
     let elements = [];
+    let origelements = [];
     let balance;
     let leaf;
     console.log(balances);
@@ -44,13 +45,14 @@ const loadTreem = async (para, fullfileName) => {
         if (address === "0xAdmin") {
             address = para.admin;
         }
-        console.log(address, token, balance);
+        origelements.push([address, token, balance]);
+        console.log("address, token, balance====",address, token, balance);
         leaf = para.web3.utils.soliditySha3(address, token, balance);
         console.log(leaf);
         elements.push(leaf);
     });
     console.log("=============loadtreem====="+ elements);
-    return elements;
+    return [elements,origelements];
 };
 
 module.exports = { loadTreem };

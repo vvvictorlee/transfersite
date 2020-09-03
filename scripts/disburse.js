@@ -114,10 +114,10 @@ const seedAllocations = async (para, path, epochNum, blockNum) => {
 
     console.log('await redeem.seedAllocations(' + epochNum + ', "' + root + '")');
 
-    await para.contract.methods.seedAllocations(
-        epochNum,
-        root
-    ).send({ from: para.admin });
+    // await para.contract.methods.seedAllocations(
+    //     epochNum,
+    //     root
+    // ).send({ from: para.admin });
 
 }
 

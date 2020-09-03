@@ -45,36 +45,43 @@ const claimProof = async (para, address, balances) => {
     console.log("===claimProof==" + balances);
 
     let list = [];
+    console.log("balances.length===", balances.length);
+    token = balances[0]
+    // for (const token of balances) {
+    console.log("token===" + token);
+    let elements = [];
+    let balance = token.balance;
+    console.log("====888==", address, "====",token.token,"====", balance, "===888 end====");
+    let leaf = para.web3.utils.soliditySha3(address, token.token, balance);
+    console.log("leaf==" + leaf);
+    elements.push(leaf);
+    console.log("elements==" + elements);
+    const merkleTree = new MerkleTree(elements);
 
-    for (const token of balances) {
-        console.log("token===" + token);
-        let elements = [];
-        let balance = token.balance;
-        console.log("====888==", address, token.token, balance, "===888 end====");
-        let leaf = para.web3.utils.soliditySha3(address, token.token, balance);
-        console.log("leaf=="+leaf);
-        elements.push(leaf);
-        console.log("elements=="+elements);
-        const merkleTree = new MerkleTree(elements);
-
-        const root = merkleTree.getHexRoot();
-        console.log("root===",root,"merkletree===",merkleTree);
-        console.log("elements[0]===",elements[0]);
-        const proof = merkleTree.getHexProof(elements[0]);
-        console.log("proof===",proof);
-        list.push([token.cycle, token.token, balance, proof]);
-    }
+    const root = merkleTree.getHexRoot();
+    console.log("root===", root, "merkletree===", merkleTree);
+    console.log("elements[0]===", elements[0]);
+    const proof = merkleTree.getHexProof(elements[0]);
+    console.log("proof===", proof);
+    list.push([token.cycle, token.token, balance, proof]);
+    // }
     // try {
 
     console.log(list);
     await para.web3.eth.personal.unlockAccount(para.admin, para.password);
 
-    await para.contract.methods.claimEpochs(
-        address,
-        list
-    ).send({ from: para.admin });
+    // await para.contract.methods.claimEpochs(
+    //     address,
+    //     list
+    // ).send({ from: para.admin });
     // } catch (error) {
     // }
+
+    let result = await  para.contract.methods.verifyClaim(address, 2, token.token, balance, proof).call({ from: para.admin });
+    console.log(result);
+    // let result1 = await para.contract.methods.merkleRoots(1, 3).call({ from: para.admin });
+    // console.log(result1);
+
 
     console.log("===claimProof end==");
     return await para.contract.methods.claimEpochs(
