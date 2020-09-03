@@ -388,20 +388,24 @@ async function getCycleRewardsByAddress(address) {
 
     var rows = await conn.query(sql_detail, [address]);
 
-    var token_list = [];
+    var cycle_tokens = {};
     var n=0;
+    let cycle = 0;
     for (let i=0; i<rows.length; i++) {
-        var ti = {
-            cycle:rows[i].cycle,
+        cycle  = rows[i].cycle;
+        if (!cycle_tokens.hasOwnProperty(cycle)) {
+                cycle_tokens[cycle]=[];
+        }
+        let ti = {
             token:rows[i].token,
             balance:rows[i].amount.toString(),
         };
         console.log(ti);
-        token_list.push(ti);
+        cycle_tokens[cycle].push(ti);
     }
     console.log('getCycleRewardsByAddress :', rows.length);
 
-    return token_list;
+    return cycle_tokens;
 }
 
 

@@ -31,6 +31,7 @@ var symbol_conf = './data/conf.json';
 
 const admin = process.env.ADMIN;
 const password = process.env.PASSWORD;
+const epoch_reports_path = process.env.EPOCH_REPORTS_PATH||"/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
 
 async function getRewardListByAddress(addr) {
     const token_symbols = await get_token_symbol();
@@ -48,10 +49,13 @@ async function claim_all(addr) {
         admin: admin,
         contract: redeem,
         erc20_abi:erc20_abi,
+        path:epoch_reports_path,
         password: password,
     };
 
-    return await claimProof(para, addr, balances);
+    const encodedAbi= await claimProof(para, addr, balances);
+    console.log("encodedAbi====",encodedAbi);
+    return encodedAbi;
 }
 
 async function get_token_symbol() {
@@ -84,7 +88,6 @@ async function get_token_symbol() {
 
 }
 
-const epoch_reports_path = process.env.EPOCH_REPORTS_PATH||"/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
 const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 

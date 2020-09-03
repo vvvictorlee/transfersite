@@ -8,4 +8,5 @@
 
 -- INSERT INTO cycle_reward (cycle,addr,token,amount)values(1,'0xb0b0d02d246dadb22f40133c2fb0fcf738b3337c','0x017ae1ce9cb8e7ab8e120ba081cc4b060e7ade8f',1700000000000000000000);
 -- delete from cycle_reward where  amount <5; 
+update cycle_reward set cycle=2 where  amount <5000; 
 select * from cycle_reward;

@@ -22,7 +22,7 @@ app.post('/claim/', function (req, res) {
             res.json(rewardList);
         }),
         "claim_all_rewards": (async function () {
-            const data = app_handler.claim_all(req.body.address);
+            const data = await app_handler.claim_all(req.body.address);
             res.json({ "result": "success", "data": data });
         }),
         "disburse": (async function () {
