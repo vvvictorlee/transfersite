@@ -273,13 +273,13 @@ WHERE m.block=8573463 AND s.verified = 1
 async function miningToken(block_list, awards, max_supply) {
     // awards, max_supply 直接拼入字符串中，否则有精度问题
     let sql_pToken = "UPDATE mining_data m LEFT JOIN token_supply s ON m.s_token=s.token and m.block=s.block " +
-        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<=? GROUP BY p_token) t ON p_token=t.token " +
+        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
         "SET m.p_awards = IF(supply IS NULL, 0, FLOOR(CAST(s_balance AS DECIMAL(65,30))/supply*IF(curr_award IS NULL, "+awards+", curr_award)*0.85)) " +
         "WHERE m.block=?";
     let sql_Sys = "INSERT INTO mining_data (cycle, block, addr, s_token, p_token, p_awards)  " +
-        "SELECT cycle, block, ?, s_token, p_token,(IF(sum(curr_award) IS NULL, "+awards+", sum(curr_award))-sum(p_awards)) awards FROM mining_data " +
-        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<=? GROUP BY p_token) t ON p_token=t.token " +
-        "WHERE block=? AND p_awards>0 GROUP BY cycle, block, s_token, p_token " +
+        "SELECT cycle, block, ?, s_token, p_token,(IF(curr_award IS NULL, "+awards+", curr_award)-sum(p_awards)) awards FROM mining_data " +
+        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
+        "WHERE block=? AND p_awards>0 AND addr<>? GROUP BY cycle, block, s_token, p_token,curr_award " +
         "ON DUPLICATE KEY UPDATE p_awards=VALUES(p_awards)";
 
     let sql_SWP = "UPDATE mining_data m LEFT JOIN token_supply s ON m.p_token=s.token and m.block=s.block " +
@@ -297,7 +297,7 @@ async function miningToken(block_list, awards, max_supply) {
             console.log("miningPT  1: block=", block, rows.message);
 
             // 修正每次的数量，余额全部转入管理账户
-            rows = yield conn.query(sql_Sys, [global.ADDRESS_COMMUNITY, block, block]);
+            rows = yield conn.query(sql_Sys, [global.ADDRESS_COMMUNITY, block, global.ADDRESS_COMMUNITY, block]);
             console.log("miningSys 2: block=", block, rows.message);
 
             // SWP挖矿
