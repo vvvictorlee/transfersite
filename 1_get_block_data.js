@@ -3,7 +3,8 @@ var co = require('co');
 var util = require('./util');
 var block_db = require('./block_db');
 // require('./conf/const');
-require('./conf/const_private');
+require('./conf/const_ropsten');
+// require('./conf/const_private');
 
 var web3 = new Web3();
 web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
@@ -21,9 +22,6 @@ var erc20_abi = util.loadJson('abi/ERC20.json');
 var file_tokens = './data/token_list.json';
 var file_conf = './data/conf.json';
 
-
-
-
 // -------------------------------
 
 // Get All S-Token、Pair Token List
@@ -40,8 +38,6 @@ async function getAllTokenList() {
         dataList.push([result[i].blockNumber, info.pair.toLowerCase(), info.ptoken.toLowerCase(), info.token0.toLowerCase(), info.token1.toLowerCase()]);
         tokenList.sTokens.push(info.pair.toLowerCase());
         tokenList.pTokens.push(info.ptoken.toLowerCase());
-        // let erc20 = new web3.eth.Contract(erc20_abi, info.ptoken);
-        // await erc20.methods.addIssuer(global.CONTRACT_REDEEM).send({ from: admin });
     }
     // 写入文件
     util.writeFile(file_tokens, tokenList);
@@ -139,19 +135,20 @@ function getAllClaim(startBlock) {
 
 // 判断地址类型
 async function getAddrType(addr) {
+    if (addr == global.ADDRESS_ZERO) return 2;
     try {
         var code = await web3.eth.getCode(addr);
         if (code === '0x') return 0;
         return 1;
     } catch(e) {
         console.log('getAddrType Err :',e.message);
-        return 7;
+        return 7;   // 错误地址
     }
 }
 // 获取所有的地址，并判断类型
-async function checkAllAddr() {
+async function chaeckAllAddr() {
     // 获取所有的地址，并入库
-    await block_db.addAllAddr();
+    await block_db.addAllAddr(global.ADDRESS_COMMUNITY);
 
     // 获取所有未校验地址
     let list = await block_db.getUncheckAddr();
@@ -161,23 +158,26 @@ async function checkAllAddr() {
         var type = await getAddrType(list[i].addr);
         type_list.push([list[i].addr, type]);
     }
-    console.log(type_list);
-
     await block_db.updateAddrTypeList(type_list);
+
+    console.log('chaeckAllAddr :', type_list.length);
 }
 // ================
 
-function getBlockData() {
+function getBlockData(lastBlock) {
     co(function* () {
         let now_block = (yield web3.eth.getBlockNumber());
         console.log('NowBlock :',now_block);
 
         // 加载配置文件
-        // var conf = {
-        //     lastBlocker: 0,
-        //     updatedBlocks: []
-        // }
         var conf = util.loadJson(file_conf);
+        // 重设lastBlock
+        if (lastBlock>=0) {
+            conf = {
+                lastBlock: lastBlock,
+                updatedBlocks: []
+            }
+        }
 
         // #1 ---- 获取所有Token
         var token_list = yield getAllTokenList();
@@ -187,30 +187,23 @@ function getBlockData() {
 
         // #2 ---- 获取Token的转账记录
         // var token_list = util.loadJson(file_tokens);
-        yield getAllTokenBlockData(conf.lastBlocker, token_list);
+        yield getAllTokenBlockData(conf.lastBlock, token_list);
 
         // 3# ---- 获取流动池SToken的存量
-        getAllPoolReserve(conf.lastBlocker, token_list);
+        getAllPoolReserve(conf.lastBlock, token_list);
 
         // 4# 获取所有奖励提取记录
-        getAllClaim(conf.lastBlocker);
+        getAllClaim(conf.lastBlock);
 
         // 5# 获取所有的地址，并判断类型
-        yield block_db.addAllAddr();
+        yield chaeckAllAddr();
 
         // 更新同步区块记录
-        conf.updatedBlocks.push(conf.lastBlocker);
-        conf.lastBlocker = now_block;
+        conf.updatedBlocks.push(conf.lastBlock);
+        conf.lastBlock = now_block;
         util.writeFile(file_conf, conf);
     });
 }
 
-getBlockData();
-(async function () {
-    // var a = getAddrType('0xAdmin');
-    // var a = await getAddrType(global.CONTRACT_FACTORY);
-    // var a = await getAddrType('0x9842495d6bab5cb632777ff25b5b4c1e1d595f24');
-    // console.log(a);
-
-    checkAllAddr();
-})();
+// -1 表示自动，否则可以强制指定块号
+getBlockData(0);

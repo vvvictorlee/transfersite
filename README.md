@@ -1,5 +1,7 @@
 # Mining Scripts V2
 
+> v1.2
+
 
 
 ## 0. 配置
@@ -13,16 +15,16 @@
 ## 1. 获取链上数据
 
 ```
-node get_block_data.js
+node 1_get_block_data.js
 ```
 
 
 
-可以修改 `data/conf.json` 文件中的 `lastBlocker`，设置本次开始同步的块号
+可以修改 `data/conf.json` 文件中的 `lastBlock`，设置本次开始同步的块号
 
 ```json
 {
-  "lastBlocker": 607254,
+  "lastBlock": 607254,
   "updatedBlocks": [
     0
   ]
@@ -34,7 +36,7 @@ node get_block_data.js
 ## 2. 生成快照块
 
 ```
-node snapshot.js
+node 2_snapshot.js
 ```
 
 
@@ -55,7 +57,7 @@ node snapshot.js
 ## 3. 挖矿
 
 ```
-node machining_data.js
+node 3_machining_data.js
 ```
 
 
@@ -72,7 +74,18 @@ miningCycle(cycle_index); // cycle_index是奖励周期的索引号，从0开始
 
 ## 4. 验证奖励周期的挖矿结果
 
-// TODO
+```
+node 4_check_data.js
+```
+
+
+
+验证奖励结果可以在 `check_data.js` 中执行以下函数（该检查已包含在 `machining_data.js` 中）：
+
+```
+block_db.checkCycleData();
+```
+
 基本规则：
 1、每个币种的总奖励 <= 总发行量（570万）
 2、每个币种的本周期奖励 <= 本周期最大奖励（19.2万）
@@ -85,7 +98,7 @@ miningCycle(cycle_index); // cycle_index是奖励周期的索引号，从0开始
 ### 5.1 执行方式
 
 ```
-node create_cycle_report.js
+node 5_create_cycle_report.js
 ```
 
 
@@ -103,14 +116,14 @@ createReport(cycle);	// cycle为奖励周期
 根据 `cycle_reward` 表可以获取奖励指定周期的所有数据
 
 ```sql
-SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND flag=0
+SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND type=0
 ```
 
-其中 `flag=0` 用于屏蔽部分地址的奖励：
+其中 `type=0` 为地址的类型，用于屏蔽部分地址的奖励：
 
 1、如果奖励的地址为合约地址，则奖励应不发放，否则该合约无法领取奖励
 
-2、不发放的奖励将会放回待分配池中
+2、不发放的奖励，将会暂停处理，等待社区决议
 
 
 
@@ -123,81 +136,7 @@ SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND flag=0
 每个文件中是本币种获得奖励的地址和具体金额
 
 
-## 6 领取收益接口
 
-### 6.1 获取指定账户收益列表
-#### 请求
-##### 参数说明：
-- method  方法名称 get_reward_list
-- address 提供流动性的账户地址
-##### 请求示例
-```
-curl  -X POST --url http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
-	"method": "get_reward_list",
-	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
-}'
+## 6. SWP倍率奖励
 
-
-curl  -X POST --url https://swapx.99ss.ml/claim/  -H "Content-Type: application/json"  -d '{
- "method": "get_reward_list",
- "address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
-}'
-```
-#### 应答
-##### 数据说明
-- name  代币符号名称
-- address 代币合约地址
-- value   代币领取收益金额
-##### 应答示例
-```
-[{
-	"name": "TLTBTBTCX",
-	"address": "0x1df382c017c2aae21050d61a5ca8bc918772f419",
-	"value": "0.000000000000002"
-}, {
-	"name": "TLTATBTCX",
-	"address": "0x4cf4d866dcc3a615d258d6a84254aca795020a2b",
-	"value": "0.000000000000003"
-}, {
-	"name": "TLTDTBTCX",
-	"address": "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199",
-	"value": "0.000000000000004"
-}, {
-	"name": "TLTCTBTCX",
-	"address": "0x71805940991e64222f75cc8a907353f2a60f892e",
-	"value": "0.000000000000001"
-}]
-```
-
-### 6.2 提交领取指定账户收益
-#### 请求
-##### 参数说明：
-- method  方法名称 claim_all_rewards
-- address 提供流动性的账户地址
-##### 请求示例
-```
-curl  -X POST --url  http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
-	"method": "claim_all_rewards",
-	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
-}'
-
-curl  -X POST --url  https://swapx.99ss.ml/claim/  -H "Content-Type: application/json"  -d '{
-	"method": "claim_all_rewards",
-	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
-}'
-```
-
-#### 应答
-##### 数据说明
-- result  执行结果 成功success
-- data  合约地址方法调用.编码ABI encodedABI（）获得用于sendTransaction data参数
-##### 应答示例
-```
-{
-    "result": "success", 
-    "data": "0xc44faa3f000000000000000000000000b0b0d02d246dadb22f40133c2fb0fcf738b3337c0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000002000000000000000000000000017ae1ce9cb8e7ab8e120ba081cc4b060e7ade8f00000000000000000000000000000000000000000000005c283d410394100000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000010d3ea72e734e7b4cf601030f752d8bb2df21f1b432e93064fd86edbaf2e2a4dc"
-}
-
-```
-
-
+在获取链上数据 `get_block_data` 完成之后，可以在数据库的 `token_list` 表中，设置币种的 `verified` 字段为相应的倍率，然后计算挖矿奖励即可。
