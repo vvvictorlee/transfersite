@@ -20,11 +20,11 @@ node get_block_data.js
 
 
 
-可以修改 `data/conf.json` 文件中的 `lastBlocker`，设置本次开始同步的块号
+可以修改 `data/conf.json` 文件中的 `lastBlock`，设置本次开始同步的块号
 
 ```json
 {
-  "lastBlocker": 607254,
+  "lastBlock": 607254,
   "updatedBlocks": [
     0
   ]

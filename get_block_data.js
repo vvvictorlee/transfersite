@@ -163,17 +163,20 @@ async function chaeckAllAddr() {
 }
 // ================
 
-function getBlockData() {
+function getBlockData(lastBlock) {
     co(function* () {
         let now_block = (yield web3.eth.getBlockNumber());
         console.log('NowBlock :',now_block);
 
         // 加载配置文件
-        // var conf = {
-        //     lastBlocker: 0,
-        //     updatedBlocks: []
-        // }
         var conf = util.loadJson(file_conf);
+        // 重设lastBlock
+        if (lastBlock>=0) {
+            conf = {
+                lastBlock: lastBlock,
+                updatedBlocks: []
+            }
+        }
 
         // #1 ---- 获取所有Token
         var token_list = yield getAllTokenList();
@@ -183,22 +186,23 @@ function getBlockData() {
 
         // #2 ---- 获取Token的转账记录
         // var token_list = util.loadJson(file_tokens);
-        yield getAllTokenBlockData(conf.lastBlocker, token_list);
+        yield getAllTokenBlockData(conf.lastBlock, token_list);
 
         // 3# ---- 获取流动池SToken的存量
-        getAllPoolReserve(conf.lastBlocker, token_list);
+        getAllPoolReserve(conf.lastBlock, token_list);
 
         // 4# 获取所有奖励提取记录
-        getAllClaim(conf.lastBlocker);
+        getAllClaim(conf.lastBlock);
 
         // 5# 获取所有的地址，并判断类型
         yield chaeckAllAddr();
 
         // 更新同步区块记录
-        conf.updatedBlocks.push(conf.lastBlocker);
-        conf.lastBlocker = now_block;
+        conf.updatedBlocks.push(conf.lastBlock);
+        conf.lastBlock = now_block;
         util.writeFile(file_conf, conf);
     });
 }
 
-getBlockData();
+// -1 表示自动，否则可以强制指定块号
+getBlockData(-1);
