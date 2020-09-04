@@ -63,27 +63,28 @@ const claimProof = async (para, address, balances) => {
     // try {
 
     console.log(list);
-    // await para.web3.eth.personal.unlockAccount(para.admin, para.password);
+    await para.web3.eth.personal.unlockAccount(para.admin, para.password);
 
-    // await para.contract.methods.claimEpochs(
-    //     address,
-    //     list
-    // ).send({ from: para.admin });
-    // } catch (error) {
-    // }
-
-    // let result = await para.contract.methods.verifyClaim(address, 2, token.token, balance, proof).call({ from: para.admin });
-    // console.log(result);
-    // let result1 = await para.contract.methods.merkleRoots(1, 3).call({ from: para.admin });
-    // console.log(result1);
-
-
-    console.log("===claimProof end==");
-    const abi = await para.contract.methods.claimEpochs(
+    await para.contract.methods.claimEpochs(
         address,
         list
-    ).encodeABI();
-    return abi;
+    ).send({ from: para.admin });
+} catch (error) {
+    console.log(error);
+}
+
+// let result = await para.contract.methods.verifyClaim(address, 2, token.token, balance, proof).call({ from: para.admin });
+// console.log(result);
+// let result1 = await para.contract.methods.merkleRoots(1, 3).call({ from: para.admin });
+// console.log(result1);
+
+
+console.log("===claimProof end==");
+const abi = await para.contract.methods.claimEpochs(
+    address,
+    list
+).encodeABI();
+return abi;
     // myContract.methods.myMethod([param1[, param2[, ...]]]).encodeABI()
 
 }
