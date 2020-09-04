@@ -25,6 +25,8 @@ module.exports = {
     miningToken,
     creatCycleReward,
     getCycleRewardReport,
+    getRewardListByAddress,
+    getCycleRewardsByAddress,
     checkCycleData
 };
 
@@ -391,6 +393,58 @@ async function getCycleRewardReport(cycle) {
     console.log('getCycleRewardReport :', rows.length);
 
     return token_list;
+}
+
+
+
+// 获取指定账户地址奖励列表
+async function getRewardListByAddress(address,token_symbols,web3) {
+    // 获取奖励周期每个币种的发行量，注意数量转为字符串：CONCAT
+    let sql_total = "SELECT token,CONCAT(SUM(amount)) total FROM cycle_reward WHERE addr=? AND flag=0 GROUP BY token ORDER BY token";
+
+    let tokens = await conn.query(sql_total, [address]);
+
+    let token_list = [];
+    // const token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
+    for (let i=0; i<tokens.length; i++) {
+            let ti = {
+            name:token_symbols[tokens[i].token]||"UNKNOWN",
+            address: tokens[i].token,
+            value: web3.utils.fromWei(tokens[i].total.toString()),
+        };
+       
+        token_list.push(ti);
+    }
+    console.log('getRewardListByAddress', token_list.length);
+
+    return token_list;
+}
+
+
+// 获取奖励周期列表
+async function getCycleRewardsByAddress(address) {
+    let sql_detail = "SELECT cycle,token,CONCAT(amount) amount FROM cycle_reward WHERE addr=? AND flag=0 ORDER BY cycle,token";
+
+    var rows = await conn.query(sql_detail, [address]);
+
+    var cycle_tokens = {};
+    var n=0;
+    let cycle = 0;
+    for (let i=0; i<rows.length; i++) {
+        cycle  = rows[i].cycle;
+        if (!cycle_tokens.hasOwnProperty(cycle)) {
+                cycle_tokens[cycle]=[];
+        }
+        let ti = {
+            token:rows[i].token,
+            balance:rows[i].amount.toString(),
+        };
+        console.log(ti);
+        cycle_tokens[cycle].push(ti);
+    }
+    console.log('getCycleRewardsByAddress :', rows.length);
+
+    return cycle_tokens;
 }
 /*
 
