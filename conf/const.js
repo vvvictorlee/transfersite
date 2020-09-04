@@ -1,5 +1,4 @@
 
-// global.HTTP_PROVIDER = "https://ropsten.infura.io/v3/afea481cd4da4deabd6d296e6509b601"; // 测试网RPC接口
 global.HTTP_PROVIDER = "https://mainnet.infura.io/v3/afea481cd4da4deabd6d296e6509b601"; // RPC接口
 
 

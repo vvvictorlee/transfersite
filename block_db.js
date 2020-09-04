@@ -102,13 +102,15 @@ async function addClaimBlockDataList(dataList) {
 
 // ----- Snapshot -----
 // 生成某个奖励周期的快照持币地址情况
-async function addSnapshotBlock(cycle, block_list, addr_zero) {
+async function addSnapshotBlock(cycle, block_list, addr_zero, addr_community) {
+    // 若form和to都是 0x0 地址，则设置为 addr_community ，即计算建池子最低保留的 1000 个
     let sql = "INSERT INTO snapshot_block (cycle, block, addr, token, balance) SELECT ?, ?, Addr,token,sum(amount) balance2 FROM ( " +
-        "(SELECT toAddr Addr, token,sum(amount) amount FROM block_chain_data WHERE block<=? GROUP BY toAddr,token) UNION ALL " +
-        "(SELECT fromAddr Addr, token,sum(-amount) amount FROM block_chain_data WHERE block<=? GROUP BY fromAddr,token) " +
+        "(SELECT IF(fromAddr=toAddr,'"+addr_community+"', toAddr) Addr, token,sum(amount) amount FROM block_chain_data WHERE block<=? GROUP BY Addr,token) UNION ALL " +
+        "(SELECT fromAddr Addr, token,sum(-amount) amount FROM block_chain_data WHERE block<=? AND fromAddr<>toAddr GROUP BY fromAddr,token) " +
         ") t WHERE Addr<>'"+addr_zero+"' GROUP BY Addr,token ON DUPLICATE KEY UPDATE balance=VALUES(balance)";
 
     await co(function*() {
+        console.log(sql)
         for (let i = 0;i<block_list.length;i++) {
             let block = block_list[i];
             // 生成快照块的持币地址

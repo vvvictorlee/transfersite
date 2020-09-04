@@ -3,6 +3,7 @@ var util = require('./util');
 var co = require('co');
 
 require('./conf/const');
+// require('./conf/const_ropsten');
 
 var snapshot_filename = 'data/snapshot.json';
 var snapshot_list = util.loadJson(snapshot_filename);
@@ -15,7 +16,7 @@ function miningCycle(cycle) {
 
     co(function*() {
         // #1 ---- 生成每个快照块，各个地址的持币情况
-        yield block_db.addSnapshotBlock(curr_cycle.cycle, curr_cycle.snapshot, global.ADDRESS_ZERO);
+        yield block_db.addSnapshotBlock(curr_cycle.cycle, curr_cycle.snapshot, global.ADDRESS_ZERO, global.ADDRESS_COMMUNITY);
 
         // #2 ---- 生成每个快照块，各个币种的总发行量、流动池大小
         // 生成每个快照块，各个币种的总发行量
