@@ -13,7 +13,6 @@
 
  Date: 30/08/2020 01:40:49
 */
-use eth_data_ropsten;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
