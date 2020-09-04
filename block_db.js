@@ -19,8 +19,9 @@ module.exports = {
     addAllTokenSupply,
     updatPoolUSDT,
     updatVerified,
+    updatWeightPoolUSDT,
     initMiningData,
-    updateUnclaimed,
+    cleanCycleMiningData,
     miningToken,
     creatCycleReward,
     getCycleRewardReport,
@@ -154,14 +155,24 @@ LEFT JOIN (SELECT pToken,verified,vBlock FROM token_list WHERE verified=1) t ON 
 SET s.verified=t.verified
 WHERE s.block>=t.vBlock
  */
-async function updatVerified(startBlock) {
-    let sql = "UPDATE token_supply s LEFT JOIN (SELECT pToken,verified,vBlock FROM token_list WHERE verified=1) t ON s.token = t.pToken\n" +
+async function updatVerified() {
+    let sql = "UPDATE token_supply s LEFT JOIN (SELECT pToken,verified,vBlock FROM token_list WHERE verified>=1) t ON s.token = t.pToken\n" +
         "SET s.verified=t.verified WHERE s.block>=t.vBlock";
 
     await conn.query(sql, null).then(function (rows) {
         console.log("updatVerified :", rows.message);
     });
 }
+
+// 更新每个区块的USDT加权平均量
+async function updatWeightPoolUSDT() {
+    let sql = "UPDATE token_supply SET weight_pool_usdt=verified*pool_usdt";
+
+    await conn.query(sql, null).then(function (rows) {
+        console.log("updatWeightPoolUSDT :", rows.message);
+    });
+}
+
 
 // 添加所有有交易记录的地址
 async function addAllAddr() {
@@ -223,18 +234,28 @@ SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<8573463
 SET m.p_unclaimed=t.unclaimed
 WHERE m.block=8573463 AND t.unclaimed IS NOT NULL
 */
-async function updateUnclaimed(block_list) {
-    let sql = "UPDATE mining_data m LEFT JOIN ( SELECT addr,token,SUM(amount) unclaimed FROM ( " +
-        "SELECT addr,p_token token,SUM(p_awards) amount FROM mining_data WHERE block<? GROUP BY addr,p_token UNION ALL " +
-        "SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<? GROUP BY addr,token ) x GROUP BY addr,token " +
-        ") t ON m.addr=t.addr AND m.p_token=t.token SET m.p_unclaimed=t.unclaimed WHERE m.block=? AND t.unclaimed IS NOT NULL";
+// async function updateUnclaimed(block_list) {
+//     let sql = "UPDATE mining_data m LEFT JOIN ( SELECT addr,token,SUM(amount) unclaimed FROM ( " +
+//         "SELECT addr,p_token token,SUM(p_awards) amount FROM mining_data WHERE block<? GROUP BY addr,p_token UNION ALL " +
+//         "SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<? GROUP BY addr,token ) x GROUP BY addr,token " +
+//         ") t ON m.addr=t.addr AND m.p_token=t.token SET m.p_unclaimed=t.unclaimed WHERE m.block=? AND t.unclaimed IS NOT NULL";
+//
+//     await co(function*() {
+//         for (let i = 0;i<block_list.length;i++) {
+//             let block = block_list[i];
+//             let rows = yield conn.query(sql, [block, block, block]);
+//             console.log("updateUnclaimed : block=", block, rows.message);
+//         }
+//     });
+// }
+
+// 清理一个周期的挖矿数据，防止计算出错
+async function cleanCycleMiningData(cycle) {
+    let sql_claen = "DELETE FROM mining_data WHERE cycle=?";
 
     await co(function*() {
-        for (let i = 0;i<block_list.length;i++) {
-            let block = block_list[i];
-            let rows = yield conn.query(sql, [block, block, block]);
-            console.log("updateUnclaimed : block=", block, rows.message);
-        }
+        let rows = yield conn.query(sql_claen, [cycle]);
+        console.log("cleanCycleMiningData : cycle=", cycle, rows.message);
     });
 }
 
@@ -287,11 +308,11 @@ async function miningToken(block_list, awards, max_supply) {
         ") t ON m.addr=t.addr AND m.p_token=t.token SET m.p_unclaimed=t.unclaimed WHERE m.block=? AND t.unclaimed IS NOT NULL";
 
     let sql_SWP = "UPDATE mining_data m LEFT JOIN token_supply s ON m.p_token=s.token and m.block=s.block " +
-        "LEFT JOIN (SELECT SUM(pool_usdt) all_pool FROM token_supply WHERE block=? AND verified = 1) t1 ON 1=1 " +
+        "LEFT JOIN (SELECT SUM(weight_pool_usdt) all_pool FROM token_supply WHERE block=? AND verified >= 1) t1 ON 1=1 " +
         "LEFT JOIN (SELECT SUM(p_awards) new_p_totle, p_token FROM mining_data WHERE block<=? GROUP BY p_token) t2 ON t2.p_token=m.p_token " +
         "LEFT JOIN (SELECT IF((SUM(swp_awards)+"+awards+"<="+max_supply+" OR SUM(swp_awards) IS NULL), "+awards+", IF("+max_supply+"-SUM(swp_awards)<=0,0,"+max_supply+"-SUM(swp_awards))) curr_award FROM mining_data WHERE block<?) t3 ON 1=1 " +
-        "SET m.swp_awards = IF(all_pool=0, 0, ROUND(ROUND(CAST(curr_award AS DECIMAL(65,30))*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/new_p_totle*10-5.5)/10)) " +
-        "WHERE m.block=? AND s.verified = 1";
+        "SET m.swp_awards = IF(all_pool=0, 0, ROUND(ROUND(CAST(curr_award AS DECIMAL(65,30))*weight_pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/new_p_totle*10-5.5)/10)) " +
+        "WHERE m.block=? AND s.verified >= 1";
 
     await co(function*() {
         for (let i = 0;i<block_list.length;i++) {

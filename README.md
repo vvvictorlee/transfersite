@@ -1,6 +1,6 @@
 # Mining Scripts V2
 
-> v1.1
+> v1.2
 
 
 
@@ -134,3 +134,9 @@ SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND type=0
 每个文件以币种进行划分，文件名命名规则为：`周期_本期发行总量_Token地址.json`
 
 每个文件中是本币种获得奖励的地址和具体金额
+
+
+
+## 6. SWP倍率奖励
+
+在获取链上数据 `get_block_data` 完成之后，可以在数据库的 `token_list` 表中，设置币种的 `verified` 字段为相应的倍率，然后计算挖矿奖励即可。
