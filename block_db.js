@@ -207,20 +207,21 @@ async function updateAddrTypeList(list) {
 
 // ----- Mining -----
 // 初始化挖矿数据
-async function initMiningData(block) {
+async function initMiningData(block, addr_redeem) {
     let sql_S = "INSERT INTO mining_data (cycle, block, addr, s_token, s_balance, p_token) " +
         "SELECT cycle, t.block, addr, sToken, balance, pToken FROM snapshot_block t LEFT JOIN token_list ON sToken=token " +
         "WHERE t.block>=? AND sToken IS NOT NULL ON DUPLICATE KEY UPDATE s_balance=VALUES(s_balance)";
+    // 删除挖矿表中的 REDEEM领取合约，防止持有Pair Token 重复计算
     let sql_P = "INSERT INTO mining_data (cycle, block, addr, s_token, p_balance, p_token) " +
         "SELECT cycle, t.block, addr, sToken, balance, pToken FROM snapshot_block t LEFT JOIN token_list ON pToken=token \n" +
-        "WHERE t.block>=? AND pToken IS NOT NULL ON DUPLICATE KEY UPDATE p_balance=VALUES(p_balance)";
+        "WHERE t.block>=? AND pToken IS NOT NULL AND addr<>? ON DUPLICATE KEY UPDATE p_balance=VALUES(p_balance)";
 
     await co(function*() {
         // 更新SToken在每个快照块的持有量
         let rows = yield conn.query(sql_S, [block]);
         console.log("initMiningData 1: syncBlock=", block, rows.message);
         // 更新PairToken在每个快照块的持有量
-        rows = yield conn.query(sql_P, [block]);
+        rows = yield conn.query(sql_P, [block, addr_redeem]);
         console.log("initMiningData 2: syncBlock=", block, rows.message);
     });
 }
@@ -359,6 +360,7 @@ async function creatCycleReward(cycle, contract_swp) {
         rows = yield conn.query(sql_swp, [contract_swp, cycle]);
         console.log("creatCycleReward SWP: cycle=", cycle, rows.message);
 
+        // 更新账户类型
         rows = yield conn.query(sql_type, null);
         console.log("creatCycleReward : updateCycleType", rows.message);
     });
