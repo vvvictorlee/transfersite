@@ -276,17 +276,21 @@ async function miningToken(block_list, awards, max_supply) {
         "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
         "SET m.p_awards = IF(supply IS NULL, 0, FLOOR(CAST(s_balance AS DECIMAL(65,30))/supply*IF(curr_award IS NULL, "+awards+", curr_award)*0.85)) " +
         "WHERE m.block=?";
-    let sql_Sys = "INSERT INTO mining_data (cycle, block, addr, s_token, p_token, p_awards)  " +
+    let sql_Sys = "INSERT INTO mining_data (cycle, block, addr, s_token, p_token, p_awards) " +
         "SELECT cycle, block, ?, s_token, p_token,(IF(curr_award IS NULL, "+awards+", curr_award)-sum(p_awards)) awards FROM mining_data " +
         "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
         "WHERE block=? AND p_awards>0 AND addr<>? GROUP BY cycle, block, s_token, p_token,curr_award " +
         "ON DUPLICATE KEY UPDATE p_awards=VALUES(p_awards)";
+    let sql_unclaimed = "UPDATE mining_data m LEFT JOIN ( SELECT addr,token,SUM(amount) unclaimed FROM ( " +
+        "SELECT addr,p_token token,SUM(p_awards) amount FROM mining_data WHERE block<? GROUP BY addr,p_token UNION ALL " +
+        "SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<? GROUP BY addr,token ) x GROUP BY addr,token " +
+        ") t ON m.addr=t.addr AND m.p_token=t.token SET m.p_unclaimed=t.unclaimed WHERE m.block=? AND t.unclaimed IS NOT NULL";
 
     let sql_SWP = "UPDATE mining_data m LEFT JOIN token_supply s ON m.p_token=s.token and m.block=s.block " +
         "LEFT JOIN (SELECT SUM(pool_usdt) all_pool FROM token_supply WHERE block=? AND verified = 1) t1 ON 1=1 " +
-        "LEFT JOIN (SELECT SUM(p_awards) new_p_totle, p_token FROM mining_data WHERE block=? GROUP BY p_token) t2 ON t2.p_token=m.p_token " +
+        "LEFT JOIN (SELECT SUM(p_awards) new_p_totle, p_token FROM mining_data WHERE block<=? GROUP BY p_token) t2 ON t2.p_token=m.p_token " +
         "LEFT JOIN (SELECT IF((SUM(swp_awards)+"+awards+"<="+max_supply+" OR SUM(swp_awards) IS NULL), "+awards+", IF("+max_supply+"-SUM(swp_awards)<=0,0,"+max_supply+"-SUM(swp_awards))) curr_award FROM mining_data WHERE block<?) t3 ON 1=1 " +
-        "SET m.swp_awards = IF(all_pool=0, 0, FLOOR(CAST(curr_award AS DECIMAL(65,30))*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/(supply+new_p_totle))) " +
+        "SET m.swp_awards = IF(all_pool=0, 0, ROUND(ROUND(CAST(curr_award AS DECIMAL(65,30))*pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/new_p_totle*10-5.5)/10)) " +
         "WHERE m.block=? AND s.verified = 1";
 
     await co(function*() {
@@ -294,15 +298,19 @@ async function miningToken(block_list, awards, max_supply) {
             let block = block_list[i];
             // 计算每个块的pToken奖励
             let rows = yield conn.query(sql_pToken, [block, block]);
-            console.log("miningPT  1: block=", block, rows.message);
+            console.log("miningPT  1 PT : block=", block, rows.message);
 
             // 修正每次的数量，余额全部转入管理账户
-            rows = yield conn.query(sql_Sys, [global.ADDRESS_COMMUNITY, block, global.ADDRESS_COMMUNITY, block]);
-            console.log("miningSys 2: block=", block, rows.message);
+            rows = yield conn.query(sql_Sys, [global.ADDRESS_COMMUNITY, block, block, global.ADDRESS_COMMUNITY]);
+            console.log("miningSys 2 Sys: block=", block, rows.message);
+
+            // 更新待领取数量
+            rows = yield conn.query(sql_unclaimed, [block, block, block]);
+            console.log("miningSys 3 Unclaime: block=", block, rows.message);
 
             // SWP挖矿
             rows = yield conn.query(sql_SWP, [block, block, block, block]);
-            console.log("miningSWP 3: block=", block, rows.message);
+            console.log("miningSWP 4 SWP: block=", block, rows.message);
         }
     });
 }

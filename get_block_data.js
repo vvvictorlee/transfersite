@@ -2,8 +2,8 @@ var Web3 = require("web3");
 var co = require('co');
 var util = require('./util');
 var block_db = require('./block_db');
-// require('./conf/const');
-require('./conf/const_private');
+require('./conf/const');
+// require('./conf/const_private');
 
 var web3 = new Web3();
 web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
@@ -134,13 +134,14 @@ function getAllClaim(startBlock) {
 
 // 判断地址类型
 async function getAddrType(addr) {
+    if (addr == global.ADDRESS_ZERO) return 2;
     try {
         var code = await web3.eth.getCode(addr);
         if (code === '0x') return 0;
         return 1;
     } catch(e) {
         console.log('getAddrType Err :',e.message);
-        return 7;
+        return 7;   // 错误地址
     }
 }
 // 获取所有的地址，并判断类型

@@ -31,9 +31,6 @@ function miningCycle(cycle) {
         // 初始化挖矿数据
         yield block_db.initMiningData(syncBlock);
 
-        // 更新待领取数量
-        yield block_db.updateUnclaimed(curr_cycle.snapshot);
-
         // TODO 删除挖矿表中的 REDEEM领取合约，防止持有Pair Token 重复计算？【需要根据真实数据测试影响】
 
         // 开始挖矿
