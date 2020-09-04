@@ -23,14 +23,14 @@ const loadTreem = async (para, fullfileName) => {
     const token = items[2];
 
 
-    await para.web3.eth.personal.unlockAccount(para.admin, para.password);
-    let erc20 = new para.web3.eth.Contract(erc20_abi, token);
+    // await para.web3.eth.personal.unlockAccount(para.admin, para.password);
+    // let erc20 = new para.web3.eth.Contract(erc20_abi, token);
     // console.log("=============addissuer begin");
-    await erc20.methods.addIssuer(global.CONTRACT_REDEEM).send({ from: para.admin });
+    // await erc20.methods.addIssuer(global.CONTRACT_REDEEM).send({ from: para.admin });
 
     // console.log("=============issue begin");
 
-    await para.contract.methods.issue(token, supply).send({ from: para.admin });
+    // await para.contract.methods.issue(token, supply).send({ from: para.admin });
 
     // console.log("=============issue end");
 
