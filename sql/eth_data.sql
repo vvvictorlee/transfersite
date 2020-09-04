@@ -11,7 +11,7 @@
  Target Server Version : 50610
  File Encoding         : 65001
 
- Date: 30/08/2020 01:40:49
+ Date: 04/09/2020 21:04:19
 */
 
 SET NAMES utf8mb4;
@@ -40,7 +40,7 @@ CREATE TABLE `block_chain_claim` (
   `eventName` varchar(50) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`txnHash`,`addr`,`token`) USING BTREE,
   KEY `idxBlock` (`block`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='流动池快照';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='领取记录';
 
 -- ----------------------------
 -- Table structure for block_chain_data
@@ -146,6 +146,7 @@ CREATE TABLE `token_supply` (
   `supply` decimal(50,0) NOT NULL DEFAULT '0',
   `pool_usdt` decimal(50,0) NOT NULL DEFAULT '0',
   `verified` int(1) NOT NULL DEFAULT '0',
+  `weight_pool_usdt` decimal(50,0) NOT NULL DEFAULT '0',
   PRIMARY KEY (`block`,`token`) USING BTREE,
   KEY `idxBlock` (`block`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
