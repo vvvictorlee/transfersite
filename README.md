@@ -15,7 +15,7 @@
 ## 1. 获取链上数据
 
 ```
-node get_block_data.js
+node 1_get_block_data.js
 ```
 
 
@@ -36,7 +36,7 @@ node get_block_data.js
 ## 2. 生成快照块
 
 ```
-node snapshot.js
+node 2_snapshot.js
 ```
 
 
@@ -57,7 +57,7 @@ node snapshot.js
 ## 3. 挖矿
 
 ```
-node machining_data.js
+node 3_machining_data.js
 ```
 
 
@@ -75,7 +75,7 @@ miningCycle(cycle_index); // cycle_index是奖励周期的索引号，从0开始
 ## 4. 验证奖励周期的挖矿结果
 
 ```
-node check_data.js
+node 4_check_data.js
 ```
 
 
@@ -98,7 +98,7 @@ block_db.checkCycleData();
 ### 5.1 执行方式
 
 ```
-node create_cycle_report.js
+node 5_create_cycle_report.js
 ```
 
 
