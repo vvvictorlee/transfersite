@@ -38,7 +38,7 @@ function miningCycle(cycle) {
         // TODO 删除挖矿表中的 REDEEM领取合约，防止持有Pair Token 重复计算？【需要根据真实数据测试影响】
 
         // 开始挖矿
-        yield block_db.miningToken(curr_cycle.snapshot, global.BLOCK_AWARDS, global.MAX_SUPPLY);
+        yield block_db.miningToken(curr_cycle.snapshot, global.BLOCK_AWARDS, global.MAX_SUPPLY, global.BLOCK_AWARDS_SWP, global.MAX_SUPPLY_SWP);
 
         // #4 ---- 计算周期奖励
         // 计算周期奖励，同时更新地址类型

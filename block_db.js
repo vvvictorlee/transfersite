@@ -156,7 +156,7 @@ SET s.verified=t.verified
 WHERE s.block>=t.vBlock
  */
 async function updatVerified() {
-    let sql = "UPDATE token_supply s LEFT JOIN (SELECT pToken,verified,vBlock FROM token_list WHERE verified>=1) t ON s.token = t.pToken\n" +
+    let sql = "UPDATE token_supply s LEFT JOIN (SELECT pToken,verified,vBlock FROM token_list WHERE verified>=1) t ON s.token = t.pToken " +
         "SET s.verified=t.verified WHERE s.block>=t.vBlock";
 
     await conn.query(sql, null).then(function (rows) {
@@ -291,7 +291,7 @@ SET m.swp_awards = IF(all_pool=0, 0, FLOOR(curr_award*pool_usdt/all_pool*(p_bala
 WHERE m.block=8573463 AND s.verified = 1
  */
 
-async function miningToken(block_list, awards, max_supply) {
+async function miningToken(block_list, awards, max_supply, awards_SWP, max_supply_SWP) {
     // awards, max_supply 直接拼入字符串中，否则有精度问题
     let sql_pToken = "UPDATE mining_data m LEFT JOIN token_supply s ON m.s_token=s.token and m.block=s.block " +
         "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
@@ -310,7 +310,7 @@ async function miningToken(block_list, awards, max_supply) {
     let sql_SWP = "UPDATE mining_data m LEFT JOIN token_supply s ON m.p_token=s.token and m.block=s.block " +
         "LEFT JOIN (SELECT SUM(weight_pool_usdt) all_pool FROM token_supply WHERE block=? AND verified >= 1) t1 ON 1=1 " +
         "LEFT JOIN (SELECT SUM(p_awards) new_p_totle, p_token FROM mining_data WHERE block<=? GROUP BY p_token) t2 ON t2.p_token=m.p_token " +
-        "LEFT JOIN (SELECT IF((SUM(swp_awards)+"+awards+"<="+max_supply+" OR SUM(swp_awards) IS NULL), "+awards+", IF("+max_supply+"-SUM(swp_awards)<=0,0,"+max_supply+"-SUM(swp_awards))) curr_award FROM mining_data WHERE block<?) t3 ON 1=1 " +
+        "LEFT JOIN (SELECT IF((SUM(swp_awards)+"+awards_SWP+"<="+max_supply_SWP+" OR SUM(swp_awards) IS NULL), "+awards_SWP+", IF("+max_supply_SWP+"-SUM(swp_awards)<=0,0,"+max_supply_SWP+"-SUM(swp_awards))) curr_award FROM mining_data WHERE block<?) t3 ON 1=1 " +
         "SET m.swp_awards = IF(all_pool=0, 0, ROUND(ROUND(CAST(curr_award AS DECIMAL(65,30))*weight_pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/new_p_totle*10-5.5)/10)) " +
         "WHERE m.block=? AND s.verified >= 1";
 
@@ -398,13 +398,19 @@ async function checkCycleData() {
     var sql_list = [];
 
     // 1、每个币种的总奖励 <= 总发行量（570万）
-    sql_list[0] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY+' assert FROM cycle_reward GROUP BY token';
+    sql_list[0] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY+' assert FROM cycle_reward WHERE token<>"'+global.CONTRACT_SWP+'" GROUP BY token';
+    sql_list[1] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY_SWP+' assert FROM cycle_reward WHERE token="'+global.CONTRACT_SWP+'" ';
 
     // 2、每个币种的本周期奖励 <= 本周期最大奖励（19.2万）
-    sql_list[1] = 'SELECT cycle,token,SUM(amount)>('+global.MAX_SUPPLY+'/30) assert FROM cycle_reward GROUP BY cycle,token';
+    sql_list[2] = 'SELECT cycle,token,SUM(amount)>('+global.MAX_SUPPLY+'/30) assert FROM cycle_reward WHERE token<>"'+global.CONTRACT_SWP+'" GROUP BY cycle,token';
+    sql_list[3] = 'SELECT cycle,token,SUM(amount)>('+global.MAX_SUPPLY_SWP+'/30) assert FROM cycle_reward WHERE token="'+global.CONTRACT_SWP+'" GROUP BY cycle';
+
+    // 3、每个块的奖励 <= 本块最大奖励
+    sql_list[4] = 'SELECT block,p_token,SUM(p_awards)>'+global.BLOCK_AWARDS+' assert FROM mining_data GROUP BY block,p_token';
+    sql_list[5] = 'SELECT block,SUM(swp_awards)>'+global.BLOCK_AWARDS_SWP+' assert FROM mining_data GROUP BY block';
 
     // 3、每个币种的总领取数量 <= 当前总发行量
-    sql_list[2] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY+' assert FROM block_chain_claim GROUP BY token';
+    sql_list[6] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY+' assert FROM block_chain_claim GROUP BY token';
 
     for (let i=0; i<sql_list.length; i++) {
         let sql = 'SELECT SUM(assert) assert FROM ( '+sql_list[i]+') t';
