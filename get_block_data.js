@@ -147,7 +147,7 @@ async function getAddrType(addr) {
 // 获取所有的地址，并判断类型
 async function chaeckAllAddr() {
     // 获取所有的地址，并入库
-    await block_db.addAllAddr();
+    await block_db.addAllAddr(global.ADDRESS_COMMUNITY);
 
     // 获取所有未校验地址
     let list = await block_db.getUncheckAddr();

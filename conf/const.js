@@ -19,10 +19,3 @@ global.MAX_SUPPLY_SWP = '2880000000000000000000000'; // *1000000000000000000
 global.ADDRESS_COMMUNITY = '0xa4a4005a9497548427a141d53ad8869829fb9ec7';   // 社区收款账户，用于获取挖矿奖励
 global.ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
-// 数据配置
-global.db_config = {
-    host: 'localhost',
-    user: 'root',
-    password: 'p@ssw0rd',
-    database: 'eth_data'
-};

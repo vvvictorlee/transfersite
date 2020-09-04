@@ -2,7 +2,7 @@
 var mysql = require('mysql');
 var wrapper = require('co-mysql');
 var co = require('co');
-require('./conf/const');
+require('./conf/db_conf');
 
 
 module.exports = {
@@ -29,7 +29,7 @@ module.exports = {
 };
 
 //实现本地链接
-var pool = mysql.createPool(db_config);
+var pool = mysql.createPool(DB_CONFIG);
 var conn = wrapper(pool);
 
 // ----- Block Chain -----
@@ -102,11 +102,11 @@ async function addClaimBlockDataList(dataList) {
 
 // ----- Snapshot -----
 // 生成某个奖励周期的快照持币地址情况
-async function addSnapshotBlock(cycle, block_list) {
+async function addSnapshotBlock(cycle, block_list, addr_zero) {
     let sql = "INSERT INTO snapshot_block (cycle, block, addr, token, balance) SELECT ?, ?, Addr,token,sum(amount) balance2 FROM ( " +
         "(SELECT toAddr Addr, token,sum(amount) amount FROM block_chain_data WHERE block<=? GROUP BY toAddr,token) UNION ALL " +
         "(SELECT fromAddr Addr, token,sum(-amount) amount FROM block_chain_data WHERE block<=? GROUP BY fromAddr,token) " +
-        ") t WHERE Addr<>'"+global.ADDRESS_ZERO+"' GROUP BY Addr,token ON DUPLICATE KEY UPDATE balance=VALUES(balance)";
+        ") t WHERE Addr<>'"+addr_zero+"' GROUP BY Addr,token ON DUPLICATE KEY UPDATE balance=VALUES(balance)";
 
     await co(function*() {
         for (let i = 0;i<block_list.length;i++) {
@@ -175,13 +175,13 @@ async function updatWeightPoolUSDT() {
 
 
 // 添加所有有交易记录的地址
-async function addAllAddr() {
+async function addAllAddr(addr_community) {
     let sql = "INSERT IGNORE INTO addr_type (addr) SELECT DISTINCT * FROM ( " +
         "SELECT fromAddr FROM block_chain_data GROUP BY fromAddr UNION ALL " +
         "SELECT toAddr FROM block_chain_data GROUP BY toAddr UNION ALL " +
         "SELECT ? ) t";
 
-    await conn.query(sql, [global.ADDRESS_COMMUNITY]).then(function (rows) {
+    await conn.query(sql, [addr_community]).then(function (rows) {
         console.log("addAllAddr :", rows.message);
     });
 }
@@ -291,7 +291,7 @@ SET m.swp_awards = IF(all_pool=0, 0, FLOOR(curr_award*pool_usdt/all_pool*(p_bala
 WHERE m.block=8573463 AND s.verified = 1
  */
 
-async function miningToken(block_list, awards, max_supply, awards_SWP, max_supply_SWP) {
+async function miningToken(block_list, awards, max_supply, awards_SWP, max_supply_SWP,addr_community) {
     // awards, max_supply 直接拼入字符串中，否则有精度问题
     let sql_pToken = "UPDATE mining_data m LEFT JOIN token_supply s ON m.s_token=s.token and m.block=s.block " +
         "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
@@ -322,7 +322,7 @@ async function miningToken(block_list, awards, max_supply, awards_SWP, max_suppl
             console.log("miningPT  1 PT : block=", block, rows.message);
 
             // 修正每次的数量，余额全部转入管理账户
-            rows = yield conn.query(sql_Sys, [global.ADDRESS_COMMUNITY, block, block, global.ADDRESS_COMMUNITY]);
+            rows = yield conn.query(sql_Sys, [addr_community, block, block, addr_community]);
             console.log("miningSys 2 Sys: block=", block, rows.message);
 
             // 更新待领取数量
@@ -336,7 +336,7 @@ async function miningToken(block_list, awards, max_supply, awards_SWP, max_suppl
     });
 }
 // 创建周期奖励
-async function creatCycleReward(cycle) {
+async function creatCycleReward(cycle, contract_swp) {
     let sql_clean = "DELETE FROM cycle_reward WHERE cycle=?";
     let sql_pToken = "INSERT INTO cycle_reward (cycle,addr,token,amount) " +
         "SELECT cycle,addr,p_token,SUM(p_awards) FROM mining_data m WHERE cycle=? AND p_awards>0 GROUP BY cycle,addr,p_token";
@@ -354,7 +354,7 @@ async function creatCycleReward(cycle) {
         console.log("creatCycleReward  PT: cycle=", cycle, rows.message);
 
         // 计算SWP奖励
-        rows = yield conn.query(sql_swp, [global.CONTRACT_SWP, cycle]);
+        rows = yield conn.query(sql_swp, [contract_swp, cycle]);
         console.log("creatCycleReward SWP: cycle=", cycle, rows.message);
 
         rows = yield conn.query(sql_type, null);
@@ -394,23 +394,23 @@ async function getCycleRewardReport(cycle) {
 
  */
 // 更新地址类型
-async function checkCycleData() {
+async function checkCycleData(block_awards, max_supply, block_awards_swp, max_supply_swp, contract_swp) {
     var sql_list = [];
 
     // 1、每个币种的总奖励 <= 总发行量（570万）
-    sql_list[0] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY+' assert FROM cycle_reward WHERE token<>"'+global.CONTRACT_SWP+'" GROUP BY token';
-    sql_list[1] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY_SWP+' assert FROM cycle_reward WHERE token="'+global.CONTRACT_SWP+'" ';
+    sql_list[0] = 'SELECT token,SUM(amount)>'+max_supply+' assert FROM cycle_reward WHERE token<>"'+contract_swp+'" GROUP BY token';
+    sql_list[1] = 'SELECT token,SUM(amount)>'+max_supply_swp+' assert FROM cycle_reward WHERE token="'+contract_swp+'" ';
 
     // 2、每个币种的本周期奖励 <= 本周期最大奖励（19.2万）
-    sql_list[2] = 'SELECT cycle,token,SUM(amount)>('+global.MAX_SUPPLY+'/30) assert FROM cycle_reward WHERE token<>"'+global.CONTRACT_SWP+'" GROUP BY cycle,token';
-    sql_list[3] = 'SELECT cycle,token,SUM(amount)>('+global.MAX_SUPPLY_SWP+'/30) assert FROM cycle_reward WHERE token="'+global.CONTRACT_SWP+'" GROUP BY cycle';
+    sql_list[2] = 'SELECT cycle,token,SUM(amount)>('+max_supply+'/30) assert FROM cycle_reward WHERE token<>"'+contract_swp+'" GROUP BY cycle,token';
+    sql_list[3] = 'SELECT cycle,token,SUM(amount)>('+max_supply_swp+'/30) assert FROM cycle_reward WHERE token="'+contract_swp+'" GROUP BY cycle';
 
     // 3、每个块的奖励 <= 本块最大奖励
-    sql_list[4] = 'SELECT block,p_token,SUM(p_awards)>'+global.BLOCK_AWARDS+' assert FROM mining_data GROUP BY block,p_token';
-    sql_list[5] = 'SELECT block,SUM(swp_awards)>'+global.BLOCK_AWARDS_SWP+' assert FROM mining_data GROUP BY block';
+    sql_list[4] = 'SELECT block,p_token,SUM(p_awards)>'+block_awards+' assert FROM mining_data GROUP BY block,p_token';
+    sql_list[5] = 'SELECT block,SUM(swp_awards)>'+block_awards_swp+' assert FROM mining_data GROUP BY block';
 
-    // 3、每个币种的总领取数量 <= 当前总发行量
-    sql_list[6] = 'SELECT token,SUM(amount)>'+global.MAX_SUPPLY+' assert FROM block_chain_claim GROUP BY token';
+    // 4、每个币种的总领取数量 <= 当前总发行量
+    sql_list[6] = 'SELECT token,SUM(amount)>'+max_supply+' assert FROM block_chain_claim GROUP BY token';
 
     for (let i=0; i<sql_list.length; i++) {
         let sql = 'SELECT SUM(assert) assert FROM ( '+sql_list[i]+') t';

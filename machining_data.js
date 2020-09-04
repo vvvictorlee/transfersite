@@ -15,7 +15,7 @@ function miningCycle(cycle) {
 
     co(function*() {
         // #1 ---- 生成每个快照块，各个地址的持币情况
-        yield block_db.addSnapshotBlock(curr_cycle.cycle, curr_cycle.snapshot);
+        yield block_db.addSnapshotBlock(curr_cycle.cycle, curr_cycle.snapshot, global.ADDRESS_ZERO);
 
         // #2 ---- 生成每个快照块，各个币种的总发行量、流动池大小
         // 生成每个快照块，各个币种的总发行量
@@ -38,11 +38,11 @@ function miningCycle(cycle) {
         // TODO 删除挖矿表中的 REDEEM领取合约，防止持有Pair Token 重复计算？【需要根据真实数据测试影响】
 
         // 开始挖矿
-        yield block_db.miningToken(curr_cycle.snapshot, global.BLOCK_AWARDS, global.MAX_SUPPLY, global.BLOCK_AWARDS_SWP, global.MAX_SUPPLY_SWP);
+        yield block_db.miningToken(curr_cycle.snapshot, global.BLOCK_AWARDS, global.MAX_SUPPLY, global.BLOCK_AWARDS_SWP, global.MAX_SUPPLY_SWP, global.ADDRESS_COMMUNITY);
 
         // #4 ---- 计算周期奖励
         // 计算周期奖励，同时更新地址类型
-        yield block_db.creatCycleReward(curr_cycle.cycle);
+        yield block_db.creatCycleReward(curr_cycle.cycle, global.CONTRACT_SWP);
 
         // TODO 合约未领取的数据要如何处理？
         //  【是否回到待分配池中（释放mining_data的数量）？
@@ -53,7 +53,7 @@ function miningCycle(cycle) {
         console.log('---- finished! ----');
 
         // #5 ---- 数据检查
-        yield block_db.checkCycleData();
+        yield block_db.checkCycleData(global.BLOCK_AWARDS, global.MAX_SUPPLY, global.BLOCK_AWARDS_SWP, global.MAX_SUPPLY_SWP, global.CONTRACT_SWP);
     });
 }
 
