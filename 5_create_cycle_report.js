@@ -23,4 +23,4 @@ function createReport(cycle) {
 }
 
 
-createReport(2);
+createReport(1);

@@ -208,51 +208,6 @@ async function updateAddrTypeList(list) {
 
 
 // ----- Mining -----
-// 初始化挖矿数据
-async function initMiningData(block, addr_redeem) {
-    let sql_S = "INSERT INTO mining_data (cycle, block, addr, s_token, s_balance, p_token) " +
-        "SELECT cycle, t.block, addr, sToken, balance, pToken FROM snapshot_block t LEFT JOIN token_list ON sToken=token " +
-        "WHERE t.block>=? AND sToken IS NOT NULL ON DUPLICATE KEY UPDATE s_balance=VALUES(s_balance)";
-    // 删除挖矿表中的 REDEEM领取合约，防止持有Pair Token 重复计算
-    let sql_P = "INSERT INTO mining_data (cycle, block, addr, s_token, p_balance, p_token) " +
-        "SELECT cycle, t.block, addr, sToken, balance, pToken FROM snapshot_block t LEFT JOIN token_list ON pToken=token \n" +
-        "WHERE t.block>=? AND pToken IS NOT NULL AND addr<>? ON DUPLICATE KEY UPDATE p_balance=VALUES(p_balance)";
-
-    await co(function*() {
-        // 更新SToken在每个快照块的持有量
-        let rows = yield conn.query(sql_S, [block]);
-        console.log("initMiningData 1: syncBlock=", block, rows.message);
-        // 更新PairToken在每个快照块的持有量
-        rows = yield conn.query(sql_P, [block, addr_redeem]);
-        console.log("initMiningData 2: syncBlock=", block, rows.message);
-    });
-}
-// 更新待领取数量
-/*
-UPDATE mining_data m LEFT JOIN (
-SELECT addr,token,SUM(amount) unclaimed FROM (
-SELECT addr,p_token token,SUM(p_awards) amount FROM mining_data WHERE block<8573463 GROUP BY addr,p_token
-UNION ALL
-SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<8573463 GROUP BY addr,token
-) x GROUP BY addr,token
-) t ON m.addr=t.addr AND m.p_token=t.token
-SET m.p_unclaimed=t.unclaimed
-WHERE m.block=8573463 AND t.unclaimed IS NOT NULL
-*/
-// async function updateUnclaimed(block_list) {
-//     let sql = "UPDATE mining_data m LEFT JOIN ( SELECT addr,token,SUM(amount) unclaimed FROM ( " +
-//         "SELECT addr,p_token token,SUM(p_awards) amount FROM mining_data WHERE block<? GROUP BY addr,p_token UNION ALL " +
-//         "SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<? GROUP BY addr,token ) x GROUP BY addr,token " +
-//         ") t ON m.addr=t.addr AND m.p_token=t.token SET m.p_unclaimed=t.unclaimed WHERE m.block=? AND t.unclaimed IS NOT NULL";
-//
-//     await co(function*() {
-//         for (let i = 0;i<block_list.length;i++) {
-//             let block = block_list[i];
-//             let rows = yield conn.query(sql, [block, block, block]);
-//             console.log("updateUnclaimed : block=", block, rows.message);
-//         }
-//     });
-// }
 
 // 清理一个周期的挖矿数据，防止计算出错
 async function cleanCycleMiningData(cycle) {
@@ -261,6 +216,26 @@ async function cleanCycleMiningData(cycle) {
     await co(function*() {
         let rows = yield conn.query(sql_claen, [cycle]);
         console.log("cleanCycleMiningData : cycle=", cycle, rows.message);
+    });
+}
+
+// 初始化挖矿数据
+async function initMiningData(startBlock, endBlock, addr_redeem) {
+    let sql_S = "INSERT INTO mining_data (cycle, block, addr, s_token, s_balance, p_token) " +
+        "SELECT cycle, t.block, addr, sToken, balance, pToken FROM snapshot_block t LEFT JOIN token_list ON sToken=token " +
+        "WHERE t.block>=? AND sToken IS NOT NULL ON DUPLICATE KEY UPDATE s_balance=VALUES(s_balance)";
+    // 需要同时删除挖矿表中的 REDEEM 领取合约，防止持有Pair Token 重复计算
+    let sql_P = "INSERT INTO mining_data (cycle, block, addr, s_token, p_balance, p_token) " +
+        "SELECT cycle, t.block, addr, sToken, balance, pToken FROM snapshot_block t LEFT JOIN token_list ON pToken=token \n" +
+        "WHERE t.block>=? AND pToken IS NOT NULL AND addr<>? ON DUPLICATE KEY UPDATE p_balance=VALUES(p_balance)";
+
+    await co(function*() {
+        // 更新SToken在每个快照块的持有量
+        let rows = yield conn.query(sql_S, [startBlock]);
+        console.log("initMiningData 1: startBlock=", startBlock, rows.message);
+        // 更新PairToken在每个快照块的持有量
+        rows = yield conn.query(sql_P, [startBlock, addr_redeem]);
+        console.log("initMiningData 2: startBlock=", startBlock, rows.message);
     });
 }
 
@@ -309,7 +284,7 @@ async function miningToken(block_list, awards, max_supply, awards_SWP, max_suppl
         "ON DUPLICATE KEY UPDATE p_awards=VALUES(p_awards)";
     let sql_unclaimed = "UPDATE mining_data m LEFT JOIN ( SELECT addr,token,SUM(amount) unclaimed FROM ( " +
         "SELECT addr,p_token token,SUM(p_awards) amount FROM mining_data WHERE block<? GROUP BY addr,p_token UNION ALL " +
-        "SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<? GROUP BY addr,token ) x GROUP BY addr,token " +
+        "SELECT addr,token,SUM(-amount) amount FROM block_chain_claim WHERE block<=? GROUP BY addr,token ) x GROUP BY addr,token " +
         ") t ON m.addr=t.addr AND m.p_token=t.token SET m.p_unclaimed=t.unclaimed WHERE m.block=? AND t.unclaimed IS NOT NULL";
 
     let sql_SWP = "UPDATE mining_data m LEFT JOIN token_supply s ON m.p_token=s.token and m.block=s.block " +
