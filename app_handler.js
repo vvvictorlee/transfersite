@@ -4,21 +4,25 @@ var co = require('co');
 var util = require('./util');
 var block_db = require('./block_db');
 // require('./conf/const');
-require('./conf/const_private');
+// require('./conf/const_private');
+require('./conf/const_ropsten');
+var sleep = require('sleep');
+
 const { claimProof } = require("./scripts/calculateProof");
 const disburse = require("./scripts/disburse");
 const { fstat } = require("fs");
-let HDWalletProvider = require('truffle-hdwallet-provider')
 
 var web3 = new Web3();
-// web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
+web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 
-let terms = util.loadJson('secrets/admin.json');
+// let HDWalletProvider = require('truffle-hdwallet-provider')
 
-//3.设置测试网络 infura
-let netIp = global.HTTP_PROVIDER
-let provider = new HDWalletProvider(terms, netIp)
-web3.setProvider(provider);
+// let terms = util.loadJson('secrets/admin.json');
+
+// // //3.设置测试网络 infura
+// // let netIp = global.HTTP_PROVIDER
+// // let provider = new HDWalletProvider(terms, netIp)
+// // web3.setProvider(provider);
 
 // 合约abi
 var factory_abi = util.loadJson('abi/Factory.json');
@@ -40,7 +44,9 @@ var symbol_conf = './data/conf.json';
 const admin = process.env.ADMIN;
 const password = process.env.PASSWORD;
 const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
-
+const admin_secrets = process.env.ADMIN_SECRETS;
+const chain_id = process.env.CHAIN_ID;
+const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
 async function getRewardListByAddress(addr) {
     try {
         const token_symbols = await get_token_symbol();
@@ -67,6 +73,8 @@ async function claim_all(addr) {
             contractaddress: global.CONTRACT_REDEEM,
             path: epoch_reports_path,
             password: password,
+            admin_secrets: admin_secrets,
+            chain_id: chain_id,
         };
 
         const encodedAbi = await claimProof(para, addr, balances);
@@ -95,10 +103,16 @@ async function get_token_symbol() {
         console.log(token);
         if (!token_symbols.hasOwnProperty(token)) {
             console.log("in==", token);
-            let erc20 = new web3.eth.Contract(erc20_abi, token);
-            let symbol = await erc20.methods.symbol().call();
-            console.log("symbol==", symbol);
-            token_symbols[token] = symbol;
+            try {
+                let erc20 = new web3.eth.Contract(erc20_abi, token);
+                let symbol = await erc20.methods.symbol().call();
+                console.log("symbol==", symbol);
+                token_symbols[token] = symbol;
+                sleep.msleep(symbol_interval);
+            }
+            catch (error) {
+                console.log(error);
+            }
         }
     }
 
@@ -126,6 +140,8 @@ async function disburse_by_epoch(epochNum, step) {
             erc20_abi: erc20_abi,
             contractaddress: global.CONTRACT_REDEEM,
             password: password,
+            admin_secrets: admin_secrets,
+            chain_id: chain_id,
         };
 
         // await disburse(para, epoch_path, epochNum, blockNum);

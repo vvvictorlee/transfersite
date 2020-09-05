@@ -1,6 +1,6 @@
 var block_db = require('./block_db');
-require('./conf/const');
-
+// require('./conf/const');
+require('./conf/const_ropsten');
 
 (async function () {
     // 数据检查
