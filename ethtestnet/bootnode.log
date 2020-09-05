@@ -1,0 +1,4 @@
+enode://4b121fe97d6e0c4b58804b69846ad34495780c2613ac079c8559f1996f63ca70e1c2301c5ea849e39bd08e74430d576784561a395d4e23501339d730ab8ec440@127.0.0.1:0?discport=30301
+Note: you're using cmd/bootnode, a developer tool.
+We recommend using a regular node as bootstrap node for production deployments.
+INFO [08-27|18:50:46.225] New local node record                    seq=1 id=cf95dcab45e5fd0e ip=<nil> udp=0 tcp=0
