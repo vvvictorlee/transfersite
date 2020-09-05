@@ -14,6 +14,8 @@
  Date: 04/09/2020 21:04:19
 */
 
+use eth_data;
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 

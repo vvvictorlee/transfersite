@@ -20,7 +20,7 @@ curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application
 
 curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "get_reward_list",
-	"address": "0xb0b0d02d246dadb22f40133c2fb0fcf738b3337c"
+	"address": "0xa4a4005a9497548427a141d53ad8869829fb9ec7"
 }'
 
 curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{

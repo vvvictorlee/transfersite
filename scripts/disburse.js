@@ -4,6 +4,7 @@
 const { MerkleTree } = require("../lib/merkleTree");
 const { loadTrees } = require("./loadTrees");
 const fs = require("fs");
+const { sentSignedTx } = require("./sentSignedTx");
 
 module.exports = async function (callback) {
     console.log("File Path Arg (must be absolute):", process.argv[4]);
@@ -85,13 +86,27 @@ const finishEpoch = async (para, path, epochNum, blockNum) => {
         block.hash +
         '")'
     );
+    try {
+        //ropsten
+        if (3 === para.chain_id) {
+            const abi = await para.contract.methods.finishEpoch(epochNum,
+                block.timestamp,
+                block.hash
+            ).encodeABI();
+            sentSignedTx(para, abi);
+        }
+        else {
+            await para.web3.eth.personal.unlockAccount(para.admin, para.password);
 
-    await para.web3.eth.personal.unlockAccount(para.admin, para.password);
-
-    await para.contract.methods.finishEpoch(epochNum,
-        block.timestamp,
-        block.hash
-    ).send({ from: para.admin });
+            await para.contract.methods.finishEpoch(epochNum,
+                block.timestamp,
+                block.hash
+            ).send({ from: para.admin });
+        }
+    }
+    catch (error) {
+        console.log(error);
+    }
 
 }
 
@@ -109,17 +124,31 @@ const seedAllocations = async (para, path, epochNum, blockNum) => {
     console.log("\n\n// TO FINISH THIS WEEK");
     console.log("let redeem\nMerkleRedeem.deployed().then(i => redeem = i);");
     console.log("let epochNum = " + epochNum + " // adjust accordingly");
+    try {
+        //ropsten
+        if (3 === para.chain_id) {
+            const abi = await para.contract.methods.seedAllocations(
+                epochNum,
+                root
+            ).encodeABI();
+            sentSignedTx(para, abi);
+        }
+        else {
+            await para.web3.eth.personal.unlockAccount(para.admin, para.password);
 
-    await para.web3.eth.personal.unlockAccount(para.admin, para.password);
+            console.log('await redeem.seedAllocations(' + epochNum + ', "' + root + '")');
 
-    console.log('await redeem.seedAllocations(' + epochNum + ', "' + root + '")');
-
-    // await para.contract.methods.seedAllocations(
-    //     epochNum,
-    //     root
-    // ).send({ from: para.admin });
+            await para.contract.methods.seedAllocations(
+                epochNum,
+                root
+            ).send({ from: para.admin });
+        }
+    }
+    catch (error) {
+        console.log(error);
+    }
 
 }
 
 
-module.exports = { disburse ,finishEpoch,seedAllocations};
+module.exports = { disburse, finishEpoch, seedAllocations };

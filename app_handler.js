@@ -8,9 +8,17 @@ require('./conf/const_private');
 const { claimProof } = require("./scripts/calculateProof");
 const disburse = require("./scripts/disburse");
 const { fstat } = require("fs");
+let HDWalletProvider = require('truffle-hdwallet-provider')
 
 var web3 = new Web3();
-web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
+// web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
+
+let terms = util.loadJson('secrets/admin.json');
+
+//3.设置测试网络 infura
+let netIp = global.HTTP_PROVIDER
+let provider = new HDWalletProvider(terms, netIp)
+web3.setProvider(provider);
 
 // 合约abi
 var factory_abi = util.loadJson('abi/Factory.json');
@@ -56,6 +64,7 @@ async function claim_all(addr) {
             admin: admin,
             contract: redeem,
             erc20_abi: erc20_abi,
+            contractaddress: global.CONTRACT_REDEEM,
             path: epoch_reports_path,
             password: password,
         };
@@ -115,6 +124,7 @@ async function disburse_by_epoch(epochNum, step) {
             admin: admin,
             contract: redeem,
             erc20_abi: erc20_abi,
+            contractaddress: global.CONTRACT_REDEEM,
             password: password,
         };
 

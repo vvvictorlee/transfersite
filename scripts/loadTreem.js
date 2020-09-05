@@ -22,15 +22,26 @@ const loadTreem = async (para, fullfileName) => {
     const supply = items[1];
     const token = items[2];
 
+    try {
+        //ropsten
+        if (3 === para.chain_id) {
+            const abi = await para.contract.methods.issue(token, supply).encodeABI();
+            sentSignedTx(para, abi);
+        }
+        else {
+            await para.web3.eth.personal.unlockAccount(para.admin, para.password);
+            // let erc20 = new para.web3.eth.Contract(erc20_abi, token);
+            // console.log("=============addissuer begin");
+            // await erc20.methods.addIssuer(global.CONTRACT_REDEEM).send({ from: para.admin });
 
-    await para.web3.eth.personal.unlockAccount(para.admin, para.password);
-    let erc20 = new para.web3.eth.Contract(erc20_abi, token);
-    // console.log("=============addissuer begin");
-    await erc20.methods.addIssuer(global.CONTRACT_REDEEM).send({ from: para.admin });
+            // console.log("=============issue begin");
 
-    // console.log("=============issue begin");
-
-    await para.contract.methods.issue(token, supply).send({ from: para.admin });
+            await para.contract.methods.issue(token, supply).send({ from: para.admin });
+        }
+    }
+    catch (error) {
+        console.log(error);
+    }
 
     // console.log("=============issue end");
 
@@ -46,13 +57,13 @@ const loadTreem = async (para, fullfileName) => {
             address = para.admin;
         }
         origelements.push([address, token, balance]);
-        console.log("address, token, balance====",address, token, balance);
+        console.log("address, token, balance====", address, token, balance);
         leaf = para.web3.utils.soliditySha3(address, token, balance);
         console.log(leaf);
         elements.push(leaf);
     });
-    console.log("=============loadtreem====="+ elements);
-    return [elements,origelements];
+    console.log("=============loadtreem=====" + elements);
+    return [elements, origelements];
 };
 
 module.exports = { loadTreem };
