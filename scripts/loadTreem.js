@@ -1,9 +1,9 @@
-const { MerkleTree } = require("../lib/merkleTree");
+// const { MerkleTree } = require("../lib/merkleTree");
 const fs = require("fs");
 const path = require('path');
-var util = require('../util');
-const erc20_abi = util.loadJson('./abi/ERC20.json');
-require('../conf/const_private');
+// var util = require('../util');
+// const erc20_abi = util.loadJson('./abi/ERC20.json');
+const { sentSignedTx } = require("./sentSignedTx");
 
 
 const loadTreem = async (para, fullfileName) => {
@@ -24,9 +24,10 @@ const loadTreem = async (para, fullfileName) => {
 
     try {
         //ropsten
-        if (3 === para.chain_id) {
+        if (3 == para.chain_id) {
             const abi = await para.contract.methods.issue(token, supply).encodeABI();
-            sentSignedTx(para, abi);
+            console.log("+++++++++ issue ", token);
+            await sentSignedTx(para, abi);
         }
         else {
             await para.web3.eth.personal.unlockAccount(para.admin, para.password);

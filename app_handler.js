@@ -1,16 +1,11 @@
 require('dotenv').config();
 var Web3 = require("web3");
-var co = require('co');
 var util = require('./util');
 var block_db = require('./block_db');
-// require('./conf/const');
-// require('./conf/const_private');
 require('./conf/const_ropsten');
-var sleep = require('sleep');
 
 const { claimProof } = require("./scripts/calculateProof");
 const disburse = require("./scripts/disburse");
-const { fstat } = require("fs");
 
 var web3 = new Web3();
 web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
@@ -25,9 +20,6 @@ web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 // // web3.setProvider(provider);
 
 // 合约abi
-var factory_abi = util.loadJson('abi/Factory.json');
-var factory = new web3.eth.Contract(factory_abi, global.CONTRACT_FACTORY);
-
 var redeem_abi = util.loadJson('abi/MerkleRedeem.json');
 var redeem = new web3.eth.Contract(redeem_abi, global.CONTRACT_REDEEM);
 
@@ -35,10 +27,7 @@ var stoken_abi = util.loadJson('abi/SToken.json');
 var erc20_abi = util.loadJson('abi/ERC20.json');
 
 var file_tokens = './data/token_list.json';
-var file_conf = './data/conf.json';
-
 var token_symbols_json = './data/token_symbols.json';
-var symbol_conf = './data/conf.json';
 
 
 const admin = process.env.ADMIN;
@@ -47,6 +36,7 @@ const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "/Users/lisheng/myg
 const admin_secrets = process.env.ADMIN_SECRETS;
 const chain_id = process.env.CHAIN_ID;
 const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
+
 async function getRewardListByAddress(addr) {
     try {
         const token_symbols = await get_token_symbol();
@@ -164,3 +154,5 @@ module.exports = {
     get_token_symbol,
     disburse_by_epoch,
 };
+
+// disburse_by_epoch(1, 1)

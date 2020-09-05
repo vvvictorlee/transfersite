@@ -76,7 +76,7 @@ const finishEpoch = async (para, path, epochNum, blockNum) => {
     console.log("Block:\t", blockNum, block.hash, block.timestamp);
 
 
-    console.log("\n\n// TO FINISH THIS WEEK");
+    console.log("\n\n// TO FINISH THIS EPOCH");
     console.log("let redeem\nMerkleRedeem.deployed().then(i => redeem = i);");
     console.log("let epochNum = " + epochNum + " // adjust accordingly");
     console.log(
@@ -88,7 +88,7 @@ const finishEpoch = async (para, path, epochNum, blockNum) => {
     );
     try {
         //ropsten
-        if (3 === para.chain_id) {
+        if (3 == para.chain_id) {
             const abi = await para.contract.methods.finishEpoch(epochNum,
                 block.timestamp,
                 block.hash
@@ -121,12 +121,12 @@ const seedAllocations = async (para, path, epochNum, blockNum) => {
     const root = merkleTree.getHexRoot();
     console.log("Tree:\t", root);
 
-    console.log("\n\n// TO FINISH THIS WEEK");
+    console.log("\n\n// TO FINISH THIS EPOCH");
     console.log("let redeem\nMerkleRedeem.deployed().then(i => redeem = i);");
     console.log("let epochNum = " + epochNum + " // adjust accordingly");
     try {
         //ropsten
-        if (3 === para.chain_id) {
+        if (3 == para.chain_id) {
             const abi = await para.contract.methods.seedAllocations(
                 epochNum,
                 root

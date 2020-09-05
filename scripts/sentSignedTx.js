@@ -1,14 +1,17 @@
-
+var Web3 = require("web3");
 var Tx = require('ethereumjs-tx').Transaction;
+
+var web3 = new Web3();
+web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
+
 
 const sentSignedTx = async (para, data) => {
 
     try {
-
         let nonce = await para.web3.eth.getTransactionCount(para.admin, "pending");
-        console.log(nonce);
 
-        let encodedabi = await para.contract.methods.verify(token).encodeABI();//send({ from: admin4 });
+        // console.log("------nonce-------", nonce, para.contractaddress);
+        // let encodedabi = await para.contract.methods.verify(token).encodeABI();//send({ from: admin4 });
 
         var privateKey = Buffer.from(para.admin_secrets, 'hex');
         const gasprice = await para.web3.eth.getGasPrice();
@@ -30,14 +33,13 @@ const sentSignedTx = async (para, data) => {
 
         var serializedTx = tx.serialize();
 
-        let receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
+        let receipt = await web3.eth.sendSignedTransaction('0x'+serializedTx.toString('hex'));
+
         console.log(receipt);
 
     } catch (error) {
         console.log(error);
     }
-
-
 }
 
 
