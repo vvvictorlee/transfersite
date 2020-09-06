@@ -3,7 +3,7 @@ const fs = require('fs');
 const Web3 = require('web3');
 
 // // // Connect to local Ethereum node
-const web3 = new Web3(new Web3.providers.HttpProvider(process.env.HTTP_API_URL ||"http://192.168.38.227:18045"));
+const web3 = new Web3(new Web3.providers.HttpProvider(process.env.HTTP_API_URL || "http://192.168.38.227:18045"));
 
 
 const writeData = (data, path) => {
@@ -20,10 +20,12 @@ const writeData = (data, path) => {
 
 function checkAllBalances() {
     web3.eth.getAccounts(function (err, accounts) {
-        writeData(accounts,"accounts");
+        writeData(accounts, "accounts");
         accounts.forEach(function (id) {
             web3.eth.getBalance(id, function (err, balance) {
-                console.log("" + id + " \t:\tbalance: " + web3.utils.fromWei(balance, "ether") + " ether");
+                if (balance > 0) {
+                    console.log("" + id + " \t:\tbalance: " + web3.utils.fromWei(balance, "ether") + " ether");
+                }
             });
         });
     });

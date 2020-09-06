@@ -42,30 +42,31 @@ const token2 = "0x0cEeD9D6CFD5558f0dA79FA21644E4c7Ff106c8F";
 (async function () {
 
     ////step 3
-    await web3.eth.personal.unlockAccount(admin3, password);
+    //     await web3.eth.personal.unlockAccount(admin3, password);
 
-    // await TToken.methods.issue(admin, web3.utils.toWei("145000")).send({ from: admin });
+    //     // await TToken.methods.issue(admin, web3.utils.toWei("145000")).send({ from: admin });
 
-    ////step 4 tran
+    //     ////step 4 tran
 
-    let amt = await TToken.methods.balanceOf(user1).call({ from: user1 });
-    console.log(amt);
+    //     let amt = await TToken.methods.balanceOf(user1).call({ from: user1 });
+    //     console.log(amt);
 
-    // await TToken.methods.transfer(REDEEM, web3.utils.toWei("20000")).send({ from: admin });
-    let amt1 = await TToken.methods.balanceOf(REDEEM).call({ from: admin3 });
-    console.log(amt1);
-amt1 = await TToken.methods.name().call({ from: admin3 });
-    console.log(amt1);
-amt1 = await TToken.methods.symbol().call({ from: admin3 });
-    console.log(amt1);
+    //     // await TToken.methods.transfer(REDEEM, web3.utils.toWei("20000")).send({ from: admin });
+    //     let amt1 = await TToken.methods.balanceOf(REDEEM).call({ from: admin3 });
+    //     console.log(amt1);
+    // amt1 = await TToken.methods.name().call({ from: admin3 });
+    //     console.log(amt1);
+    // amt1 = await TToken.methods.symbol().call({ from: admin3 });
+    // console.log(amt1);
 
 
 
     // // //  //step5
-    let epoch1Block = (await web3.eth.getBlock(1));
+    // let epoch1Block = (await web3.eth.getBlock(1));
 
 
     const claimBalance1 = web3.utils.toWei("1000");
+    console.log(user1, token1, claimBalance1);
     const elements1 = [web3.utils.soliditySha3(user1, token1, claimBalance1),web3.utils.soliditySha3(user1, token1, claimBalance1)];
     const merkleTree1 = new MerkleTree(elements1);
     const root1 = merkleTree1.getHexRoot();
@@ -77,13 +78,13 @@ amt1 = await TToken.methods.symbol().call({ from: admin3 });
 
 
     // // //step6
-    // const claimBalance2 = web3.utils.toWei("1234");
-    // const elements2 = [web3.utils.soliditySha3(user1, token1, claimBalance2)];
-    // const merkleTree2 = new MerkleTree(elements2);
-    // const root2 = merkleTree2.getHexRoot();
-    // console.log(root2);
+    const claimBalance2 = web3.utils.toWei("1234");
+    const elements2 = [web3.utils.soliditySha3(user1, token1, claimBalance2),web3.utils.soliditySha3(user1, token2, claimBalance2)];
+    const merkleTree2 = new MerkleTree(elements2);
+    const root2 = merkleTree2.getHexRoot();
+    console.log(root2);
 
-    let epoch2Block = (await web3.eth.getBlock(epochblocks * 1));
+    // let epoch2Block = (await web3.eth.getBlock(epochblocks * 1));
 
     // await Redeem.methods.finishEpoch(2, epoch2Block.timestamp, epoch2Block.hash).send({ from: admin3 });
     // await Redeem.methods.seedAllocations(5, root2).send({ from: admin });
@@ -91,13 +92,14 @@ amt1 = await TToken.methods.symbol().call({ from: admin3 });
 
     // //step7
 
-    await web3.eth.personal.unlockAccount(user1, password);
+    // await web3.eth.personal.unlockAccount(user1, password);
 
     let claimedBalance1 = web3.utils.toWei("1000");
     let claimedBalance2 = web3.utils.toWei("1234");
 
     const proof1 = merkleTree1.getHexProof(elements1[0]);
-    await Redeem.methods.claimEpoch(1, token1,claimedBalance1, proof1  ).send({ from: user1 });
+    console.log(elements1[0],elements1, merkleTree1, "1111===", proof1);
+    // await Redeem.methods.claimEpoch(1, token1,claimedBalance1, proof1  ).send({ from: user1 });
 
 
     // const proof2 = merkleTree2.getHexProof(elements2[0]);
@@ -123,8 +125,8 @@ amt1 = await TToken.methods.symbol().call({ from: admin3 });
     // ).send({ from: user1 });
 
     //   //step9
-    let result = await TToken.methods.balanceOf(user1).call({ from: user1 });
-    console.log(result);
+    // let result = await TToken.methods.balanceOf(user1).call({ from: user1 });
+    // console.log(result);
 
 })();
 
