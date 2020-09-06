@@ -7,6 +7,14 @@ var app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+var timeout = require('connect-timeout'); //express v4
+
+app.use(timeout(120000));
+app.use(haltOnTimedout);
+
+function haltOnTimedout(req, res, next){
+  if (!req.timedout) next();
+}
 
 app.use(function (req, res, next) {
     console.log('req ' + JSON.stringify(req.body))
@@ -26,8 +34,12 @@ app.post('/claim/', function (req, res) {
             const result = data.length > 0?"success":"fail";
             res.json({ "result": result, "data": data });
         }),
-        "disburse": (async function () {
-            app_handler.disburse_by_epoch(req.body.epoch,req.body.step);
+        "finish_epoch": (async function () {
+            await app_handler.disburse_by_epoch(req.body.epoch,0);
+            res.json({ "result": "success"});
+        }),
+        "seed_allocations": (async function () {
+            await app_handler.disburse_by_epoch(req.body.epoch,1);
             res.json({ "result": "success"});
         }),
         "default": (async function () {

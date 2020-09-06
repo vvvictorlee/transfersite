@@ -15,6 +15,9 @@ const claimProof = async (para, address, balances) => {
     for (const cycle of Object.keys(balances)) {
         const merkleTree = await loadTrees(para, para.path + cycle);
 
+        const root = merkleTree.getHexRoot();
+        console.log("Tree:\t", root);
+
         for (const tb of balances[cycle]) {
             const token = tb.token;
             console.log("token===" + token);
@@ -36,6 +39,9 @@ const claimProof = async (para, address, balances) => {
             //     list
             // ).encodeABI();
             for (const ctbp of claim_list) {
+                const [cycle, token, balance, proof] = ctbp;
+                let result = await para.contract.methods.verifyClaim(address, cycle, token, balance, proof).call({ from: para.admin });
+                console.log(result, "ctbp===", ctbp);
                 const abi = await para.contract.methods.claimEpoch(
                     address,
                     cycle, token, balance, proof
@@ -64,7 +70,7 @@ const claimProof = async (para, address, balances) => {
 
     const abi = await para.contract.methods.claimEpochs(
         address,
-        list
+        claim_list
     ).encodeABI();
 
     console.log("===claimProof end==");

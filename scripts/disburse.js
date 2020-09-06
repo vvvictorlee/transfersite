@@ -7,7 +7,7 @@ const fs = require("fs");
 const { sentSignedTx } = require("./sentSignedTx");
 
 
-const finishEpoch = async (para, path, epochNum, blockNum) => {
+const finishEpoch = async (para, epochNum, blockNum) => {
 
     const block = await para.web3.eth.getBlock(blockNum);
     console.log("Block:\t", blockNum, block.hash, block.timestamp);
@@ -30,7 +30,7 @@ const finishEpoch = async (para, path, epochNum, blockNum) => {
                 block.timestamp,
                 block.hash
             ).encodeABI();
-           await  sentSignedTx(para, abi);
+            await sentSignedTx(para, abi);
         }
         else {
             await para.web3.eth.personal.unlockAccount(para.admin, para.password);
@@ -48,7 +48,11 @@ const finishEpoch = async (para, path, epochNum, blockNum) => {
 }
 
 
-const seedAllocations = async (para, path, epochNum, blockNum) => {
+const disburse = async (para, path, epochNum, blockNum) => {
+    if (0 == para.step) {
+        await finishEpoch(para, epochNum, blockNum);
+        return;
+    }
 
     const merkleTree = await loadTrees(para, path);
 
@@ -88,4 +92,4 @@ const seedAllocations = async (para, path, epochNum, blockNum) => {
 }
 
 
-module.exports = { disburse, finishEpoch, seedAllocations };
+module.exports = { disburse };

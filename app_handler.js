@@ -123,6 +123,7 @@ async function get_token_symbol() {
 const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 
+
 async function disburse_by_epoch(epochNum, step) {
     try {
         if (epochNum <= 0) {
@@ -140,15 +141,12 @@ async function disburse_by_epoch(epochNum, step) {
             admin_secrets: admin_secrets,
             chain_id: chain_id,
             is_issue:is_issue,
+            step:step,
         };
 
         // await disburse(para, epoch_path, epochNum, blockNum);
-        if (0 == step || 0) {
-            await disburse.finishEpoch(para, epoch_path, epochNum, blockNum);
-        }
-        else {
-            await disburse.seedAllocations(para, epoch_path, epochNum, blockNum);
-        }
+        await disburse.disburse(para, epoch_path, epochNum, blockNum);
+        
     } catch (error) {
         console.log(error);
     }
