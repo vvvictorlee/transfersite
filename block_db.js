@@ -17,9 +17,9 @@ module.exports = {
     getAllTokens,
     addSnapshotBlock,
     addAllTokenSupply,
-    updatPoolUSDT,
-    updatVerified,
-    updatWeightPoolUSDT,
+    updatePoolUSDT,
+    updateVerified,
+    updateWeightPoolUSDT,
     initMiningData,
     cleanCycleMiningData,
     miningToken,
@@ -134,7 +134,7 @@ async function addAllTokenSupply(startBlock) {
 }
 
 // 更新每个区块的USDT存量
-async function updatPoolUSDT(block_list, usdt_addr) {
+async function updatePoolUSDT(block_list, usdt_addr) {
     let sql = "INSERT INTO token_supply (block, token, pool_usdt) " +
         "SELECT ?, t.pToken, IF(t.token0=?, p.reserve0, IF(t.token1=?, p.reserve1, 0)) usdt FROM " +
         "(SELECT token, max(block) block FROM block_chain_pool WHERE block<=? GROUP BY token) m " +
@@ -147,7 +147,7 @@ async function updatPoolUSDT(block_list, usdt_addr) {
             let block = block_list[i];
             // 计算每个块的pToken奖励
             let rows = yield conn.query(sql, [block, usdt_addr, usdt_addr, block]);
-            console.log("updatPoolUSDT : block=", block, rows.message);
+            console.log("updatePoolUSDT : block=", block, rows.message);
         }
     });
 }
@@ -159,21 +159,21 @@ LEFT JOIN (SELECT pToken,verified,vBlock FROM token_list WHERE verified=1) t ON 
 SET s.verified=t.verified
 WHERE s.block>=t.vBlock
  */
-async function updatVerified() {
+async function updateVerified() {
     let sql = "UPDATE token_supply s LEFT JOIN (SELECT pToken,verified,vBlock FROM token_list WHERE verified>=1) t ON s.token = t.pToken " +
         "SET s.verified=t.verified WHERE s.block>=t.vBlock";
 
     await conn.query(sql, null).then(function (rows) {
-        console.log("updatVerified :", rows.message);
+        console.log("updateVerified :", rows.message);
     });
 }
 
 // 更新每个区块的USDT加权平均量
-async function updatWeightPoolUSDT() {
+async function updateWeightPoolUSDT() {
     let sql = "UPDATE token_supply SET weight_pool_usdt=verified*pool_usdt";
 
     await conn.query(sql, null).then(function (rows) {
-        console.log("updatWeightPoolUSDT :", rows.message);
+        console.log("updateWeightPoolUSDT :", rows.message);
     });
 }
 

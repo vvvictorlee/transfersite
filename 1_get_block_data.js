@@ -146,7 +146,7 @@ async function getAddrType(addr) {
     }
 }
 // 获取所有的地址，并判断类型
-async function chaeckAllAddr() {
+async function checkAllAddr() {
     // 获取所有的地址，并入库
     await block_db.addAllAddr(global.ADDRESS_COMMUNITY);
 
@@ -160,7 +160,7 @@ async function chaeckAllAddr() {
     }
     await block_db.updateAddrTypeList(type_list);
 
-    console.log('chaeckAllAddr :', type_list.length);
+    console.log('checkAllAddr :', type_list.length);
 }
 // ================
 
@@ -196,7 +196,7 @@ function getBlockData(lastBlock) {
         getAllClaim(conf.lastBlock);
 
         // 5# 获取所有的地址，并判断类型
-        yield chaeckAllAddr();
+        yield checkAllAddr();
 
         // 更新同步区块记录
         conf.updatedBlocks.push(conf.lastBlock);
