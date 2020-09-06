@@ -41,6 +41,7 @@ const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "/Users/lisheng/myg
 const admin_secrets = process.env.ADMIN_SECRETS;
 const chain_id = process.env.CHAIN_ID;
 const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
+const is_issue = process.env.IS_ISSUE;
 
 async function getRewardListByAddress(addr) {
     try {
@@ -70,6 +71,7 @@ async function claim_all(addr) {
             password: password,
             admin_secrets: admin_secrets,
             chain_id: chain_id,
+            symbol_interval:symbol_interval,
         };
 
         const encodedAbi = await claimProof(para, addr, balances);
@@ -137,6 +139,7 @@ async function disburse_by_epoch(epochNum, step) {
             password: password,
             admin_secrets: admin_secrets,
             chain_id: chain_id,
+            is_issue:is_issue,
         };
 
         // await disburse(para, epoch_path, epochNum, blockNum);

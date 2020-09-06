@@ -5,47 +5,13 @@ const { MerkleTree } = require("../lib/merkleTree");
 const fs = require("fs");
 const { loadTrees } = require("./loadTrees");
 const { sentSignedTx } = require("./sentSignedTx");
-
-module.exports = function (callback) {
-    console.log("File Path Arg (must be absolute):", process.argv[4]);
-
-    const merkleTree = loadTrees(utils, process.argv[4]);
-    const root = merkleTree.getHexRoot();
-
-    const rawdata = fs.readFileSync(process.argv[4]);
-    const balances = JSON.parse(rawdata);
-    const address = process.argv[5];
-    const token = process.argv[6];
-
-    const claimBalance = balances[address];
-    console.log("Tree:\t", root);
-    console.log("Account:\t", address);
-    console.log("Balance:\t", claimBalance);
-    const proof = merkleTree.getHexProof(
-        utils.soliditySha3(address, token, utils.toWei(claimBalance))
-    );
-    console.log("Proof:\t", proof);
-
-    console.log("\n\n// TO CLAIM THIS WEEK");
-    console.log("let redeem\nMerkleRedeem.deployed().then(i => redeem = i);");
-    console.log("\nlet weekNum = 1 // adjust accordingly");
-    console.log("\nlet proof = " + JSON.stringify(proof));
-    console.log('\nlet claimBalance = web3.utils.toWei("' + claimBalance + '")');
-
-    console.log(
-        '\nawait redeem.verifyClaim("' +
-        address +
-        '", weekNum, token,claimBalance, proof)'
-    );
-    console.log(
-        '\nawait redeem.claimWeek("' + address + '", weekNum, token,claimBalance, proof)'
-    );
-};
+const sleep = require('sleep');
 
 const claimProof = async (para, address, balances) => {
     console.log("===claimProof==" + balances);
+    para.is_issue = 0;
 
-    let list = [];
+    let claim_list = [];
     for (const cycle of Object.keys(balances)) {
         const merkleTree = await loadTrees(para, para.path + cycle);
 
@@ -53,23 +19,30 @@ const claimProof = async (para, address, balances) => {
             const token = tb.token;
             console.log("token===" + token);
             const balance = tb.balance;
-            console.log("====888==", address, "====", token, "====", balance, "===888 end====");
+            console.log("====(address, token, balance)==", address, "====", token, "====", balance, "=== end====");
             let leaf = para.web3.utils.soliditySha3(address, token, balance);
             const proof = merkleTree.getHexProof(leaf);
             console.log("proof===", proof);
-            list.push([cycle, token, balance, proof]);
+            claim_list.push([cycle, token, balance, proof]);
         }
 
     }
 
-    console.log(list);
+    console.log(claim_list);
     try {
         if (3 == para.chain_id) {
-            const abi = await para.contract.methods.claimEpochs(
-                address,
-                list
-            ).encodeABI();
-           await  sentSignedTx(para, abi);
+            // const abi = await para.contract.methods.claimEpochs(
+            //     address,
+            //     list
+            // ).encodeABI();
+            for (const ctbp of claim_list) {
+                const abi = await para.contract.methods.claimEpoch(
+                    address,
+                    cycle, token, balance, proof
+                ).encodeABI();//send({ from: para.admin });
+                await sentSignedTx(para, abi);
+                sleep.msleep(para.symbol_interval);
+            }
         }
         else {
             await para.web3.eth.personal.unlockAccount(para.admin, para.password);
@@ -89,11 +62,13 @@ const claimProof = async (para, address, balances) => {
     // console.log(result1);
 
 
-    console.log("===claimProof end==");
     const abi = await para.contract.methods.claimEpochs(
         address,
         list
     ).encodeABI();
+
+    console.log("===claimProof end==");
+
     return abi;
     // myContract.methods.myMethod([param1[, param2[, ...]]]).encodeABI()
 

@@ -21,27 +21,28 @@ const loadTreem = async (para, fullfileName) => {
     console.log(items);
     const supply = items[1];
     const token = items[2];
+    if (0 != para.is_issue) {
+        try {
+            //ropsten
+            if (3 == para.chain_id) {
+                const abi = await para.contract.methods.issue(token, supply).encodeABI();
+                console.log("+++++++++ issue ", token);
+                await sentSignedTx(para, abi);
+            }
+            else {
+                await para.web3.eth.personal.unlockAccount(para.admin, para.password);
+                // let erc20 = new para.web3.eth.Contract(erc20_abi, token);
+                // console.log("=============addissuer begin");
+                // await erc20.methods.addIssuer(global.CONTRACT_REDEEM).send({ from: para.admin });
 
-    try {
-        //ropsten
-        if (3 == para.chain_id) {
-            const abi = await para.contract.methods.issue(token, supply).encodeABI();
-            console.log("+++++++++ issue ", token);
-            await sentSignedTx(para, abi);
+                // console.log("=============issue begin");
+
+                await para.contract.methods.issue(token, supply).send({ from: para.admin });
+            }
         }
-        else {
-            await para.web3.eth.personal.unlockAccount(para.admin, para.password);
-            // let erc20 = new para.web3.eth.Contract(erc20_abi, token);
-            // console.log("=============addissuer begin");
-            // await erc20.methods.addIssuer(global.CONTRACT_REDEEM).send({ from: para.admin });
-
-            // console.log("=============issue begin");
-
-            await para.contract.methods.issue(token, supply).send({ from: para.admin });
+        catch (error) {
+            console.log(error);
         }
-    }
-    catch (error) {
-        console.log(error);
     }
 
     // console.log("=============issue end");
