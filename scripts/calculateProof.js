@@ -64,12 +64,12 @@ const claimProof = async (para, address, balances) => {
 
     console.log(list);
     try {
-        if (3 === para.chain_id) {
+        if (3 == para.chain_id) {
             const abi = await para.contract.methods.claimEpochs(
                 address,
                 list
             ).encodeABI();
-            sentSignedTx(para, abi);
+           await  sentSignedTx(para, abi);
         }
         else {
             await para.web3.eth.personal.unlockAccount(para.admin, para.password);

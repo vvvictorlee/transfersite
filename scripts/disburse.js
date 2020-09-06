@@ -93,7 +93,7 @@ const finishEpoch = async (para, path, epochNum, blockNum) => {
                 block.timestamp,
                 block.hash
             ).encodeABI();
-            sentSignedTx(para, abi);
+           await  sentSignedTx(para, abi);
         }
         else {
             await para.web3.eth.personal.unlockAccount(para.admin, para.password);

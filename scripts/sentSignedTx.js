@@ -8,10 +8,9 @@ web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 const sentSignedTx = async (para, data) => {
 
     try {
-        let nonce = await para.web3.eth.getTransactionCount(para.admin, "pending");
 
-        // console.log("------nonce-------", nonce, para.contractaddress);
-        // let encodedabi = await para.contract.methods.verify(token).encodeABI();//send({ from: admin4 });
+        let nonce = await para.web3.eth.getTransactionCount(para.admin, "pending");
+        console.log(nonce);
 
         var privateKey = Buffer.from(para.admin_secrets, 'hex');
         const gasprice = await para.web3.eth.getGasPrice();
@@ -26,20 +25,21 @@ const sentSignedTx = async (para, data) => {
             chainId: 3
         }
 
-        // let gas = await Redeem_Ropsten.methods.verify(token).estimateGas();
+        // let gas = await para.contract.methods.verify(token).estimateGas();
         // rawTx.gas = gas*1.2;
         var tx = new Tx(rawTx, { 'chain': 'ropsten', hardfork: 'istanbul' });
         tx.sign(privateKey);
 
         var serializedTx = tx.serialize();
 
-        let receipt = await web3.eth.sendSignedTransaction('0x'+serializedTx.toString('hex'));
-
+        let receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
         console.log(receipt);
 
     } catch (error) {
         console.log(error);
     }
+
+
 }
 
 

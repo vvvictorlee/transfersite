@@ -1,11 +1,16 @@
 require('dotenv').config();
 var Web3 = require("web3");
+var co = require('co');
 var util = require('./util');
 var block_db = require('./block_db');
+// require('./conf/const');
+// require('./conf/const_private');
 require('./conf/const_ropsten');
+var sleep = require('sleep');
 
 const { claimProof } = require("./scripts/calculateProof");
 const disburse = require("./scripts/disburse");
+const { fstat } = require("fs");
 
 var web3 = new Web3();
 web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
