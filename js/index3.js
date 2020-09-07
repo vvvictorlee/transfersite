@@ -81,7 +81,7 @@ let erc20 = new web3.eth.Contract(tabi, TTOKEN_);//0x54e92B8C0a7Ea8DE6404A0F43DA
 // console.log(balance);
 const user1 = "0x929378dbc9a1fdc0d05529e48097ff65c6902231";
 const token = "0x06403d9dc00b7cf577023d49f96f899aed86d6c0";
-const tokens = [    "0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5",
+const tokens = ["0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5",
     "0x8d3acd2969ca969188bd8b227dfca09e1691e263",
     "0xc5201589361c2da2b07df626f1cab71b4255b16e",
     "0xe59eb769a705443936a043b07ec1892b448ca24d"];
@@ -232,6 +232,17 @@ async function sendSignedTx() {
         chainId: 3
     }
 
+    // var rawTx = {
+    //             "from": fromAddress, // Add this
+    //             "nonce": "0x" + nonces.toString(16),
+    //             "gasPrice": web3.utils.toHex('20000000000'),
+    //             "gasLimit": web3.utils.toHex('21000'),
+    //             "to": contractAddr,
+    //             "value": "0x0",
+    //             "data": dataso,
+    //             "chainId": 1 // For mainnet // Use 3 for ropsten testnet
+    //         };
+
     // let gas = await Redeem_Ropsten.methods.verify(token).estimateGas();
     // rawTx.gas = gas*1.2;
     var tx = new Tx(rawTx, { 'chain': 'ropsten', hardfork: 'istanbul' });
@@ -242,7 +253,7 @@ async function sendSignedTx() {
     let receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
     console.log(receipt);
 }
-
+// sendSignedTx();
 
 
 // // function checkAllBalances() {
