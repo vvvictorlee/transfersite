@@ -59,6 +59,8 @@ async function getRewardListByAddress(addr) {
 async function claim_all(addr) {
 
     try {
+        await block_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
+
         let sizebalances = await block_db.getCycleRewardsByAddress(addr.toLowerCase());
         if (sizebalances[0] == 0) {
             return {};
