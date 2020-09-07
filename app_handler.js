@@ -47,7 +47,7 @@ async function getRewardListByAddress(addr) {
     try {
         const token_symbols = await get_token_symbol();
         console.log(token_symbols);
-        return await block_db.getRewardListByAddress(addr, token_symbols, web3);
+        return await block_db.getRewardListByAddress(addr.toLowerCase(), token_symbols, web3);
     } catch (error) {
         console.log(error);
     }
@@ -57,7 +57,7 @@ async function getRewardListByAddress(addr) {
 async function claim_all(addr) {
 
     try {
-        let balances = await block_db.getCycleRewardsByAddress(addr);
+        let balances = await block_db.getCycleRewardsByAddress(addr.toLowerCase());
         if (balances.length == 0) {
             return {};
         }
