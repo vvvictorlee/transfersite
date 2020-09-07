@@ -42,6 +42,7 @@ const admin_secrets = process.env.ADMIN_SECRETS;
 const chain_id = process.env.CHAIN_ID;
 const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
 const is_issue = process.env.IS_ISSUE;
+const claim_exec_by_admin=process.env.CLAIM_EXEC_BY_ADMIN;
 
 async function getRewardListByAddress(addr) {
     try {
@@ -58,10 +59,11 @@ async function getRewardListByAddress(addr) {
 async function claim_all(addr) {
 
     try {
-        let balances = await block_db.getCycleRewardsByAddress(addr.toLowerCase());
-        if (balances.length == 0) {
+        let sizebalances = await block_db.getCycleRewardsByAddress(addr.toLowerCase());
+        if (sizebalances[0] == 0) {
             return {};
         }
+        let balances = sizebalances[1] ;
         const para = {
             web3: web3,
             admin: admin,
@@ -73,6 +75,7 @@ async function claim_all(addr) {
             admin_secrets: admin_secrets,
             chain_id: chain_id,
             symbol_interval:symbol_interval,
+            claim_exec_by_admin:claim_exec_by_admin,
         };
 
         const encodedAbi = await claimProof(para, addr, balances);

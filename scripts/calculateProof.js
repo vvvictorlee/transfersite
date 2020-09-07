@@ -32,34 +32,36 @@ const claimProof = async (para, address, balances) => {
     }
 
     console.log(claim_list);
-    try {
-        if (3 == para.chain_id) {
-            // const abi = await para.contract.methods.claimEpochs(
-            //     address,
-            //     list
-            // ).encodeABI();
-            for (const ctbp of claim_list) {
-                const [cycle, token, balance, proof] = ctbp;
-                let result = await para.contract.methods.verifyClaim(address, cycle, token, balance, proof).call({ from: para.admin });
-                console.log(result, "ctbp===", ctbp);
-                const abi = await para.contract.methods.claimEpoch(
-                    address,
-                    cycle, token, balance, proof
-                ).encodeABI();//send({ from: para.admin });
-                await sentSignedTx(para, abi);
-                sleep.msleep(para.symbol_interval);
+    if (0 != para.claim_exec_by_admin) {
+        try {
+            if (3 == para.chain_id) {
+                // const abi = await para.contract.methods.claimEpochs(
+                //     address,
+                //     list
+                // ).encodeABI();
+                for (const ctbp of claim_list) {
+                    const [cycle, token, balance, proof] = ctbp;
+                    let result = await para.contract.methods.verifyClaim(address, cycle, token, balance, proof).call({ from: para.admin });
+                    console.log(result, "ctbp===", ctbp);
+                    const abi = await para.contract.methods.claimEpoch(
+                        address,
+                        cycle, token, balance, proof
+                    ).encodeABI();//send({ from: para.admin });
+                    await sentSignedTx(para, abi);
+                    sleep.msleep(para.symbol_interval);
+                }
             }
-        }
-        else {
-            await para.web3.eth.personal.unlockAccount(para.admin, para.password);
+            else {
+                await para.web3.eth.personal.unlockAccount(para.admin, para.password);
 
-            await para.contract.methods.claimEpochs(
-                address,
-                list
-            ).send({ from: para.admin });
+                await para.contract.methods.claimEpochs(
+                    address,
+                    list
+                ).send({ from: para.admin });
+            }
+        } catch (error) {
+            console.log(error);
         }
-    } catch (error) {
-        console.log(error);
     }
 
     // let result = await para.contract.methods.verifyClaim(address, 2, token.token, balance, proof).call({ from: para.admin });

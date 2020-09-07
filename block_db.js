@@ -450,7 +450,7 @@ async function getCycleRewardsByAddress(address) {
     }
     console.log('getCycleRewardsByAddress :', rows.length);
 
-    return cycle_tokens;
+    return [rows.length,cycle_tokens];
 }
 /*
 
