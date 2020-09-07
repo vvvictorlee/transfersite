@@ -2,7 +2,7 @@ require('dotenv').config();
 var Web3 = require("web3");
 var co = require('co');
 var util = require('./util');
-var block_db = require('./block_db');
+var redeem_db = require('./redeem_db');
 // require('./conf/const');
 // require('./conf/const_private');
 require('./conf/const_ropsten');
@@ -46,10 +46,10 @@ const claim_exec_by_admin=process.env.CLAIM_EXEC_BY_ADMIN;
 
 async function getRewardListByAddress(addr) {
     try {
-        await block_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
+        await redeem_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
         const token_symbols = await get_token_symbol();
         console.log(token_symbols);
-        return await block_db.getRewardListByAddress(addr.toLowerCase(), token_symbols, web3);
+        return await redeem_db.getRewardListByAddress(addr.toLowerCase(), token_symbols, web3);
     } catch (error) {
         console.log(error);
     }
@@ -59,9 +59,9 @@ async function getRewardListByAddress(addr) {
 async function claim_all(addr) {
 
     try {
-        await block_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
+        await redeem_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
 
-        let sizebalances = await block_db.getCycleRewardsByAddress(addr.toLowerCase());
+        let sizebalances = await redeem_db.getCycleRewardsByAddress(addr.toLowerCase());
         if (sizebalances[0] == 0) {
             return {};
         }
@@ -101,6 +101,8 @@ async function get_token_symbol() {
         console.log(error);
         // token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
     }
+
+    token_symbols[process.env.SWP_ADDRESS]=process.env.SWP_SYMBOL||"SWP";
 
     for (let token of token_list.pTokens) {
         console.log(token);

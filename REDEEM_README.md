@@ -98,7 +98,7 @@ curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/
 
 curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "get_reward_list",
-	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
+	"address": "0x929378dbc9a1fdc0d05529e48097ff65c6902231"
 }'
 
 
@@ -110,7 +110,7 @@ curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application
 
 curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "claim_all_rewards",
-	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
+	"address": "0x929378dbc9a1fdc0d05529e48097ff65c6902231"
 }'
 
 ```
