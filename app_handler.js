@@ -45,6 +45,7 @@ const is_issue = process.env.IS_ISSUE;
 
 async function getRewardListByAddress(addr) {
     try {
+        await block_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
         const token_symbols = await get_token_symbol();
         console.log(token_symbols);
         return await block_db.getRewardListByAddress(addr.toLowerCase(), token_symbols, web3);
@@ -117,7 +118,6 @@ async function get_token_symbol() {
     util.writeFile(token_symbols_json, token_symbols);
 
     return token_symbols;
-
 }
 
 const firstStartBlockNum = 1;

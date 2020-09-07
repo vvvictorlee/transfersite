@@ -9,7 +9,7 @@
 ```
 curl  -X POST --url http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "get_reward_list",
-	"address": "0x1084d79a66ef86bfc9c945d4a21159a024dee14e"
+	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
 }'
 
 
@@ -58,7 +58,7 @@ curl  -X POST --url  http://192.168.38.227:3536/claim/  -H "Content-Type: applic
 
 curl  -X POST --url  https://appswapx.99ss.ml/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "claim_all_rewards",
-	"address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
+	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
 }'
 ```
 
@@ -93,7 +93,7 @@ curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application
 
 curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "get_reward_list",
-	"address": "0x929378dbc9a1fdc0d05529e48097ff65c6902231"
+	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
 }'
 
 curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
@@ -104,7 +104,7 @@ curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/
 
 curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "claim_all_rewards",
-	"address": "0x929378dbc9a1fdc0d05529e48097ff65c6902231"
+	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
 }'
 
 

@@ -25,6 +25,7 @@ module.exports = {
     miningToken,
     creatCycleReward,
     getCycleRewardReport,
+    updateClaimStatusByAddress,
     getRewardListByAddress,
     getCycleRewardsByAddress,
     checkCycleData
@@ -37,7 +38,7 @@ var conn = wrapper(pool);
 // ----- Block Chain -----
 // Add Token List
 async function addTokenList(dataList) {
-    if (dataList.length==0) return;
+    if (dataList.length == 0) return;
 
     let sql = "INSERT IGNORE INTO token_list(block,sToken,pToken,token0,token1) VALUES ? ";
 
@@ -48,14 +49,14 @@ async function addTokenList(dataList) {
 
 // 更新币种认证状态
 async function updateVerifiedToken(dataList) {
-    if (dataList.length==0) return;
+    if (dataList.length == 0) return;
 
     let sql = "UPDATE token_list SET verified=1,vBlock=? WHERE pToken=? AND verified=0";
 
-    await co(function*() {
-        for (let i = 0;i<dataList.length;i++) {
+    await co(function* () {
+        for (let i = 0; i < dataList.length; i++) {
             let info = dataList[i];
-            let rows = yield conn.query(sql, [info[0],info[1]]);
+            let rows = yield conn.query(sql, [info[0], info[1]]);
         }
         console.log("updateVerifiedToken : ", dataList.length);
     });
@@ -75,7 +76,7 @@ async function getAllTokens(callback) {
 
 // Add Token Transfer Data List
 async function addBlockDataList(dataList) {
-    if (dataList.length==0) return;
+    if (dataList.length == 0) return;
 
     let sql = "INSERT IGNORE INTO block_chain_data(block,txnHash,fromAddr,toAddr,amount,eventName,token) VALUES ? ";
 
@@ -84,7 +85,7 @@ async function addBlockDataList(dataList) {
     });
 }
 async function addPoolBlockData(dataList) {
-    if (dataList.length==0) return;
+    if (dataList.length == 0) return;
 
     let sql = "INSERT IGNORE INTO block_chain_pool(block,txnHash,reserve0,reserve1,eventName,token) VALUES ? ";
 
@@ -93,7 +94,7 @@ async function addPoolBlockData(dataList) {
     });
 }
 async function addClaimBlockDataList(dataList) {
-    if (dataList.length==0) return;
+    if (dataList.length == 0) return;
 
     let sql = "INSERT IGNORE INTO block_chain_claim(block,txnHash,addr,token,amount,eventName) VALUES ? ";
 
@@ -107,13 +108,13 @@ async function addClaimBlockDataList(dataList) {
 async function addSnapshotBlock(cycle, block_list, addr_zero, addr_community) {
     // 若form和to都是 0x0 地址，则设置为 addr_community ，即计算建池子最低保留的 1000 个
     let sql = "INSERT INTO snapshot_block (cycle, block, addr, token, balance) SELECT ?, ?, Addr,token,sum(amount) balance2 FROM ( " +
-        "(SELECT IF(fromAddr=toAddr,'"+addr_community+"', toAddr) Addr, token,sum(amount) amount FROM block_chain_data WHERE block<=? GROUP BY Addr,token) UNION ALL " +
+        "(SELECT IF(fromAddr=toAddr,'" + addr_community + "', toAddr) Addr, token,sum(amount) amount FROM block_chain_data WHERE block<=? GROUP BY Addr,token) UNION ALL " +
         "(SELECT fromAddr Addr, token,sum(-amount) amount FROM block_chain_data WHERE block<=? AND fromAddr<>toAddr GROUP BY fromAddr,token) " +
-        ") t WHERE Addr<>'"+addr_zero+"' GROUP BY Addr,token ON DUPLICATE KEY UPDATE balance=VALUES(balance)";
+        ") t WHERE Addr<>'" + addr_zero + "' GROUP BY Addr,token ON DUPLICATE KEY UPDATE balance=VALUES(balance)";
 
-    await co(function*() {
+    await co(function* () {
         console.log(sql)
-        for (let i = 0;i<block_list.length;i++) {
+        for (let i = 0; i < block_list.length; i++) {
             let block = block_list[i];
             // 生成快照块的持币地址
             let rows = yield conn.query(sql, [cycle, block, block, block]);
@@ -142,8 +143,8 @@ async function updatePoolUSDT(block_list, usdt_addr) {
         "LEFT JOIN token_list t ON p.token=t.sToken " +
         "ON DUPLICATE KEY UPDATE pool_usdt=VALUES(pool_usdt)";
 
-    await co(function*() {
-        for (let i = 0;i<block_list.length;i++) {
+    await co(function* () {
+        for (let i = 0; i < block_list.length; i++) {
             let block = block_list[i];
             // 计算每个块的pToken奖励
             let rows = yield conn.query(sql, [block, usdt_addr, usdt_addr, block]);
@@ -199,7 +200,7 @@ async function getUncheckAddr() {
 }
 // 更新地址类型列表
 async function updateAddrTypeList(list) {
-    if (list.length==0) return;
+    if (list.length == 0) return;
 
     let sql = "INSERT INTO addr_type (addr, type) VALUES ? ON DUPLICATE KEY UPDATE type=VALUES(type)";
 
@@ -213,7 +214,7 @@ async function updateAddrTypeList(list) {
 async function cleanCycleMiningData(cycle) {
     let sql_claen = "DELETE FROM mining_data WHERE cycle=?";
 
-    await co(function*() {
+    await co(function* () {
         let rows = yield conn.query(sql_claen, [cycle]);
         console.log("cleanCycleMiningData : cycle=", cycle, rows.message);
     });
@@ -229,7 +230,7 @@ async function initMiningData(startBlock, endBlock, addr_redeem) {
         "SELECT cycle, t.block, addr, sToken, balance, pToken FROM snapshot_block t LEFT JOIN token_list ON pToken=token \n" +
         "WHERE t.block>=? AND pToken IS NOT NULL AND addr<>? ON DUPLICATE KEY UPDATE p_balance=VALUES(p_balance)";
 
-    await co(function*() {
+    await co(function* () {
         // 更新SToken在每个快照块的持有量
         let rows = yield conn.query(sql_S, [startBlock]);
         console.log("initMiningData 1: startBlock=", startBlock, rows.message);
@@ -271,15 +272,15 @@ SET m.swp_awards = IF(all_pool=0, 0, FLOOR(curr_award*pool_usdt/all_pool*(p_bala
 WHERE m.block=8573463 AND s.verified = 1
  */
 
-async function miningToken(block_list, awards, max_supply, awards_SWP, max_supply_SWP,addr_community) {
+async function miningToken(block_list, awards, max_supply, awards_SWP, max_supply_SWP, addr_community) {
     // awards, max_supply 直接拼入字符串中，否则有精度问题
     let sql_pToken = "UPDATE mining_data m LEFT JOIN token_supply s ON m.s_token=s.token and m.block=s.block " +
-        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
-        "SET m.p_awards = IF(supply IS NULL, 0, FLOOR(CAST(s_balance AS DECIMAL(65,30))/supply*IF(curr_award IS NULL, "+awards+", curr_award)*0.85)) " +
+        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+" + awards + "<=" + max_supply + ", " + awards + ", IF(" + max_supply + "-SUM(p_awards)<=0,0," + max_supply + "-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
+        "SET m.p_awards = IF(supply IS NULL, 0, FLOOR(CAST(s_balance AS DECIMAL(65,30))/supply*IF(curr_award IS NULL, " + awards + ", curr_award)*0.85)) " +
         "WHERE m.block=?";
     let sql_Sys = "INSERT INTO mining_data (cycle, block, addr, s_token, p_token, p_awards) " +
-        "SELECT cycle, block, ?, s_token, p_token,(IF(curr_award IS NULL, "+awards+", curr_award)-sum(p_awards)) awards FROM mining_data " +
-        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+"+awards+"<="+max_supply+", "+awards+", IF("+max_supply+"-SUM(p_awards)<=0,0,"+max_supply+"-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
+        "SELECT cycle, block, ?, s_token, p_token,(IF(curr_award IS NULL, " + awards + ", curr_award)-sum(p_awards)) awards FROM mining_data " +
+        "LEFT JOIN (SELECT p_token token,IF(SUM(p_awards)+" + awards + "<=" + max_supply + ", " + awards + ", IF(" + max_supply + "-SUM(p_awards)<=0,0," + max_supply + "-SUM(p_awards))) curr_award FROM mining_data WHERE block<? GROUP BY p_token) t ON p_token=t.token " +
         "WHERE block=? AND p_awards>0 AND addr<>? GROUP BY cycle, block, s_token, p_token,curr_award " +
         "ON DUPLICATE KEY UPDATE p_awards=VALUES(p_awards)";
     let sql_unclaimed = "UPDATE mining_data m LEFT JOIN ( SELECT addr,token,SUM(amount) unclaimed FROM ( " +
@@ -290,12 +291,12 @@ async function miningToken(block_list, awards, max_supply, awards_SWP, max_suppl
     let sql_SWP = "UPDATE mining_data m LEFT JOIN token_supply s ON m.p_token=s.token and m.block=s.block " +
         "LEFT JOIN (SELECT SUM(weight_pool_usdt) all_pool FROM token_supply WHERE block=? AND verified >= 1) t1 ON 1=1 " +
         "LEFT JOIN (SELECT SUM(p_awards) new_p_totle, p_token FROM mining_data WHERE block<=? GROUP BY p_token) t2 ON t2.p_token=m.p_token " +
-        "LEFT JOIN (SELECT IF((SUM(swp_awards)+"+awards_SWP+"<="+max_supply_SWP+" OR SUM(swp_awards) IS NULL), "+awards_SWP+", IF("+max_supply_SWP+"-SUM(swp_awards)<=0,0,"+max_supply_SWP+"-SUM(swp_awards))) curr_award FROM mining_data WHERE block<?) t3 ON 1=1 " +
+        "LEFT JOIN (SELECT IF((SUM(swp_awards)+" + awards_SWP + "<=" + max_supply_SWP + " OR SUM(swp_awards) IS NULL), " + awards_SWP + ", IF(" + max_supply_SWP + "-SUM(swp_awards)<=0,0," + max_supply_SWP + "-SUM(swp_awards))) curr_award FROM mining_data WHERE block<?) t3 ON 1=1 " +
         "SET m.swp_awards = IF(all_pool=0, 0, ROUND(ROUND(CAST(curr_award AS DECIMAL(65,30))*weight_pool_usdt/all_pool*(p_balance+p_unclaimed+p_awards)/new_p_totle*10-5.5)/10)) " +
         "WHERE m.block=? AND s.verified >= 1";
 
-    await co(function*() {
-        for (let i = 0;i<block_list.length;i++) {
+    await co(function* () {
+        for (let i = 0; i < block_list.length; i++) {
             let block = block_list[i];
             // 计算每个块的pToken奖励
             let rows = yield conn.query(sql_pToken, [block, block]);
@@ -325,7 +326,7 @@ async function creatCycleReward(cycle, contract_swp) {
     // 更新账户类型
     let sql_type = "UPDATE cycle_reward c LEFT JOIN addr_type a ON a.addr=c.addr SET c.type=a.type";
 
-    await co(function*() {
+    await co(function* () {
         // 清空本周期数据
         let rows = yield conn.query(sql_clean, [cycle]);
 
@@ -354,14 +355,14 @@ async function getCycleRewardReport(cycle) {
     var rows = await conn.query(sql_detail, [cycle]);
 
     var token_list = [];
-    var n=0;
-    for (let i=0; i<tokens.length; i++) {
+    var n = 0;
+    for (let i = 0; i < tokens.length; i++) {
         var ti = {
             token: tokens[i].token,
             total: tokens[i].total.toString(),
             addrs: {}
         };
-        while (n<rows.length && rows[n].token==ti.token) {
+        while (n < rows.length && rows[n].token == ti.token) {
             ti.addrs[rows[n].addr] = rows[n].amount.toString();
             n++;
         }
@@ -373,23 +374,51 @@ async function getCycleRewardReport(cycle) {
 }
 
 
+// 获取指定账户地址奖励列表
+async function updateClaimStatusByAddress(address, contract) {
+    // 获取奖励周期每个币种的发行量，注意数量转为字符串：CONCAT
+    let sql_total = "SELECT  min(cycle) mincycle ,max(cycle) maxcycle,token  FROM cycle_reward WHERE addr=? AND flag=0 GROUP BY token ORDER BY token";
+
+    let tokens = await conn.query(sql_total, [address]);
+
+    let token_list = [];
+    for (let i = 0; i < tokens.length; i++) {
+        const mincycle = tokens[i].mincycle;
+        const maxcycle = tokens[i].maxcycle;
+        const token = tokens[i].token;
+        const results = await contract.methods.claimStatus(address, token, mincycle, maxcycle).call({ from: address });
+        for (let j = 0; j < results.length; j++) {
+            if (results[j]) {
+                //claimed
+                token_list.push([address, mincycle + j, token]);
+            }
+        }
+    }
+    console.log('getUnclaimedRewardListByAddress', token_list.length);
+
+    let sql_update = "update cycle_reward SET flag=1 WHERE addr=? AND cycle=? AND token=? AND flag=0 ";
+
+    for (let i = 0; i < token_list.length; i++) {
+        let result = await conn.query(sql_update, token_list[i]);
+        console.log('updateClaimStatusByAddress', result);
+    }
+}
 
 // 获取指定账户地址奖励列表
-async function getRewardListByAddress(address,token_symbols,web3) {
+async function getRewardListByAddress(address, token_symbols, web3) {
     // 获取奖励周期每个币种的发行量，注意数量转为字符串：CONCAT
     let sql_total = "SELECT token,CONCAT(SUM(amount)) total FROM cycle_reward WHERE addr=? AND flag=0 GROUP BY token ORDER BY token";
 
     let tokens = await conn.query(sql_total, [address]);
 
     let token_list = [];
-    // const token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
-    for (let i=0; i<tokens.length; i++) {
-            let ti = {
-            name:token_symbols[tokens[i].token]||"UNKNOWN",
+    for (let i = 0; i < tokens.length; i++) {
+        let ti = {
+            name: token_symbols[tokens[i].token] || "UNKNOWN",
             address: tokens[i].token,
             value: web3.utils.fromWei(tokens[i].total.toString()),
         };
-       
+
         token_list.push(ti);
     }
     console.log('getRewardListByAddress', token_list.length);
@@ -405,16 +434,16 @@ async function getCycleRewardsByAddress(address) {
     var rows = await conn.query(sql_detail, [address]);
 
     var cycle_tokens = {};
-    var n=0;
+    var n = 0;
     let cycle = 0;
-    for (let i=0; i<rows.length; i++) {
-        cycle  = rows[i].cycle;
+    for (let i = 0; i < rows.length; i++) {
+        cycle = rows[i].cycle;
         if (!cycle_tokens.hasOwnProperty(cycle)) {
-                cycle_tokens[cycle]=[];
+            cycle_tokens[cycle] = [];
         }
         let ti = {
-            token:rows[i].token,
-            balance:rows[i].amount.toString(),
+            token: rows[i].token,
+            balance: rows[i].amount.toString(),
         };
         console.log(ti);
         cycle_tokens[cycle].push(ti);
@@ -431,30 +460,30 @@ async function checkCycleData(block_awards, max_supply, block_awards_swp, max_su
     var sql_list = [];
 
     // 1、每个币种的总奖励 <= 总发行量（570万）
-    sql_list[0] = 'SELECT token,SUM(amount)>'+max_supply+' assert FROM cycle_reward WHERE token<>"'+contract_swp+'" GROUP BY token';
-    sql_list[1] = 'SELECT token,SUM(amount)>'+max_supply_swp+' assert FROM cycle_reward WHERE token="'+contract_swp+'" ';
+    sql_list[0] = 'SELECT token,SUM(amount)>' + max_supply + ' assert FROM cycle_reward WHERE token<>"' + contract_swp + '" GROUP BY token';
+    sql_list[1] = 'SELECT token,SUM(amount)>' + max_supply_swp + ' assert FROM cycle_reward WHERE token="' + contract_swp + '" ';
 
     // 2、每个币种的本周期奖励 <= 本周期最大奖励（19.2万）
-    sql_list[2] = 'SELECT cycle,token,SUM(amount)>('+max_supply+'/30) assert FROM cycle_reward WHERE token<>"'+contract_swp+'" GROUP BY cycle,token';
-    sql_list[3] = 'SELECT cycle,token,SUM(amount)>('+max_supply_swp+'/30) assert FROM cycle_reward WHERE token="'+contract_swp+'" GROUP BY cycle';
+    sql_list[2] = 'SELECT cycle,token,SUM(amount)>(' + max_supply + '/30) assert FROM cycle_reward WHERE token<>"' + contract_swp + '" GROUP BY cycle,token';
+    sql_list[3] = 'SELECT cycle,token,SUM(amount)>(' + max_supply_swp + '/30) assert FROM cycle_reward WHERE token="' + contract_swp + '" GROUP BY cycle';
 
     // 3、每个块的奖励 <= 本块最大奖励
-    sql_list[4] = 'SELECT block,p_token,SUM(p_awards)>'+block_awards+' assert FROM mining_data GROUP BY block,p_token';
-    sql_list[5] = 'SELECT block,SUM(swp_awards)>'+block_awards_swp+' assert FROM mining_data GROUP BY block';
+    sql_list[4] = 'SELECT block,p_token,SUM(p_awards)>' + block_awards + ' assert FROM mining_data GROUP BY block,p_token';
+    sql_list[5] = 'SELECT block,SUM(swp_awards)>' + block_awards_swp + ' assert FROM mining_data GROUP BY block';
 
     // 4、每个币种的总领取数量 <= 当前总发行量
-    sql_list[6] = 'SELECT token,SUM(amount)>'+max_supply+' assert FROM block_chain_claim GROUP BY token';
+    sql_list[6] = 'SELECT token,SUM(amount)>' + max_supply + ' assert FROM block_chain_claim GROUP BY token';
 
-    for (let i=0; i<sql_list.length; i++) {
-        let sql = 'SELECT SUM(assert) assert FROM ( '+sql_list[i]+') t';
+    for (let i = 0; i < sql_list.length; i++) {
+        let sql = 'SELECT SUM(assert) assert FROM ( ' + sql_list[i] + ') t';
         let rows = await conn.query(sql, null);
-        let assert = (rows[0].assert<=0);
-        console.log('checkCycleData : check ', i+1, assert);
+        let assert = (rows[0].assert <= 0);
+        console.log('checkCycleData : check ', i + 1, assert);
 
         if (!assert) {
-            sql = 'SELECT * FROM ( '+sql_list[i]+') t WHERE t.assert>0';
+            sql = 'SELECT * FROM ( ' + sql_list[i] + ') t WHERE t.assert>0';
             rows = await conn.query(sql);
-            console.log('checkCycleData : fail', rows.length,'\n', sql_list[i],'\n',rows);
+            console.log('checkCycleData : fail', rows.length, '\n', sql_list[i], '\n', rows);
         }
     }
 }
