@@ -209,10 +209,10 @@ async function updateAddrTypeList(list) {
 
 // 清理一个周期的挖矿数据，防止计算出错
 async function cleanCycleMiningData(cycle) {
-    let sql_claen = "DELETE FROM mining_data WHERE cycle=?";
+    let sql_clean = "DELETE FROM mining_data WHERE cycle=?";
 
     await co(function* () {
-        let rows = yield conn.query(sql_claen, [cycle]);
+        let rows = yield conn.query(sql_clean, [cycle]);
         console.log("cleanCycleMiningData : cycle=", cycle, rows.message);
     });
 }

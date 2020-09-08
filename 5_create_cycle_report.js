@@ -7,7 +7,7 @@ function getFileName(cycle, token, total) {
     return 'reports/CR_' + cycle + '/' + cycle + '_' + total + '_' + token + '.json'
 }
 
- function createReport(cycle) {
+function createReport(cycle) {
     (async function () {
         let token_list = await block_db.getCycleRewardReport(cycle);
 
@@ -22,7 +22,10 @@ function getFileName(cycle, token, total) {
     })();
 }
 
-
-for (let i = 0; i < process.argv[2]; i++) {
-     createReport(i + 1);
+if (process.argv[2] > 0) {
+    createReport(process.argv[2]);
+}
+else {
+    console.log("usage: node 5_create_cycle_report.js 2");
+    console.log("2 =epochnum  -- epoch num such as 2");
 }
