@@ -43,6 +43,7 @@ const chain_id = process.env.CHAIN_ID;
 const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
 const is_issue = process.env.IS_ISSUE;
 const claim_exec_by_admin=process.env.CLAIM_EXEC_BY_ADMIN;
+const gasLimit = process.env.GAS_LIMIT;
 
 async function getRewardListByAddress(addr) {
     try {
@@ -56,7 +57,7 @@ async function getRewardListByAddress(addr) {
     return { "result": "unkonwn error" };
 }
 
-async function claim_all(addr) {
+async function claim_all(addr,gas_limit) {
 
     try {
         await redeem_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
@@ -78,6 +79,7 @@ async function claim_all(addr) {
             chain_id: chain_id,
             symbol_interval:symbol_interval,
             claim_exec_by_admin:claim_exec_by_admin,
+            gasLimit:gas_limit||gasLimit,
         };
 
         const encodedAbi = await claimProof(para, addr, balances);
@@ -131,7 +133,7 @@ const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 
 
-async function disburse_by_epoch(epochNum, step,issue_flag) {
+async function disburse_by_epoch(epochNum, step,issue_flag,gas_limit) {
     try {
         if (epochNum <= 0) {
             return "epoch must be larger than 0";
@@ -149,6 +151,7 @@ async function disburse_by_epoch(epochNum, step,issue_flag) {
             chain_id: chain_id,
             is_issue:issue_flag||is_issue,
             step:step,
+            gasLimit:gas_limit||gasLimit,
         };
 
         // await disburse(para, epoch_path, epochNum, blockNum);

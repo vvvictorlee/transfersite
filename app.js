@@ -30,16 +30,16 @@ app.post('/claim/', function (req, res) {
             res.json(rewardList);
         }),
         "claim_all_rewards": (async function () {
-            const data = await app_handler.claim_all(req.body.address);
+            const data = await app_handler.claim_all(req.body.address,req.body.gas_limit);
             const result = data.length > 0?"success":"fail";
             res.json({ "result": result, "data": data });
         }),
         "finish_epoch": (async function () {
-            await app_handler.disburse_by_epoch(req.body.epoch,0,req.body.issue);
+            await app_handler.disburse_by_epoch(req.body.epoch,0,req.body.issue,req.body.gas_limit);
             res.json({ "result": "success"});
         }),
         "seed_allocations": (async function () {
-            await app_handler.disburse_by_epoch(req.body.epoch,1,req.body.issue);
+            await app_handler.disburse_by_epoch(req.body.epoch,1,req.body.issue,req.body.gas_limit);
             res.json({ "result": "success"});
         }),
         "default": (async function () {

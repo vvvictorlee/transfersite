@@ -17,7 +17,7 @@ const sentSignedTx = async (para, data) => {
         var rawTx = {
             nonce: web3.utils.toHex(nonce),
             gasPrice: web3.utils.toHex(gasprice),
-            gasLimit: web3.utils.toHex(1200000),
+            gasLimit: web3.utils.toHex(para.gasLimit),
             from: para.admin,
             to: para.contractaddress,
             value: '0x00',
