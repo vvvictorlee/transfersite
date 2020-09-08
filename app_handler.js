@@ -45,11 +45,55 @@ const is_issue = process.env.IS_ISSUE;
 const claim_exec_by_admin=process.env.CLAIM_EXEC_BY_ADMIN;
 const gasLimit = process.env.GAS_LIMIT;
 
+
+const cron = require('node-cron')
+async function runJob()
+{
+/**
+ * 基本使用
+ * 第一個參數：排成格式
+ * 第二個參數：要執行的 function
+ * 第三個參數：是否要立即執行
+ **/
+let task = cron.schedule('* * * * * *', function () {
+  console.log('hello world', counter, new Date().getSeconds())
+}, true)
+
+task.start()
+task.stop()
+task.destroy()
+
+/**
+ * 檢驗是否是有效的排程格式
+ **/
+cron.validate('* * * * * *')
+
+// cron-table
+
+
+// /**
+//  * 一段時間後自動執行
+// **/
+// '* * * * * *'			// 每秒跑一次
+// '*/2 * * * *'			// 兩分鐘跑一次
+
+// /**
+//  * 特定時間執行
+//  **/
+// '1,3,4,5 * * * *'		// 每到分鐘數為 1, 3, 4, 5 時執行
+// '1-5 * * * *'			// 分鐘數為 1, 2, 3, 4, 5 時執行
+// 安裝
+// 1
+// $ npm install node-cron
+}
+
+
+
 async function getRewardListByAddress(addr) {
     try {
         await redeem_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
         const token_symbols = await get_token_symbol();
-        console.log(token_symbols);
+        // console.log(token_symbols);
         return await redeem_db.getRewardListByAddress(addr.toLowerCase(), token_symbols, web3);
     } catch (error) {
         console.log(error);
@@ -98,7 +142,7 @@ async function get_token_symbol() {
     let token_symbols = {};
     try {
         token_symbols = util.loadJson(token_symbols_json);
-        console.log(token_symbols);
+        // console.log(token_symbols);
     } catch (error) {
         console.log(error);
         // token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
@@ -107,13 +151,13 @@ async function get_token_symbol() {
     token_symbols[process.env.SWP_ADDRESS]=process.env.SWP_SYMBOL||"SWP";
 
     for (let token of token_list.pTokens) {
-        console.log(token);
+        // console.log(token);
         if (!token_symbols.hasOwnProperty(token)) {
-            console.log("in==", token);
+            // console.log("in==", token);
             try {
                 let erc20 = new web3.eth.Contract(erc20_abi, token);
                 let symbol = await erc20.methods.symbol().call();
-                console.log("symbol==", symbol);
+                // console.log("symbol==", symbol);
                 token_symbols[token] = symbol;
                 sleep.msleep(symbol_interval);
             }

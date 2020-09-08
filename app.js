@@ -8,8 +8,8 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 var timeout = require('connect-timeout'); //express v4
-
-app.use(timeout(process.env.TIME_OUT||360000));
+const t = process.env.TIME_OUT||360000;
+app.use(timeout(t));
 app.use(haltOnTimedout);
 
 function haltOnTimedout(req, res, next){

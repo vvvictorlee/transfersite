@@ -17,7 +17,7 @@ const sentSignedTx = async (para, data) => {
         const b = await web3.eth.getBlock("latest");
         var rawTx = {
             nonce: web3.utils.toHex(nonce),
-            gasPrice: web3.utils.toHex(gasprice),
+            gasPrice: web3.utils.toHex(gasprice*1.5),
             gasLimit: web3.utils.toHex(b.gasLimit - 1000),
             from: para.admin,
             to: para.contractaddress,
