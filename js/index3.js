@@ -33,7 +33,7 @@
 // }
 
 const Web3 = require('web3');
-
+const  util = require('./util');
 // // // Connect to local Ethereum node
 // const web3 = new Web3(new Web3.providers.HttpProvider("http://192.168.38.227:18045"));
 
@@ -56,6 +56,9 @@ const Web3 = require('web3');
 // global.ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
 const admin = "0x0db1bb1097ac3b7e26b3a4cf35e2f19e07d24568";
+const adminr = "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e";
+const secrets = util.loadJson('data/secrets.json');
+const adminr_secrets=secrets.key;
 // const password = "123456";
 const REDEEM = "0x99B9Bc4Ca03C227d9cBe0960c416adDE7146026F";//"0x2a103D4F9d64B4124F0a2Dd556DEee0926A92527";//redeem.address;
 const REDEEM_ROPSTEN = "0x72c09d4fd187b4336fa4ab66e4360f626619483b";//"0x2a103D4F9d64B4124F0a2Dd556DEee0926A92527";//redeem.address;
@@ -70,28 +73,38 @@ const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io
 let abi = require("../json/Redeem_Ropsten.json");///Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/BFactory.json
 let Redeem_Ropsten = new web3.eth.Contract(abi, REDEEM_ROPSTEN, { "from": admin });//0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63
 
-
 let tabi = require("../json/ERC20.json");///Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/BFactory.json
 let erc20 = new web3.eth.Contract(tabi, TTOKEN_);//0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63
+
+
 
 // var balanceWei =  web3.eth.getBalance(admin).then(console.log);//.toNumber();
 // // 从wei转换成ether
 // // var balance = web3.utils.fromWei(web3.utils.toBN(balanceWei), 'ether');
 // console.log(balanceWei);
 // console.log(balance);
-const user1 = "0x929378dbc9a1fdc0d05529e48097ff65c6902231";
+const user1 = "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e";
+const user2 = "0x929378dbc9a1fdc0d05529e48097ff65c6902231";
 const token = "0x06403d9dc00b7cf577023d49f96f899aed86d6c0";
-const tokens = ["0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5",
+let tokens = ["0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5",
     "0x8d3acd2969ca969188bd8b227dfca09e1691e263",
     "0xc5201589361c2da2b07df626f1cab71b4255b16e",
     "0xe59eb769a705443936a043b07ec1892b448ca24d"];
 
 (async function () {
 
-
+console.log("============");
+const r = await Redeem_Ropsten.methods._verifiedTokens(0).call();
+console.log(r);
+const s = await Redeem_Ropsten.methods.epochTimestamps(1).call();
+console.log(s);
+const b = await web3.eth.getBlock(2);//.toNumber();
+console.log(b.gasLimit);
+console.log("============");
 
     let result1 = await Redeem_Ropsten.methods.merkleRoots(1, 3).call({ from: user1 });
     console.log(result1);
+    tokens.push(token);
     for (const t of tokens) {
         result1 = await Redeem_Ropsten.methods.claimStatus(user1, t, 1, 3).call({ from: user1 });
         console.log(t, result1);
