@@ -33,12 +33,12 @@ var erc20_abi = util.loadJson('abi/ERC20.json');
 
 var file_tokens = './data/token_list.json';
 var token_symbols_json = './data/token_symbols.json';
-
+const secrets = util.loadJson('data/secrets.json');
 
 const admin = process.env.ADMIN;
 const password = process.env.PASSWORD;
 const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
-const admin_secrets = process.env.ADMIN_SECRETS;
+const admin_secrets = secrets.key;//process.env.ADMIN_SECRETS;
 const chain_id = process.env.CHAIN_ID;
 const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
 const is_issue = process.env.IS_ISSUE;

@@ -14,11 +14,11 @@ const sentSignedTx = async (para, data) => {
 
         var privateKey = Buffer.from(para.admin_secrets, 'hex');
         const gasprice = await para.web3.eth.getGasPrice();
-        const gasLimit = await web3.eth.getBlock(2).gasLimit;
+        const b = await web3.eth.getBlock("latest");
         var rawTx = {
             nonce: web3.utils.toHex(nonce),
             gasPrice: web3.utils.toHex(gasprice),
-            gasLimit: web3.utils.toHex(gasLimit - 1000),
+            gasLimit: web3.utils.toHex(b.gasLimit - 1000),
             from: para.admin,
             to: para.contractaddress,
             value: '0x00',
