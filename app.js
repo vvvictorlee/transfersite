@@ -35,11 +35,11 @@ app.post('/claim/', function (req, res) {
             res.json({ "result": result, "data": data });
         }),
         "finish_epoch": (async function () {
-            await app_handler.disburse_by_epoch(req.body.epoch,0);
+            await app_handler.disburse_by_epoch(req.body.epoch,0,req.body.issue);
             res.json({ "result": "success"});
         }),
         "seed_allocations": (async function () {
-            await app_handler.disburse_by_epoch(req.body.epoch,1);
+            await app_handler.disburse_by_epoch(req.body.epoch,1,req.body.issue);
             res.json({ "result": "success"});
         }),
         "default": (async function () {

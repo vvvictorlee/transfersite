@@ -131,7 +131,7 @@ const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 
 
-async function disburse_by_epoch(epochNum, step) {
+async function disburse_by_epoch(epochNum, step,issue_flag) {
     try {
         if (epochNum <= 0) {
             return "epoch must be larger than 0";
@@ -147,7 +147,7 @@ async function disburse_by_epoch(epochNum, step) {
             password: password,
             admin_secrets: admin_secrets,
             chain_id: chain_id,
-            is_issue:is_issue,
+            is_issue:issue_flag||is_issue,
             step:step,
         };
 

@@ -80,6 +80,11 @@ curl  -X POST --url  https://appswapx.99ss.ml/claim/  -H "Content-Type: applicat
 
 ```
 
+curl  -X POST --url  http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "finish_epoch",
+	"epoch": "2"
+}'
+
 curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "finish_epoch",
 	"epoch": "2"
