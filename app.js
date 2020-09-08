@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 var timeout = require('connect-timeout'); //express v4
 
-app.use(timeout(120000));
+app.use(timeout(process.env.TIME_OUT||360000));
 app.use(haltOnTimedout);
 
 function haltOnTimedout(req, res, next){

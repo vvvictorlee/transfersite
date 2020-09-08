@@ -21,6 +21,7 @@ const loadTreem = async (para, fullfileName) => {
     console.log(items);
     const supply = items[1];
     const token = items[2];
+    console.log("+++++++++ issue  flag ===", para.is_issue);
     if (0 != para.is_issue) {
         try {
             //ropsten

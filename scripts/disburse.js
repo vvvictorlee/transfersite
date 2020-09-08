@@ -55,7 +55,10 @@ const disburse = async (para, path, epochNum, blockNum) => {
     }
 
     const merkleTree = await loadTrees(para, path);
-
+    if (null == merkleTree) {
+        console.log("merkleTree is null:");
+        return;
+    }
     const block = await para.web3.eth.getBlock(blockNum);
     console.log("Block:\t", blockNum, block.hash, block.timestamp);
 

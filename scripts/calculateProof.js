@@ -14,7 +14,10 @@ const claimProof = async (para, address, balances) => {
     let claim_list = [];
     for (const cycle of Object.keys(balances)) {
         const merkleTree = await loadTrees(para, para.path + cycle);
-
+        if (null == merkleTree) {
+            console.log("merkleTree is null:");
+            return "";
+        }
         const root = merkleTree.getHexRoot();
         console.log("Tree:\t", root);
 

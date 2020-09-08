@@ -79,7 +79,7 @@ async function claim_all(addr,gas_limit) {
             chain_id: chain_id,
             symbol_interval:symbol_interval,
             claim_exec_by_admin:claim_exec_by_admin,
-            gasLimit:gas_limit||gasLimit,
+            gasLimit:gas_limit==undefined?gasLimit:gas_limit,
         };
 
         const encodedAbi = await claimProof(para, addr, balances);
@@ -149,9 +149,9 @@ async function disburse_by_epoch(epochNum, step,issue_flag,gas_limit) {
             password: password,
             admin_secrets: admin_secrets,
             chain_id: chain_id,
-            is_issue:issue_flag||is_issue,
+            is_issue:issue_flag==undefined?is_issue:issue_flag,
             step:step,
-            gasLimit:gas_limit||gasLimit,
+            gasLimit:gas_limit==undefined?gasLimit:gas_limit,
         };
 
         // await disburse(para, epoch_path, epochNum, blockNum);
