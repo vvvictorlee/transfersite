@@ -34,7 +34,7 @@ const claimProof = async (para, address, balances) => {
 
     }
 
-    console.log(claim_list);
+    console.log("claim_list===",claim_list);
     if (0 != para.claim_exec_by_admin) {
         try {
             if (3 == para.chain_id) {
@@ -73,14 +73,14 @@ const claimProof = async (para, address, balances) => {
     // console.log(result1);
 
 
-    const abi = await para.contract.methods.claimEpochs(
-        address,
-        claim_list
-    ).encodeABI();
+    // const abi = await para.contract.methods.claimEpochs(
+    //     address,
+    //     claim_list
+    // ).encodeABI();
 
     console.log("===claimProof end==");
 
-    return abi;
+    return claim_list;
     // myContract.methods.myMethod([param1[, param2[, ...]]]).encodeABI()
 
 }
