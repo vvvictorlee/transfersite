@@ -75,7 +75,7 @@ const disburse = async (para, path, epochNum, blockNum) => {
                 epochNum,
                 root
             ).encodeABI();
-            sentSignedTx(para, abi);
+           await sentSignedTx(para, abi);
         }
         else {
             await para.web3.eth.personal.unlockAccount(para.admin, para.password);

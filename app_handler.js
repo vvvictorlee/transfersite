@@ -97,9 +97,9 @@ async function getSwpInfoByAddress(addr) {
         // let reserves = await stoken.methods.getReserves().call();
         // const price = reserves[0]/(reserves[1]+1);
         const price =  1.68;
-        return {balance:balance,price:price,released:released};
+        // return {balance:balance,price:price,released:released};
 
-        // return {balance:web3.utils.fromWei(balance),price:price,released:web3.utils.fromWei(released)};
+        return {balance:web3.utils.fromWei(balance),price:price,released:web3.utils.fromWei(released)};
 
     } catch (error) {
         console.log(error);
