@@ -146,7 +146,7 @@ async function claim_all(addr, gas_limit) {
         };
 
         const encodedAbi = await claimProof(para, addr, balances);
-        console.log("encodedAbi====", encodedAbi);
+        console.log("claim list====", encodedAbi);
         return encodedAbi;
     }
     catch (error) {

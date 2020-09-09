@@ -30,7 +30,7 @@ const loadTrees = async (para, filePath) => {
 
     console.log("===loadtrees  elements=====" + elements + "*****=======");
     if (elements.length == 0) {
-        console.log("===loadtrees  elements is empty =====", para, jsonFiles);
+        console.log("===loadtrees  elements is empty =====", jsonFiles);
         return null;
     }
     const merkleTree = new MerkleTree(elements);
