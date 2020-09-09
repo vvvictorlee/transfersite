@@ -83,9 +83,15 @@ curl  -X POST --url  https://appswapx.99ss.ml/claim/  -H "Content-Type: applicat
 - address 账户地址
 ##### 请求示例
 ```
-curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
+curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_info",
-	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
+	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
+}'
+
+
+curl  -X POST --url https://appswapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_info",
+	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
 ```
 #### 应答
