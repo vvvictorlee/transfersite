@@ -5,6 +5,24 @@
 nohup node app.js &  
 ```
 
+### 部署注意事项
+#### admin_secrets
+dmin private key不在git 里，
+需要在手动创建文件 data/secrets.json，放private key
+json 内容格式   {"key":""}
+
+#### mysql 新用户
+在ubuntu nodejs 连接mysql 不能用root连接 ，需要创建新用户 sql 如下
+```
+CREATE USER 'swapxminer'@'%' IDENTIFIED BY 'p@ssw0rd';
+```
+
+授予所有权限
+```
+GRANT ALL PRIVILEGES ON *.* TO 'swapxminer'@'%' WITH GRANT OPTION;
+```
+
+
 ## 6 领取收益接口
 
 ### 6.1 获取指定账户收益列表
@@ -95,8 +113,9 @@ curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: applic
 	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
 
+https://stake-swapx.99ss.ml/
 
-curl  -X POST --url https://appswapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url https://stake-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_info",
 	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
@@ -128,6 +147,9 @@ curl  -X POST --url  http://192.168.38.227:3536/claim/   -H "Content-Type: appli
 	"method": "finish_epoch",
 	"epoch": "3"
 }'
+
+
+
 
 curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "finish_epoch",
