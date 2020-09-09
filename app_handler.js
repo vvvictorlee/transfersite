@@ -42,51 +42,70 @@ const admin_secrets = secrets.key;//process.env.ADMIN_SECRETS;
 const chain_id = process.env.CHAIN_ID;
 const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
 const is_issue = process.env.IS_ISSUE;
-const claim_exec_by_admin=process.env.CLAIM_EXEC_BY_ADMIN;
+const claim_exec_by_admin = process.env.CLAIM_EXEC_BY_ADMIN;
 const gasLimit = process.env.GAS_LIMIT;
 
 
 const cron = require('node-cron')
-async function runJob()
-{
-/**
- * 基本使用
- * 第一個參數：排成格式
- * 第二個參數：要執行的 function
- * 第三個參數：是否要立即執行
- **/
-let task = cron.schedule('* * * * * *', function () {
-  console.log('hello world', counter, new Date().getSeconds())
-}, true)
+async function runJob() {
+    /**
+     * 基本使用
+     * 第一個參數：排成格式
+     * 第二個參數：要執行的 function
+     * 第三個參數：是否要立即執行
+     **/
+    let task = cron.schedule('* * * * * *', function () {
+        console.log('hello world', counter, new Date().getSeconds())
+    }, true)
 
-task.start()
-task.stop()
-task.destroy()
+    task.start()
+    task.stop()
+    task.destroy()
 
-/**
- * 檢驗是否是有效的排程格式
- **/
-cron.validate('* * * * * *')
+    /**
+     * 檢驗是否是有效的排程格式
+     **/
+    cron.validate('* * * * * *')
 
-// cron-table
+    // cron-table
 
 
-// /**
-//  * 一段時間後自動執行
-// **/
-// '* * * * * *'			// 每秒跑一次
-// '*/2 * * * *'			// 兩分鐘跑一次
+    // /**
+    //  * 一段時間後自動執行
+    // **/
+    // '* * * * * *'			// 每秒跑一次
+    // '*/2 * * * *'			// 兩分鐘跑一次
 
-// /**
-//  * 特定時間執行
-//  **/
-// '1,3,4,5 * * * *'		// 每到分鐘數為 1, 3, 4, 5 時執行
-// '1-5 * * * *'			// 分鐘數為 1, 2, 3, 4, 5 時執行
-// 安裝
-// 1
-// $ npm install node-cron
+    // /**
+    //  * 特定時間執行
+    //  **/
+    // '1,3,4,5 * * * *'		// 每到分鐘數為 1, 3, 4, 5 時執行
+    // '1-5 * * * *'			// 分鐘數為 1, 2, 3, 4, 5 時執行
+    // 安裝
+    // 1
+    // $ npm install node-cron
 }
 
+async function getSwpInfoByAddress(addr) {
+    try {
+        const token = process.env.SWP_ADDRESS;
+        let erc20 = new web3.eth.Contract(erc20_abi, token);
+        let balance = await erc20.methods.balanceOf(addr).call();
+        let released = await erc20.methods.totalSupply().call();
+        const utoken = process.env.SWP_USDT_ADDRESS;
+        // let stoken = new web3.eth.Contract(stoken_abi, utoken);
+        // let reserves = await stoken.methods.getReserves().call();
+        // const price = reserves[0]/(reserves[1]+1);
+        const price =  1.68;
+        return {balance:balance,price:price,released:released};
+
+        // return {balance:web3.utils.fromWei(balance),price:price,released:web3.utils.fromWei(released)};
+
+    } catch (error) {
+        console.log(error);
+    }
+    return {balance:0,price:0,released:0};
+}
 
 
 async function getRewardListByAddress(addr) {
@@ -101,7 +120,7 @@ async function getRewardListByAddress(addr) {
     return { "result": "unkonwn error" };
 }
 
-async function claim_all(addr,gas_limit) {
+async function claim_all(addr, gas_limit) {
 
     try {
         await redeem_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
@@ -110,7 +129,7 @@ async function claim_all(addr,gas_limit) {
         if (sizebalances[0] == 0) {
             return {};
         }
-        let balances = sizebalances[1] ;
+        let balances = sizebalances[1];
         const para = {
             web3: web3,
             admin: admin,
@@ -121,9 +140,9 @@ async function claim_all(addr,gas_limit) {
             password: password,
             admin_secrets: admin_secrets,
             chain_id: chain_id,
-            symbol_interval:symbol_interval,
-            claim_exec_by_admin:claim_exec_by_admin,
-            gasLimit:gas_limit==undefined?gasLimit:gas_limit,
+            symbol_interval: symbol_interval,
+            claim_exec_by_admin: claim_exec_by_admin,
+            gasLimit: gas_limit == undefined ? gasLimit : gas_limit,
         };
 
         const encodedAbi = await claimProof(para, addr, balances);
@@ -148,7 +167,7 @@ async function get_token_symbol() {
         // token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
     }
 
-    token_symbols[process.env.SWP_ADDRESS]=process.env.SWP_SYMBOL||"SWP";
+    token_symbols[process.env.SWP_ADDRESS] = process.env.SWP_SYMBOL || "SWP";
 
     for (let token of token_list.pTokens) {
         // console.log(token);
@@ -177,7 +196,7 @@ const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 
 
-async function disburse_by_epoch(epochNum, step,issue_flag,gas_limit) {
+async function disburse_by_epoch(epochNum, step, issue_flag, gas_limit) {
     try {
         if (epochNum <= 0) {
             return "epoch must be larger than 0";
@@ -193,14 +212,14 @@ async function disburse_by_epoch(epochNum, step,issue_flag,gas_limit) {
             password: password,
             admin_secrets: admin_secrets,
             chain_id: chain_id,
-            is_issue:issue_flag==undefined?is_issue:issue_flag,
-            step:step,
-            gasLimit:gas_limit==undefined?gasLimit:gas_limit,
+            is_issue: issue_flag == undefined ? is_issue : issue_flag,
+            step: step,
+            gasLimit: gas_limit == undefined ? gasLimit : gas_limit,
         };
 
         // await disburse(para, epoch_path, epochNum, blockNum);
         await disburse.disburse(para, epoch_path, epochNum, blockNum);
-        
+
     } catch (error) {
         console.log(error);
     }
@@ -209,6 +228,7 @@ async function disburse_by_epoch(epochNum, step,issue_flag,gas_limit) {
 }
 
 module.exports = {
+    getSwpInfoByAddress,
     getRewardListByAddress,
     claim_all,
     get_token_symbol,

@@ -36,3 +36,6 @@ function updateSnapshotList() {
 
 updateSnapshotList();
 
+module.exports = {
+    updateSnapshotList,
+};

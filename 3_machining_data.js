@@ -58,3 +58,8 @@ function miningCycle(cycle) {
 }
 
 miningCycle(snapshot_list.length-1);
+
+
+module.exports = {
+    miningCycle,
+};

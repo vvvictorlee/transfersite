@@ -29,3 +29,9 @@ else {
     console.log("usage: node 5_create_cycle_report.js 2");
     console.log("2 =epochnum  -- epoch num such as 2");
 }
+
+
+
+module.exports = {
+    createReport,
+};

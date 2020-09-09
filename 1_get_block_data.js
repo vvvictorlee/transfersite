@@ -207,3 +207,7 @@ function getBlockData(lastBlock) {
 
 // -1 表示自动，否则可以强制指定块号
 getBlockData(0);
+
+module.exports = {
+    getBlockData,
+};

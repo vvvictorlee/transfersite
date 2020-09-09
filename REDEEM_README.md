@@ -76,10 +76,41 @@ curl  -X POST --url  https://appswapx.99ss.ml/claim/  -H "Content-Type: applicat
 ```
 
 
-
-
+### 6.3 获取指定账户SWP余额及其他信息
+#### 请求
+##### 参数说明：
+- method  方法名称 get_swp_info
+- address 账户地址
+##### 请求示例
+```
+curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_info",
+	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
+}'
+```
+#### 应答
+##### 数据说明
+- balance   指定账户SWP余额
+- price     SWP价格
+- released  SWP已发行量
+#####
+```
+{
+	"balance": "0",
+	"price": 1.68,
+	"released": "2000000000000000000000"
+}
 ```
 
+
+
+### 6.4 提交领取指定周期时间戳
+#### 请求
+##### 参数说明：
+- method  方法名称 finish_epoch
+- epoch   周期值
+##### 请求示例
+```
 curl  -X POST --url  http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
 	"method": "finish_epoch",
 	"epoch": "2"
@@ -89,6 +120,51 @@ curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application
 	"method": "finish_epoch",
 	"epoch": "2"
 }'
+```
+
+#### 应答
+##### 数据说明
+- result  执行结果 成功success
+##### 应答示例
+```
+{
+    "result": "success"
+}
+
+```
+
+
+### 6.5 提交领取名单MerkleRoot
+#### 请求
+##### 参数说明：
+- method  方法名称 seed_allocations
+- epoch   周期值
+- issue   是否发行指定代币  1 --是 0--否
+##### 请求示例
+```
+curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "seed_allocations",
+	"epoch": "2",
+    "issue":0
+}'
+
+```
+
+#### 应答
+##### 数据说明
+- result  执行结果 成功success
+##### 应答示例
+```
+{
+    "result": "success"
+}
+
+```
+
+
+
+```
+
 
 curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "seed_allocations",
