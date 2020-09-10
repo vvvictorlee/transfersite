@@ -1,5 +1,5 @@
 
-global.HTTP_PROVIDER = "https://ropsten.infura.io/v3/afea481cd4da4deabd6d296e6509b601";// "https://eth-ropsten.alchemyapi.io/v2/Z42Blpj7cANVPl6vizpQbu_DibFlfWWj";//https://ropsten.infura.io/v3/206de317234e48e28a7dd1abbd914e26";//"; // 测试网RPC接口
+global.HTTP_PROVIDER = https://ropsten.infura.io/v3/206de317234e48e28a7dd1abbd914e26";//"https://ropsten.infura.io/v3/afea481cd4da4deabd6d296e6509b601";// "https://eth-ropsten.alchemyapi.io/v2/Z42Blpj7cANVPl6vizpQbu_DibFlfWWj";// 测试网RPC接口
 
 global.CONTRACT_FACTORY = "0x39df422789de097f82ebc157e38880c2cc9a7f19"; // factory
 global.CONTRACT_REDEEM = "0x72c09d4fd187b4336fa4ab66e4360f626619483b"; // redeem

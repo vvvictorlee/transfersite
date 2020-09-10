@@ -26,8 +26,10 @@ app.post('/claim/', function (req, res) {
 
     let handlers = {
         "get_swp_info": (async function () {
-            let swpInfo = await app_handler.getSwpInfoByAddress(req.body.address);
+            // let swpInfo = await app_handler.getSwpInfoByAddress(req.body.address);
+            swpInfo = { "result": "The  'get_swp_info' interface is disabled temporarily" };
             res.json(swpInfo);
+
         }),
         "get_reward_list": (async function () {
             let rewardList = await app_handler.getRewardListByAddress(req.body.address);
