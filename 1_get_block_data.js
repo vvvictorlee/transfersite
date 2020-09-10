@@ -2,8 +2,8 @@ var Web3 = require("web3");
 var co = require('co');
 var util = require('./util');
 var block_db = require('./block_db');
-// require('./conf/const');
-require('./conf/const_ropsten');
+require('./conf/const');
+// require('./conf/const_ropsten');
 // require('./conf/const_private');
 
 var web3 = new Web3();
@@ -205,9 +205,14 @@ function getBlockData(lastBlock) {
     });
 }
 
-// -1 表示自动，否则可以强制指定块号
-getBlockData(0);
-
 module.exports = {
     getBlockData,
 };
+
+// -1 表示自动，否则可以强制指定块号
+// getBlockData(0);
+getBlockData(-1);
+
+// 重新计算账户类型
+// UPDATE addr_type SET type = 9;
+// checkAllAddr();
