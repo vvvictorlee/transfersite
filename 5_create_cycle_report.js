@@ -22,16 +22,19 @@ function createReport(cycle) {
     })();
 }
 
-if (process.argv[2] > 0) {
-    createReport(process.argv[2]);
-}
-else {
-    console.log("usage: node 5_create_cycle_report.js 2");
-    console.log("2 =epochnum  -- epoch num such as 2");
-}
-
-
 
 module.exports = {
     createReport,
 };
+
+
+var cycle = 1;
+if (process.argv[2]>0) {
+    cycle = process.argv[2]
+}
+if (cycle > 0) {
+    console.log("createReport : epoch num = ", cycle);
+    createReport(cycle);
+}
+
+
