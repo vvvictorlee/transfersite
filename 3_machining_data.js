@@ -2,8 +2,8 @@ var block_db = require('./block_db');
 var util = require('./util');
 var co = require('co');
 
-// require('./conf/const');
-require('./conf/const_ropsten');
+require('./conf/const');
+// require('./conf/const_ropsten');
 
 var snapshot_filename = 'data/snapshot.json';
 var snapshot_list = util.loadJson(snapshot_filename);
@@ -57,9 +57,9 @@ function miningCycle(cycle) {
     });
 }
 
-miningCycle(snapshot_list.length-1);
-
-
 module.exports = {
     miningCycle,
 };
+
+miningCycle(snapshot_list.length-1);
+
