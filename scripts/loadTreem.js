@@ -22,7 +22,7 @@ const loadTreem = async (para, fullfileName) => {
     const supply = items[1];
     const token = items[2];
     console.log("+++++++++ issue  flag ===", para.is_issue);
-    if (0 != para.is_issue) {
+    if (para.is_issue) {
         try {
             //ropsten
             if (3 == para.chain_id) {

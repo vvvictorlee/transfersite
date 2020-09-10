@@ -3,9 +3,9 @@ var Web3 = require("web3");
 var co = require('co');
 var util = require('./util');
 var redeem_db = require('./redeem_db');
-// require('./conf/const');
+require('./conf/const');
 // require('./conf/const_private');
-require('./conf/const_ropsten');
+// require('./conf/const_ropsten');
 var sleep = require('sleep');
 
 const { claimProof } = require("./scripts/calculateProof");
@@ -28,7 +28,7 @@ web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 var redeem_abi = util.loadJson('abi/MerkleRedeem.json');
 var redeem = new web3.eth.Contract(redeem_abi, global.CONTRACT_REDEEM);
 
-var stoken_abi = util.loadJson('abi/SToken.json');
+// var stoken_abi = util.loadJson('abi/SToken.json');
 var erc20_abi = util.loadJson('abi/ERC20.json');
 
 var file_tokens = './data/token_list.json';
@@ -37,7 +37,7 @@ const secrets = util.loadJson('data/secrets.json');
 
 const admin = process.env.ADMIN;
 const password = process.env.PASSWORD;
-const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
+const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "./reports/CR_";
 const admin_secrets = secrets.key;//process.env.ADMIN_SECRETS;
 const chain_id = process.env.CHAIN_ID;
 const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
@@ -196,7 +196,7 @@ const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 
 
-async function disburse_by_epoch(epochNum, step, issue_flag, gas_limit) {
+async function disburse_by_epoch(epochNum, step, is_execute, issue_flag, gas_limit) {
     try {
         if (epochNum <= 0) {
             return "epoch must be larger than 0";
@@ -215,6 +215,7 @@ async function disburse_by_epoch(epochNum, step, issue_flag, gas_limit) {
             is_issue: issue_flag == undefined ? is_issue : issue_flag,
             step: step,
             gasLimit: gas_limit == undefined ? gasLimit : gas_limit,
+            is_execute: is_execute == undefined ? true : is_execute,
         };
 
         // await disburse(para, epoch_path, epochNum, blockNum);
@@ -235,4 +236,13 @@ module.exports = {
     disburse_by_epoch,
 };
 
-// disburse_by_epoch(1, 1)
+
+var epoch = 1;
+// 服务器执行, 检查默克尔树根
+disburse_by_epoch(epoch, 1, false,false);
+
+// 本地执行，顺序执行，防止出错
+// disburse_by_epoch(epoch, 0, true, false, 0);   // 首次，创建周期
+// disburse_by_epoch(epoch, 1, false, true, 0);   // 发币
+// disburse_by_epoch(epoch, 1, true, false, 0);   // 上传数根
+// disburse_by_epoch(epoch+1, 0, true, false, 0); // 允许领取奖励

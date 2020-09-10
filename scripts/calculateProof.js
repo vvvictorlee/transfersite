@@ -1,8 +1,8 @@
 // Usage example:
 // npm run calculateProof -- /Users/lisheng/Downloads/defi/balancer/erc20-redeemable-master/merkle/test/sampleAllocations  0x77c845E6A61F37cB7B237de90a74fbc3679FcF06  0x77c845E6A61F37cB7B237de90a74fbc3679FcF06
 
-const { MerkleTree } = require("../lib/merkleTree");
-const fs = require("fs");
+// const { MerkleTree } = require("../lib/merkleTree");
+// const fs = require("fs");
 const { loadTrees } = require("./loadTrees");
 const { sentSignedTx } = require("./sentSignedTx");
 const sleep = require('sleep');
@@ -31,13 +31,12 @@ const claimProof = async (para, address, balances) => {
             console.log("proof===", proof);
             claim_list.push([cycle, token, balance, proof]);
         }
-
     }
 
     console.log("claim_list===",claim_list);
     if (0 != para.claim_exec_by_admin) {
         try {
-            if (3 == para.chain_id) {
+            if (para.chain_id<99) {
                 // const abi = await para.contract.methods.claimEpochs(
                 //     address,
                 //     list

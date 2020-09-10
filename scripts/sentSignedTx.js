@@ -8,7 +8,6 @@ web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 const sentSignedTx = async (para, data) => {
 
     try {
-
         let nonce = await para.web3.eth.getTransactionCount(para.admin, "pending");
         console.log(nonce);
 
@@ -39,8 +38,6 @@ const sentSignedTx = async (para, data) => {
     } catch (error) {
         console.log(error);
     }
-
-
 }
 
 

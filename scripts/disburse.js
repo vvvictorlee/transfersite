@@ -1,17 +1,15 @@
 // Usage example:
 // npm run disburse -- /Users/lisheng/Downloads/defi/balancer/erc20-redeemable-master/merkle/test/sampleAllocations 10622281
 
-const { MerkleTree } = require("../lib/merkleTree");
+// const { MerkleTree } = require("../lib/merkleTree");
+// const fs = require("fs");
 const { loadTrees } = require("./loadTrees");
-const fs = require("fs");
 const { sentSignedTx } = require("./sentSignedTx");
-
 
 const finishEpoch = async (para, epochNum, blockNum) => {
 
     const block = await para.web3.eth.getBlock(blockNum);
     console.log("Block:\t", blockNum, block.hash, block.timestamp);
-
 
     console.log("\n\n// TO FINISH THIS EPOCH");
     console.log("let redeem\nMerkleRedeem.deployed().then(i => redeem = i);");
@@ -23,6 +21,8 @@ const finishEpoch = async (para, epochNum, blockNum) => {
         block.hash +
         '")'
     );
+    if (!para.is_execute) return ;
+
     try {
         //ropsten
         if (3 == para.chain_id) {
@@ -68,9 +68,12 @@ const disburse = async (para, path, epochNum, blockNum) => {
     console.log("\n\n// TO FINISH THIS EPOCH");
     console.log("let redeem\nMerkleRedeem.deployed().then(i => redeem = i);");
     console.log("let epochNum = " + epochNum + " // adjust accordingly");
+
+    if (!para.is_execute) return ;
+
     try {
         //ropsten
-        if (3 == para.chain_id) {
+        if (para.chain_id < 99) {
             const abi = await para.contract.methods.seedAllocations(
                 epochNum,
                 root
@@ -91,7 +94,6 @@ const disburse = async (para, path, epochNum, blockNum) => {
     catch (error) {
         console.log(error);
     }
-
 }
 
 
