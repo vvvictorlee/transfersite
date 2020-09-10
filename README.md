@@ -263,6 +263,7 @@ contract.methods.balanceOf(toAddress).call().then(console.log).catch(console.err
 ```	
 			
 21.4.2. 使用 truffle-hdwallet-provider 連接到 https://ropsten.infura.io
+
 ```		
 fs = require('fs');
 const Web3 = require('web3');
@@ -368,7 +369,7 @@ web3.eth.accounts.signTransaction(tx, privateKey).then(signed => {
 			
 21.4.4. 執行合約
 
-s```
+```
 const fs = require('fs');
 const Web3 = require('web3');
 const web3 = new Web3("https://mainnet.infura.io/CsS9shwaAab0z7B4LP2d");
@@ -477,5 +478,6 @@ web3.eth.getGasPrice().then(function(gasPrice){
             }); 
         });
     });
-});			
+});		
+	
 ```	

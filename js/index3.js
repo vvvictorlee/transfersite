@@ -33,7 +33,8 @@
 // }
 
 const Web3 = require('web3');
-const  util = require('./util');
+const util = require('./util');
+var BigNumber = require('bignumber.js')
 // // // Connect to local Ethereum node
 // const web3 = new Web3(new Web3.providers.HttpProvider("http://192.168.38.227:18045"));
 
@@ -55,10 +56,12 @@ const  util = require('./util');
 // global.ADDRESS_COMMUNITY = '0xa4a4005a9497548427a141d53ad8869829fb9ec7';   // 社区收款账户，用于获取挖矿奖励
 // global.ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
+
+
 const admin = "0x0db1bb1097ac3b7e26b3a4cf35e2f19e07d24568";
 const adminr = "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e";
 const secrets = util.loadJson('data/secrets.json');
-const adminr_secrets=secrets.key;
+const adminr_secrets = secrets.key;
 // const password = "123456";
 const REDEEM = "0x99B9Bc4Ca03C227d9cBe0960c416adDE7146026F";//"0x2a103D4F9d64B4124F0a2Dd556DEee0926A92527";//redeem.address;
 const REDEEM_ROPSTEN = "0x72c09d4fd187b4336fa4ab66e4360f626619483b";//"0x2a103D4F9d64B4124F0a2Dd556DEee0926A92527";//redeem.address;
@@ -66,11 +69,16 @@ const REDEEM_ROPSTEN = "0x72c09d4fd187b4336fa4ab66e4360f626619483b";//"0x2a103D4
 const TTOKEN_ = "0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5";
 
 // const BN = require('BigNumber.js');
-const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/206de317234e48e28a7dd1abbd914e26'));
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/206de317234e48e28a7dd1abbd914e26'));
+
+
+const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-ropsten.alchemyapi.io/v2/Z42Blpj7cANVPl6vizpQbu_DibFlfWWj'));
+
 // // wei是以太坊上的的最小单位，ether小数点后18位为一个wei
 
+// 
 
-let abi = require("../json/Redeem_Ropsten.json");///Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/BFactory.json
+let abi = require("../json/markleredeem.json").abi;///Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/BFactory.json
 let Redeem_Ropsten = new web3.eth.Contract(abi, REDEEM_ROPSTEN, { "from": admin });//0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63
 
 let tabi = require("../json/ERC20.json");///Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/BFactory.json
@@ -93,35 +101,38 @@ let tokens = ["0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5",
 
 (async function () {
 
-console.log("============");
-const r = await Redeem_Ropsten.methods._verifiedTokens(0).call();
-console.log(r);
-const s = await Redeem_Ropsten.methods.epochTimestamps(1).call();
-console.log(s);
-const b = await web3.eth.getBlock(2);//.toNumber();
-console.log(b.gasLimit);
-console.log("============");
+    // console.log("============");
+    // const r = await Redeem_Ropsten.methods._verifiedTokens(0).call();
+    // console.log(r);
+    // for (let i = 0; i < 3; i++) {
+    //     const s = await Redeem_Ropsten.methods.epochTimestamps(i + 1).call();
+    //     console.log(i,s);
+    // }
+    // const b = await web3.eth.getBlock("latest");//.toNumber();
+    // console.log(b.gasLimit);
+    // console.log(b);
+    // console.log("============");
 
-    let result1 = await Redeem_Ropsten.methods.merkleRoots(1, 3).call({ from: user1 });
-    console.log(result1);
-    tokens.push(token);
-    for (const t of tokens) {
-        result1 = await Redeem_Ropsten.methods.claimStatus(user1, t, 1, 3).call({ from: user1 });
-        console.log(t, result1);
+    // let result1 = await Redeem_Ropsten.methods.merkleRoots(1, 3).call({ from: user1 });
+    // console.log(result1);
+    // tokens.push(token);
+    // for (const t of tokens) {
+    //     result1 = await Redeem_Ropsten.methods.claimStatus(user1, t, 1, 3).call({ from: user1 });
+    //     console.log(t, result1);
 
-        let tc = new web3.eth.Contract(tabi, t);//0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63
+    //     let tc = new web3.eth.Contract(tabi, t);//0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63
 
-        let symbol = await tc.methods.symbol().call();
-        console.log("symbol==", symbol);
-        result1 = await tc.methods.balanceOf(user1).call();
-        console.log("user1 balance==", result1);
-        result1 = await tc.methods.balanceOf(REDEEM_ROPSTEN).call();
-        console.log("REDEEM_ROPSTEN balance==", result1);
-    }
+    //     let symbol = await tc.methods.symbol().call();
+    //     console.log("symbol==", symbol);
+    //     result1 = await tc.methods.balanceOf(user1).call();
+    //     console.log("user1 balance==", result1);
+    //     result1 = await tc.methods.balanceOf(REDEEM_ROPSTEN).call();
+    //     console.log("REDEEM_ROPSTEN balance==", result1);
+    // }
 
 
-    result1 = await Redeem_Ropsten.methods.verifiedTokens().call({ from: admin });
-    console.log("verifiedTokens", result1);
+    // result1 = await Redeem_Ropsten.methods.verifiedTokens().call({ from: admin });
+    // console.log("verifiedTokens", result1);
 
 
     // var transactionObject = {
@@ -181,6 +192,82 @@ console.log("============");
     //     // let result = await TToken.methods.balanceOf(accounts[1]).call({ from: accounts[1] });
     //     // console.log(result);
 
+    claim_list =
+        [
+            [
+                '2',
+                '0x8d3acd2969ca969188bd8b227dfca09e1691e263',
+                '163199999999999997823968',
+                [
+                    '0x52b04ba5fc6fd08885046c3fee1fb5bdc32ea25a56a512bdf2eba5d24c05bde6',
+                    '0xf894f4fa5b01663a5c96757d6995ecec708f9bcb342425b3f0066ddc8dbdfbc9',
+                    '0x55b1fafefb692848ab8d5df389af07cf6cc5bbdc7a99e0d12df8e373408afe0b',
+                    '0x58aa5b23258100fd504b5811bb63446bfa79c69c65685473044e8d59029d2823'
+                ]
+            ],
+            [
+                '2',
+                '0xc5201589361c2da2b07df626f1cab71b4255b16e',
+                '2149919969215164723726',
+                [
+                    '0xddc358c03df38abf2c03e668ce35439b46330f5225d7edeead5811585fe361c8',
+                    '0x3bfa036d6a370510e14915ff46793c1d395e3c22c43a353fc77e500add570dd6',
+                    '0xdfe85a982b198e0249e2ad7cedbd7a6b76fba12a3fb2b05dafa409607bcc3932',
+                    '0x3d00b8858f58efc9805110f02c582c351e3d27d2b2728e8661cdca2dc7267684'
+                ]
+            ],
+            [
+                '2',
+                '0xd044a67cbb3cbaa5219cb4e2ed165351c010f828',
+                '151299999999999998487000',
+                [
+                    '0xb340817a8517358add3cf3682801ace8ee7f41dc96bac379c4384cb0ad983142',
+                    '0xdf44f5e8cb1700395dfba78aaf22c2693fe4a61e3bec842cecbc2fce0989e82a',
+                    '0x65d21c6fdeecc72e3f53d568df74dc20e2739c1926e3d9461e14a505f89829e5',
+                    '0x58aa5b23258100fd504b5811bb63446bfa79c69c65685473044e8d59029d2823'
+                ]
+            ],
+            [
+                '2',
+                '0xe59eb769a705443936a043b07ec1892b448ca24d',
+                '163199999999999999852928',
+                [
+                    '0x6425d09182a9fd81ceee391e5fc5c34608654c1d0b4b182bfe0bbfe68937468f',
+                    '0xf894f4fa5b01663a5c96757d6995ecec708f9bcb342425b3f0066ddc8dbdfbc9',
+                    '0x55b1fafefb692848ab8d5df389af07cf6cc5bbdc7a99e0d12df8e373408afe0b',
+                    '0x58aa5b23258100fd504b5811bb63446bfa79c69c65685473044e8d59029d2823'
+                ]
+            ]
+        ];
+
+    // const gas = await Redeem_Ropsten.methods.claimEpochs(
+    //     user1,
+    //     claim_list
+    // ).estimateGas({ from: adminr });
+    // console.log(gas);
+
+    for (const ctbp of claim_list) {
+        const [cycle, token, balance, proof] = ctbp;
+        console.log("ctbp===", ctbp);
+
+        let result = await Redeem_Ropsten.methods.verifyClaim(user1, cycle, token, balance, proof).call({ from: user1 });
+        console.log("verifyClaim==",result);
+
+        const gas = await Redeem_Ropsten.methods.claimEpoch(
+            user1,
+            cycle, token, balance, proof
+        ).estimateGas({ from: user1 });
+        console.log("claimEpoch  gas ==",gas);
+
+        // sleep.msleep(para.symbol_interval);
+    }
+
+
+    // const abi = await Redeem_Ropsten.methods.verify(
+    //     tokens[1],
+    // ).estimateGas({from:adminr,gas:web3.utils.toHex(2100000),value:0x00});
+
+
 })();
 
 // const {getJsonFileList} = require("./getJsonFileList.js")
@@ -200,252 +287,4 @@ console.log("============");
 // //mint(admin);
 
 // //step 4 tran
-
-// var number = web3.eth.getTransactionCount(address).then(function(count) {
-//   console.log("Count " + count);
-//   var privateKey = new EthJS.Buffer.Buffer(privateKey, 'hex');
-//   console.log(web3.utils.toHex(finalAnswers));
-//   var rawTx = {
-//     nonce: web3.utils.toHex(count),
-//     to: '0xF1aA87F7058e5ABE561cCe8A466eE1CC17d69639',
-//     value: 0,
-//     data: web3.utils.toHex(finalAnswers),
-//     gas: 50000,
-//     gasPrice: web3.utils.toWei('300', 'gwei')
-//   };
-
-//   var tx = new EthJS.Tx(rawTx);
-//   tx.sign(privateKey);
-
-//   var serializedTx = tx.serialize();
-
-
-//   web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).on('receipt', console.log);
-// });
-
-var Tx = require('ethereumjs-tx').Transaction;
-
-async function sendSignedTx() {
-
-    let nonce = await web3.eth.getTransactionCount(admin, "pending");
-    console.log(nonce);
-
-    let encodedabi = await Redeem_Ropsten.methods.verify(token).encodeABI();//send({ from: admin4 });
-
-    var privateKey = Buffer.from('62a51d2f868ca64bda12db2fbb0a17fa5561dea692f38cc97d8a4a4de2f91382', 'hex');
-    const gasprice = await web3.eth.getGasPrice();
-    var rawTx = {
-        nonce: web3.utils.toHex(nonce),
-        gasPrice: web3.utils.toHex(gasprice),
-        gasLimit: web3.utils.toHex(3000000),
-        from: admin,
-        to: REDEEM,
-        value: '0x00',
-        data: encodedabi,
-        chainId: 3
-    }
-
-    // var rawTx = {
-    //             "from": fromAddress, // Add this
-    //             "nonce": "0x" + nonces.toString(16),
-    //             "gasPrice": web3.utils.toHex('20000000000'),
-    //             "gasLimit": web3.utils.toHex('21000'),
-    //             "to": contractAddr,
-    //             "value": "0x0",
-    //             "data": dataso,
-    //             "chainId": 1 // For mainnet // Use 3 for ropsten testnet
-    //         };
-
-    // let gas = await Redeem_Ropsten.methods.verify(token).estimateGas();
-    // rawTx.gas = gas*1.2;
-    var tx = new Tx(rawTx, { 'chain': 'ropsten', hardfork: 'istanbul' });
-    tx.sign(privateKey);
-
-    var serializedTx = tx.serialize();
-
-    let receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
-    console.log(receipt);
-}
-// sendSignedTx();
-
-
-// // function checkAllBalances() {
-// //     web3.eth.getAccounts(function (err, accounts) {
-// //         accounts.forEach(function (id) {
-// //             web3.eth.getBalance(id, function (err, balance) {
-// //                 console.log("" + id + ":\tbalance: " + web3.utils.fromWei(balance, "ether") + " ether");
-// //             });
-// //         });
-// //     });
-// // };
-
-// // checkAllBalances()
-
-
-
-
-
-
-
-// // let Hello = new web3.eth.Contract(JSON.parse(helloCompiled.interface), null, { 
-// //     data: '0x' + helloCompiled.bytecode 
-// // });
-
-// // contract.events.allEvents({
-// //     filter: {}, // Using an array means OR: e.g. 20 or 23
-// //     fromBlock: 578042
-// // }, function(error, event){ console.log(event); })
-// // .on('data', function(event){
-// //     console.log(event); // same results as the optional callback above
-// // })
-// // .on('changed', function(event){
-// //     // remove event from local database
-// // })
-// // .on('error', console.error);
-
-
-// // console.log(contract.methods)
-// // contract.methods.newBPool().call({from: '0x0db1bb1097ac3b7e26b3a4cf35e2f19e07d24568'}, function(error, result){
-// //   console.log("error:")
-// // console.log(error)
-// // console.log("result:")
-// // console.log(result)
-// // });
-
-
-// // contract.methods.setBLabs('0x10acb77eb8db440fdd9b188a68da406344c1eb8b').call({from: '0x0db1bb1097ac3b7e26b3a4cf35e2f19e07d24568'}, function(error, result){
-// //   console.log("error:")
-// // console.log(error)
-// // console.log("result:")
-// // console.log(result)
-// // });
-
-
-
-
-
-// // let abi = require("/Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/TToken.json").abi;
-// // let contract = new web3.eth.Contract(abi, "0xb67B487377BD6e74db3892514E4477e24da4B53c");
-// // if(undefined==contract)
-// // {
-// //         console.log("un");
-// // return;
-// // }
-// // console.log(contract.methods)
-// // contract.methods.mint("0x0db1bb1097ac3b7e26b3a4cf35e2f19e07d24568", web3.utils.toWei('5')).call({from: '0x0db1bb1097ac3b7e26b3a4cf35e2f19e07d24568'});
-// // // weth.mint(admin, toWei('5'));
-
-
-// // const path = require('path');
-// // const fs = require('fs');
-// // const solc = require('solc');
-
-
-
-// // const helloPath = path.resolve(__dirname, '.', 'TToken.sol');
-// // const source = fs.readFileSync(helloPath, 'UTF-8');
-
-// // var input = {
-// //     language: 'Solidity',
-// //     sources: {
-// //         'TToken.sol' : {
-// //             content: source
-// //         }
-// //     },
-// //     settings: {
-// //         outputSelection: {
-// //             '*': {
-// //                 '*': [ '*' ]
-// //             }
-// //         }
-// //     }
-// // }; 
-// // console.log(JSON.parse(solc.compile(JSON.stringify(input))));
-// // console.log( JSON.parse(solc.compile(JSON.stringify(input))).contracts['TToken.sol'].TToken);
-// // const { abi: interface, evm: { bytecode: { object } } } = JSON.parse(solc.compile(JSON.stringify(input))).contracts['TToken.sol'].TToken; // 
-
-// // module.exports = { interface, object }; // object is the actual name of the bytecode
-
-
-
-
-// // const ganache = require('ganache-cli');
-// // const Web3 = require('web3');
-// // const web3 = new Web3(ganache.provider());
-// // const { interface, object: bytecode } = require('../compile'); 
-// // i've renamed object with bytecode 
-
-// // const accounts =  web3.eth.getAccounts();
-// //   templatename =  new web3.eth.Contract(interface)
-// //     .deploy({ data: object, arguments: ['Wrapped Ether', 'WETH', 18] })
-// //     .send({ from: "0x0db1bb1097ac3b7e26b3a4cf35e2f19e07d24568", gas: '6000000' }, function(error, transactionHash){  })
-// // .on('error', function(error){  })
-// // .on('transactionHash', function(transactionHash){ })
-// // .on('receipt', function(receipt){
-// //    console.log(receipt.contractAddress) // contains the new contract address
-// // })
-// // .on('confirmation', function(confirmationNumber, receipt){  })
-// // .then(function(newContractInstance){
-// //     console.log(newContractInstance.options.address) // instance with the new contract address
-// // });
-
-// //0xb67B487377BD6e74db3892514E4477e24da4B53c
-
-
-// // console.log(JSON.parse(solc.compile(JSON.stringify({
-// //   language: 'Solidity',
-// //   sources: {
-// //     'lottery.sol': {
-// //       content: source,
-// //     },
-// //   },
-// //   settings: {
-// //     outputSelection: {
-// //       '*': {
-// //         '*': ['evm', 'bytecode'],
-// //       },
-// //     },
-// //   },
-// // }))).contracts['lottery.sol'].Lottery);
-
-
-
-// // const templatePath = path.resolve(__dirname, 'contracts', 'templatename.sol');
-// // const source = fs.readFileSync(templatePath, 'utf8');
-
-// // const input = {
-// //     language: 'Solidity',
-// //     sources: {
-// //         'yourtemplate.sol': {
-// //             content: source
-// //         }
-// //     },
-// //     settings: {
-// //         outputSelection: {
-// //             '*': {
-// //                 '*': ['*']
-// //             }
-// //         }
-// //     }
-// // }
-
-// // const { abi: interface, evm: { bytecode: { object } } } = JSON.parse(solc.compile(JSON.stringify(input))).contracts['yourtemplate.sol'].Templatename; // 
-
-// // module.exports = { interface, object }; // object is the actual name of the bytecode
-
-
-
-
-// // const ganache = require('ganache-cli');
-// // const Web3 = require('web3');
-// // const web3 = new Web3(ganache.provider());
-// // const { interface, object: bytecode } = require('../compile'); 
-// // // i've renamed object with bytecode 
-
-// // const accounts = await web3.eth.getAccounts();
-// //   templatename = await new web3.eth.Contract(interface)
-// //     .deploy({ data: bytecode, arguments: [INPUT_PARAMETER_GOES_HERE] })
-// //     .send({ from: accounts[0], gas: '1000000' });
-
-
 

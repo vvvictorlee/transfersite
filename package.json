@@ -7,6 +7,7 @@
     "deploy": ""
   },
   "dependencies": {
+    "bignumber.js": "^9.0.0",
     "dotenv": "^8.2.0",
     "solc": "^0.5.12",
     "web3": "^1.2.11"
