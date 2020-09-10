@@ -36,7 +36,7 @@ const sentSignedTx = async (para, data) => {
         console.log(receipt);
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 

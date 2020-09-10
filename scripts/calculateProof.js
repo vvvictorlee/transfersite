@@ -62,7 +62,7 @@ const claimProof = async (para, address, balances) => {
                 ).send({ from: para.admin });
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }
 

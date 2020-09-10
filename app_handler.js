@@ -102,7 +102,7 @@ async function getSwpInfoByAddress(addr) {
         return {balance:web3.utils.fromWei(balance),price:price,released:web3.utils.fromWei(released)};
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
     return {balance:0,price:0,released:0};
 }
@@ -115,7 +115,7 @@ async function getRewardListByAddress(addr) {
         // console.log(token_symbols);
         return await redeem_db.getRewardListByAddress(addr.toLowerCase(), token_symbols, web3);
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
     return { "result": "unkonwn error" };
 }
@@ -150,7 +150,7 @@ async function claim_all(addr, gas_limit) {
         return encodedAbi;
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
     return "";
 }
@@ -163,7 +163,7 @@ async function get_token_symbol() {
         token_symbols = util.loadJson(token_symbols_json);
         // console.log(token_symbols);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         // token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
     }
 
@@ -181,7 +181,7 @@ async function get_token_symbol() {
                 sleep.msleep(symbol_interval);
             }
             catch (error) {
-                console.log(error);
+                console.error(error);
             }
         }
     }
@@ -222,7 +222,7 @@ async function disburse_by_epoch(epochNum, step, is_execute, issue_flag, gas_lim
         await disburse.disburse(para, epoch_path, epochNum, blockNum);
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
     return { "result": "unkonwn error" };
 
@@ -239,10 +239,10 @@ module.exports = {
 
 var epoch = 1;
 // 服务器执行, 检查默克尔树根
-disburse_by_epoch(epoch, 1, false,false);
+// disburse_by_epoch(epoch, 1, false,false);
 
 // 本地执行，顺序执行，防止出错
-// disburse_by_epoch(epoch, 0, true, false, 0);   // 首次，创建周期
+disburse_by_epoch(epoch, 0, true, false, 0);   // 首次，创建周期
 // disburse_by_epoch(epoch, 1, false, true, 0);   // 发币
 // disburse_by_epoch(epoch, 1, true, false, 0);   // 上传数根
 // disburse_by_epoch(epoch+1, 0, true, false, 0); // 允许领取奖励

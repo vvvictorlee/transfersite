@@ -141,7 +141,7 @@ async function getAddrType(addr) {
         if (code === '0x') return 0;
         return 1;
     } catch(e) {
-        console.log('getAddrType Err :',e.message);
+        console.error('getAddrType Err :',e.message);
         return 7;   // 错误地址
     }
 }

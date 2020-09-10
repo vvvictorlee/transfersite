@@ -42,7 +42,7 @@ const finishEpoch = async (para, epochNum, blockNum) => {
         }
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
 
 }
@@ -92,7 +92,7 @@ const disburse = async (para, path, epochNum, blockNum) => {
         }
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 

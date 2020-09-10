@@ -42,7 +42,7 @@ const loadTreem = async (para, fullfileName) => {
             }
         }
         catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }
 
