@@ -3,10 +3,10 @@ var Web3 = require("web3");
 var co = require('co');
 var util = require('./util');
 var redeem_db = require('./redeem_db');
-require('./conf/const');
-// require('./conf/const_private');
-// require('./conf/const_ropsten');
 var sleep = require('sleep');
+require('./conf/const');
+// require('./conf/const_ropsten');
+// require('./conf/const_private');
 
 const { claimProof } = require("./scripts/calculateProof");
 const disburse = require("./scripts/disburse");
@@ -33,7 +33,7 @@ var erc20_abi = util.loadJson('abi/ERC20.json');
 
 var file_tokens = './data/token_list.json';
 var token_symbols_json = './data/token_symbols.json';
-const secrets = util.loadJson('data/secrets.json');
+const secrets = util.loadJson('conf/secrets.json');
 
 const admin = process.env.ADMIN;
 const password = process.env.PASSWORD;
@@ -135,7 +135,7 @@ async function claim_all(addr, gas_limit) {
             admin: admin,
             contract: redeem,
             erc20_abi: erc20_abi,
-            contractaddress: global.CONTRACT_REDEEM,
+            contractAddress: global.CONTRACT_REDEEM,
             path: epoch_reports_path,
             password: password,
             admin_secrets: admin_secrets,
@@ -208,7 +208,7 @@ async function disburse_by_epoch(epochNum, step, is_execute, issue_flag, gas_lim
             admin: admin,
             contract: redeem,
             erc20_abi: erc20_abi,
-            contractaddress: global.CONTRACT_REDEEM,
+            contractAddress: global.CONTRACT_REDEEM,
             password: password,
             admin_secrets: admin_secrets,
             chain_id: chain_id,
@@ -217,6 +217,10 @@ async function disburse_by_epoch(epochNum, step, is_execute, issue_flag, gas_lim
             gasLimit: gas_limit == undefined ? gasLimit : gas_limit,
             is_execute: is_execute == undefined ? true : is_execute,
         };
+
+        console.log("redeem addr :", para.contractAddress);
+        console.log("admin  addr :", para.admin);
+        console.log("------ START ------");
 
         // await disburse(para, epoch_path, epochNum, blockNum);
         await disburse.disburse(para, epoch_path, epochNum, blockNum);
@@ -239,10 +243,10 @@ module.exports = {
 
 var epoch = 1;
 // 服务器执行, 检查默克尔树根
-// disburse_by_epoch(epoch, 1, false,false);
+disburse_by_epoch(epoch, 1, false,false);
 
 // 本地执行，顺序执行，防止出错
-disburse_by_epoch(epoch, 0, true, false, 0);   // 首次，创建周期
+// disburse_by_epoch(epoch, 0, true, false, 0);   // 首次，创建周期
 // disburse_by_epoch(epoch, 1, false, true, 0);   // 发币
 // disburse_by_epoch(epoch, 1, true, false, 0);   // 上传数根
 // disburse_by_epoch(epoch+1, 0, true, false, 0); // 允许领取奖励

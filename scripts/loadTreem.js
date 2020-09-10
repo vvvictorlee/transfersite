@@ -1,8 +1,5 @@
-// const { MerkleTree } = require("../lib/merkleTree");
 const fs = require("fs");
 const path = require('path');
-// var util = require('../util');
-// const erc20_abi = util.loadJson('./abi/ERC20.json');
 const { sentSignedTx } = require("./sentSignedTx");
 
 
@@ -11,23 +8,23 @@ const loadTreem = async (para, fullfileName) => {
     const balances = JSON.parse(rawdata);
     // `周期_本期发行总量_Token地址.json`
     //   const token =  fileName.substr(fileName.lastIndexOf("_")+1);
-    console.log(fullfileName);
+    // console.log(fullfileName);
     const fileName = path.basename(fullfileName, ".json");//.substr(fullfileName.lastIndexOf("/")+1);
     const items = fileName.split("_");
     if (items.length < 2) {
-        console.log(fileName + " file name parsing failed ");
+        console.error(fileName + " file name parsing failed ");
         return [];
     }
-    console.log(items);
+    // console.log(items);
     const supply = items[1];
     const token = items[2];
-    console.log("+++++++++ issue  flag ===", para.is_issue);
+    // console.log("+++++++++ issue  flag ===", para.is_issue);
     if (para.is_issue) {
         try {
             //ropsten
-            if (3 == para.chain_id) {
+            if (para.chain_id<99) {
                 const abi = await para.contract.methods.issue(token, supply).encodeABI();
-                console.log("+++++++++ issue ", token);
+                console.log("+++++++++ issue ", token, supply);
                 await sentSignedTx(para, abi);
             }
             else {
@@ -52,7 +49,7 @@ const loadTreem = async (para, fullfileName) => {
     let origelements = [];
     let balance;
     let leaf;
-    console.log(balances);
+    // console.log(balances);
     Object.keys(balances).forEach(address => {
         // balance = para.utils.toWei(balances[address]);
         balance = (balances[address]);
@@ -60,12 +57,12 @@ const loadTreem = async (para, fullfileName) => {
             address = para.admin;
         }
         origelements.push([address, token, balance]);
-        console.log("address, token, balance====", address, token, balance);
+        // console.log("address, token, balance====", address, token, balance);
         leaf = para.web3.utils.soliditySha3(address, token, balance);
-        console.log(leaf);
+        // console.log(leaf);
         elements.push(leaf);
     });
-    console.log("=============loadtreem=====" + elements);
+    // console.log("=============loadtreem=====" + elements);
     return [elements, origelements];
 };
 

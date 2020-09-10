@@ -1,44 +1,69 @@
-var Web3 = require("web3");
 var Tx = require('ethereumjs-tx').Transaction;
-
-var web3 = new Web3();
-web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 
 
 const sentSignedTx = async (para, data) => {
-
     try {
-        let nonce = await para.web3.eth.getTransactionCount(para.admin, "pending");
-        console.log(nonce);
+        var web3 = para.web3;
 
-        var privateKey = Buffer.from(para.admin_secrets, 'hex');
-        const gasprice = await para.web3.eth.getGasPrice();
-        const b = await web3.eth.getBlock("latest");
-        var rawTx = {
-            nonce: web3.utils.toHex(nonce),
-            gasPrice: web3.utils.toHex(gasprice*1.5),
-            gasLimit: web3.utils.toHex(b.gasLimit - 1000),
-            from: para.admin,
-            to: para.contractaddress,
-            value: '0x00',
-            data: data,
-            chainId: 3
-        }
+        let nonce = await web3.eth.getTransactionCount(para.admin, "pending");
+        let gasPrice = await para.web3.eth.getGasPrice();
+        gasPrice = gasPrice*3
+        // let block = await web3.eth.getBlock("latest");
+        // let gasLimit = block.gasLimit - 1000
 
-        // let gas = await para.contract.methods.verify(token).estimateGas();
-        // rawTx.gas = gas*1.2;
-        var tx = new Tx(rawTx, { 'chain': 'ropsten', hardfork: 'istanbul' });
-        tx.sign(privateKey);
-
-        var serializedTx = tx.serialize();
-
-        let receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
-        console.log(receipt);
+        await sendSignedTransaction(web3, para.admin, para.contractAddress, para.admin_secrets, data, nonce, gasPrice);
 
     } catch (error) {
         console.error(error);
     }
 }
 
+const cancelTransaction = async (web3, fromAddr, toAddr, privateKey, data, nonce) => {
+    await sendSignedTransaction(web3, fromAddr, toAddr, privateKey, data, nonce, 700000000000, 0)
+}
+
+const sendSignedTransaction = async (web3, fromAddr, toAddr, privateKey, data, nonce, gasPrice, gasLimit=-1) => {
+    let chainID = await web3.eth.getChainId();
+    try {
+        var rawTx = {
+            nonce: web3.utils.toHex(nonce),
+            gasPrice: gasPrice,
+            // gasLimit: gasLimit,
+            from: fromAddr,
+            to: toAddr,
+            value: '0x00',
+            data: data,
+            chainId: chainID
+        }
+
+        // 判断是否计算gas
+        if (gasLimit<0) {
+            gasLimit = await web3.eth.estimateGas(rawTx);
+            // try {
+            //     gasLimit = await web3.eth.estimateGas(rawTx);
+            // }
+            // catch (error) {
+            //     console.warn(error.message);
+            //     gasLimit = 6000000
+            // }
+        }
+        rawTx.gasLimit = gasLimit;
+
+        console.log(">>> toAddr =", toAddr, "nonce =",nonce,", gasLimit =", gasLimit,", gasPrice =", gasPrice/1000000000);
+
+        var tx = new Tx(rawTx, { chain:chainID, hardfork: 'petersburg'});
+        tx.sign(Buffer.from(privateKey, 'hex'));
+        var serializedTx = tx.serialize();
+
+        let txn = web3.utils.sha3(serializedTx);
+        console.log(">>> txn =", txn);
+
+        let receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
+        console.log(">>>", receipt);
+
+    } catch (error) {
+        console.error('sendSignedTransaction :', error.message);
+    }
+}
 
 module.exports = { sentSignedTx };

@@ -1,7 +1,3 @@
-// Usage example:
-// npm run loadtrees -- /Users/lisheng/Downloads/defi/balancer/erc20-redeemable-master/merkle/test/sampleAllocations 10622281
-
-// const fs = require("fs");
 const { MerkleTree } = require("../lib/merkleTree");
 const { getJsonFileList } = require("./getJsonFileList.js")
 const { loadTreem } = require("./loadTreem");
@@ -15,20 +11,20 @@ async function asyncForEach(array, callback) {
 
 const loadTrees = async (para, filePath) => {
     const jsonFiles = getJsonFileList(filePath);
-    console.log(filePath, "===loadtrees  elements= begin====" + jsonFiles + "*****=======");
+    console.log("==== loadtrees elements :", filePath);
     let elements = [];
     let nextElements;
     let origelements = [];
     for (const fileName of jsonFiles) {
         arr = await loadTreem(para, fileName);
         nextElements = arr[0];
-        console.log("====*(*****)===" + arr[0]);
+        // console.log("====*(*****)===" + arr[0]);
         elements = elements.concat(arr[0]);
         origelements = origelements.concat(arr[1]);
-        console.log("=======" + elements + "*********");
+        // console.log("=======" + elements + "*********");
     }
 
-    console.log("===loadtrees  elements=====" + elements + "*****=======");
+    // console.log("===loadtrees  elements=====" + elements + "*****=======");
     if (elements.length == 0) {
         console.log("===loadtrees  elements is empty =====", jsonFiles);
         return null;
