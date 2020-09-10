@@ -35,10 +35,11 @@ var file_tokens = './data/token_list.json';
 var token_symbols_json = './data/token_symbols.json';
 const secrets = util.loadJson('conf/secrets.json');
 
+const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "./reports/CR_";
+
 const admin = process.env.ADMIN;
 const password = process.env.PASSWORD;
-const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "./reports/CR_";
-const admin_secrets = secrets.key;//process.env.ADMIN_SECRETS;
+const admin_secrets = secrets.key;
 const chain_id = process.env.CHAIN_ID;
 const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
 const is_issue = process.env.IS_ISSUE;
@@ -88,11 +89,11 @@ async function runJob() {
 
 async function getSwpInfoByAddress(addr) {
     try {
-        const token = process.env.SWP_ADDRESS;
+        const token = global.CONTRACT_SWP;
         let erc20 = new web3.eth.Contract(erc20_abi, token);
         let balance = await erc20.methods.balanceOf(addr).call();
         let released = await erc20.methods.totalSupply().call();
-        const utoken = process.env.SWP_USDT_ADDRESS;
+        // const utoken = process.env.SWP_USDT_ADDRESS;
         // let stoken = new web3.eth.Contract(stoken_abi, utoken);
         // let reserves = await stoken.methods.getReserves().call();
         // const price = reserves[0]/(reserves[1]+1);
@@ -167,7 +168,7 @@ async function get_token_symbol() {
         // token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
     }
 
-    token_symbols[process.env.SWP_ADDRESS] = process.env.SWP_SYMBOL || "SWP";
+    token_symbols[global.CONTRACT_SWP] = "SWP";
 
     for (let token of token_list.pTokens) {
         // console.log(token);

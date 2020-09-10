@@ -11,4 +11,4 @@ temp
 
 reports/*
 
-secrets.json
+secrets*.json
