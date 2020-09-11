@@ -2,8 +2,8 @@ var Web3 = require("web3");
 var co = require('co');
 var util = require('./util');
 var block_db = require('./block_db');
-require('./conf/const');
-// require('./conf/const_ropsten');
+// require('./conf/const');
+require('./conf/const_ropsten');
 // require('./conf/const_private');
 
 var web3 = new Web3();
