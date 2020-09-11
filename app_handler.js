@@ -316,6 +316,7 @@ async function disburse_by_epoch(epochNum, step,issue_flag,is_execute) {
 }
 
 module.exports = {
+    getPairsInfo,
     getSwpInfoByAddress,
     getRewardListByAddress,
     claim_all,
