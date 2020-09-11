@@ -15,12 +15,10 @@ module.exports = {
 var pool = mysql.createPool(DB_CONFIG);
 var conn = wrapper(pool);
 
-
-
 // 获取指定账户地址奖励列表
 async function updateClaimStatusByAddress(address, contract) {
     // 获取奖励周期每个币种的发行量，注意数量转为字符串：CONCAT
-    let sql_total = "SELECT  min(cycle) mincycle ,max(cycle) maxcycle,token  FROM cycle_reward WHERE addr=? AND flag=0 GROUP BY token ORDER BY token";
+    let sql_total = "SELECT  min(cycle) mincycle ,max(cycle) maxcycle,token  FROM cycle_reward WHERE addr=?  AND flag=0 GROUP BY token ORDER BY token";
 
     let tokens = await conn.query(sql_total, [address]);
 
@@ -43,14 +41,14 @@ async function updateClaimStatusByAddress(address, contract) {
 
     for (let i = 0; i < token_list.length; i++) {
         let result = await conn.query(sql_update, token_list[i]);
-        console.log('updateClaimStatusByAddress', result);
+        // console.log('updateClaimStatusByAddress', result);
     }
 }
 
 // 获取指定账户地址奖励列表
 async function getRewardListByAddress(address, token_symbols, web3) {
     // 获取奖励周期每个币种的发行量，注意数量转为字符串：CONCAT
-    let sql_total = "SELECT token,CONCAT(SUM(amount)) total FROM cycle_reward WHERE addr=? AND flag=0 GROUP BY token ORDER BY token";
+    let sql_total = "SELECT token,CONCAT(SUM(amount)) total FROM cycle_reward WHERE addr=?  AND flag=0 GROUP BY token ORDER BY token";
 
     let tokens = await conn.query(sql_total, [address]);
 

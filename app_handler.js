@@ -3,10 +3,10 @@ var Web3 = require("web3");
 var co = require('co');
 var util = require('./util');
 var redeem_db = require('./redeem_db');
-var sleep = require('sleep');
-require('./conf/const');
-// require('./conf/const_ropsten');
+// require('./conf/const');
 // require('./conf/const_private');
+require('./conf/const_ropsten');
+var sleep = require('sleep');
 
 const { claimProof } = require("./scripts/calculateProof");
 const disburse = require("./scripts/disburse");
@@ -24,22 +24,28 @@ web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 // // let provider = new HDWalletProvider(terms, netIp)
 // // web3.setProvider(provider);
 
+var mainnetweb3 = new Web3();
+mainnetweb3.setProvider(new Web3.providers.HttpProvider(process.env.MAINNET_HTTP_PROVIDER));
+
+var factory_abi = util.loadJson('abi/Factory.json');
+var factory = new mainnetweb3.eth.Contract(factory_abi, process.env.MAINNET_CONTRACT_FACTORY);
+
 // 合约abi
 var redeem_abi = util.loadJson('abi/MerkleRedeem.json');
 var redeem = new web3.eth.Contract(redeem_abi, global.CONTRACT_REDEEM);
 
-// var stoken_abi = util.loadJson('abi/SToken.json');
+var stoken_abi = util.loadJson('abi/SToken.json');
 var erc20_abi = util.loadJson('abi/ERC20.json');
 
 var file_tokens = './data/token_list.json';
 var token_symbols_json = './data/token_symbols.json';
-const secrets = util.loadJson('conf/secrets.json');
-
-const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "./reports/CR_";
+var pair_token_symbols_json = 'data/pair_token_symbols.json';
+const secrets = util.loadJson('data/secrets.json');
 
 const admin = process.env.ADMIN;
 const password = process.env.PASSWORD;
-const admin_secrets = secrets.key;
+const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
+const admin_secrets = secrets.key;//process.env.ADMIN_SECRETS;
 const chain_id = process.env.CHAIN_ID;
 const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
 const is_issue = process.env.IS_ISSUE;
@@ -87,9 +93,88 @@ async function runJob() {
     // $ npm install node-cron
 }
 
+
+async function getPairsInfo() {
+    console.log("=====pairs=======");
+
+    let len = await factory.methods.allPairsLength().call({ from: admin });
+    console.log(len);
+
+    let tokens = [];
+    for (let i = 0; i < len; i++) {
+        const s = await factory.methods.allPairs(i).call();
+        console.log(i, s);
+        let stoken = new mainnetweb3.eth.Contract(stoken_abi, s, { "from": admin });
+        // console.log(stoken.methods);
+        const r = await stoken.methods.getReserves().call();
+        console.log("getReserves==", r);
+        console.log("_reserve0==", r._reserve0);
+        console.log("_reserve1==", r._reserve1);
+
+        const t0 = await stoken.methods.token0().call();
+        console.log("t0==", t0);
+        const t1 = await stoken.methods.token1().call();
+        console.log("t1==", t1);
+        o = {
+            token0: t0,
+            token1: t1,
+            reserve0: r._reserve0,
+            reserve1: r._reserve1,
+        };
+
+        tokens.push(o);
+    }
+
+    tokens = await get_pair_token_symbol(tokens);
+    console.log("tokens===", tokens);
+    return tokens;
+}
+
+async function get_pair_token_symbol(token_list) {
+
+    let token_symbols = {};
+    try {
+        token_symbols = util.loadJson(pair_token_symbols_json);
+    } catch (error) {
+        console.log(error);
+    }
+
+    for (let token of token_list) {
+        token_symbols = await hasToken(token.token0, token_symbols);
+        token.symbol0 = token_symbols[token.token0];
+        token_symbols = await hasToken(token.token1, token_symbols);
+        token.symbol1 = token_symbols[token.token1];
+    }
+
+    // 写入文件
+    util.writeFile(pair_token_symbols_json, token_symbols);
+
+    return token_list;
+}
+
+async function hasToken(token, token_symbols) {
+    if (!token_symbols.hasOwnProperty(token)) {
+        try {
+            let erc20 = new mainnetweb3.eth.Contract(erc20_abi, token);
+            let symbol = await erc20.methods.symbol().call();
+            let decimals = await erc20.methods.decimals().call();
+            let name = await erc20.methods.name().call();
+            token_symbols[token] = [symbol, decimals, name];
+            console.log(token_symbols[token]);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    return token_symbols;
+}
+
+
+
 async function getSwpInfoByAddress(addr) {
     try {
-        const token = global.CONTRACT_SWP;
+
+        const token = process.env.SWP_ADDRESS;
         let erc20 = new web3.eth.Contract(erc20_abi, token);
         let balance = await erc20.methods.balanceOf(addr).call();
         let released = await erc20.methods.totalSupply().call();
@@ -97,36 +182,40 @@ async function getSwpInfoByAddress(addr) {
         // let stoken = new web3.eth.Contract(stoken_abi, utoken);
         // let reserves = await stoken.methods.getReserves().call();
         // const price = reserves[0]/(reserves[1]+1);
-        const price =  1.68;
+        const price = 1.68;
         // return {balance:balance,price:price,released:released};
 
-        return {balance:web3.utils.fromWei(balance),price:price,released:web3.utils.fromWei(released)};
+        return { balance: web3.utils.fromWei(balance), price: price, released: web3.utils.fromWei(released) };
 
     } catch (error) {
         console.error(error);
     }
-    return {balance:0,price:0,released:0};
+    return { balance: 0, price: 0, released: 0 };
 }
 
 
 async function getRewardListByAddress(addr) {
     try {
-        await redeem_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
+        addr = addr.toLowerCase();
+
+        await redeem_db.updateClaimStatusByAddress(addr, redeem);
         const token_symbols = await get_token_symbol();
         // console.log(token_symbols);
-        return await redeem_db.getRewardListByAddress(addr.toLowerCase(), token_symbols, web3);
+        return await redeem_db.getRewardListByAddress(addr, token_symbols, web3);
     } catch (error) {
-        console.error(error);
+        console.log(error);
     }
     return { "result": "unkonwn error" };
 }
 
-async function claim_all(addr, gas_limit) {
+async function claim_all(addr) {
 
     try {
-        await redeem_db.updateClaimStatusByAddress(addr.toLowerCase(), redeem);
+        addr = addr.toLowerCase();
 
-        let sizebalances = await redeem_db.getCycleRewardsByAddress(addr.toLowerCase());
+        await redeem_db.updateClaimStatusByAddress(addr, redeem);
+
+        let sizebalances = await redeem_db.getCycleRewardsByAddress(addr);
         if (sizebalances[0] == 0) {
             return {};
         }
@@ -143,7 +232,6 @@ async function claim_all(addr, gas_limit) {
             chain_id: chain_id,
             symbol_interval: symbol_interval,
             claim_exec_by_admin: claim_exec_by_admin,
-            gasLimit: gas_limit == undefined ? gasLimit : gas_limit,
         };
 
         const encodedAbi = await claimProof(para, addr, balances);
@@ -162,22 +250,17 @@ async function get_token_symbol() {
     let token_symbols = {};
     try {
         token_symbols = util.loadJson(token_symbols_json);
-        // console.log(token_symbols);
     } catch (error) {
         console.error(error);
-        // token_symbols = {"0x71805940991e64222f75cc8a907353f2a60f892e":"AETH", "0x1df382c017c2aae21050d61a5ca8bc918772f419":"BETH", "0x4cf4d866dcc3a615d258d6a84254aca795020a2b":"CETH", "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199":"DETH" };
     }
 
-    token_symbols[global.CONTRACT_SWP] = "SWP";
+    token_symbols[process.env.SWP_ADDRESS] = process.env.SWP_SYMBOL || "SWP";
 
     for (let token of token_list.pTokens) {
-        // console.log(token);
         if (!token_symbols.hasOwnProperty(token)) {
-            // console.log("in==", token);
             try {
                 let erc20 = new web3.eth.Contract(erc20_abi, token);
                 let symbol = await erc20.methods.symbol().call();
-                // console.log("symbol==", symbol);
                 token_symbols[token] = symbol;
                 sleep.msleep(symbol_interval);
             }
@@ -197,7 +280,7 @@ const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 
 
-async function disburse_by_epoch(epochNum, step, is_execute, issue_flag, gas_limit) {
+async function disburse_by_epoch(epochNum, step, issue_flag) {
     try {
         if (epochNum <= 0) {
             return "epoch must be larger than 0";
@@ -215,7 +298,6 @@ async function disburse_by_epoch(epochNum, step, is_execute, issue_flag, gas_lim
             chain_id: chain_id,
             is_issue: issue_flag == undefined ? is_issue : issue_flag,
             step: step,
-            gasLimit: gas_limit == undefined ? gasLimit : gas_limit,
             is_execute: is_execute == undefined ? true : is_execute,
         };
 

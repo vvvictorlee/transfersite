@@ -8,13 +8,13 @@ nohup node app.js &
 ### 部署注意事项
 #### admin_secrets
 admin private key不在git 里，
-需要在手动创建文件 data/secrets.json，放private key
+当前项目data文件夹下。需要在手动创建或重命名文件secrets.json.example为secrets.json，放private key
 json 内容格式   {"key":""}
 
 #### mysql 新用户
 在ubuntu nodejs 连接mysql 不能用root连接 ，需要创建新用户 sql 如下
 ```
-CREATE USER 'swapxminer'@'%' IDENTIFIED BY 'p@ssw0rd';
+CREATE USER 'swapxminer'@'%' IDENTIFIED BY 'password';
 ```
 
 授予所有权限
@@ -35,6 +35,12 @@ GRANT ALL PRIVILEGES ON *.* TO 'swapxminer'@'%' WITH GRANT OPTION;
 curl  -X POST --url http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "get_reward_list",
 	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
+}'
+
+
+curl  -X POST --url https://appswapx.99ss.ml/claim/  -H "Content-Type: application/json"  -d '{
+ "method": "get_reward_list",
+ "address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
 }'
 
 
@@ -76,6 +82,20 @@ curl  -X POST --url https://appswapx.99ss.ml/claim/  -H "Content-Type: applicati
 - address 提供流动性的账户地址
 ##### 请求示例
 ```
+curl  -X POST --url  http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "claim_all_rewards",
+	"address": "0xa4a4005a9497548427a141d53ad8869829fb9ec7"
+}'
+
+
+curl  -X POST --url  http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "claim_all_rewards",
+	"address": "0x0DB1bB1097ac3b7e26B3A4Cf35E2f19E07d24568"
+}'
+
+
+
+
 curl  -X POST --url  http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "claim_all_rewards",
 	"address": "0x929378dbc9a1fdc0d05529e48097ff65c6902231"
@@ -120,9 +140,8 @@ curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: applic
 	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
 
-https://stake-swapx.99ss.ml/
 
-curl  -X POST --url https://stake-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_info",
 	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
@@ -142,8 +161,107 @@ curl  -X POST --url https://stake-swapx.99ss.ml/claim/   -H "Content-Type: appli
 ```
 
 
+### 6.4 获取主网交易对信息
+#### 请求
+##### 参数说明：
+- method  方法名称 get_pairs_info
+##### 请求示例
+```
+curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_pairs_info"
+}'
 
-### 6.4 提交领取指定周期时间戳
+
+curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_pairs_info"
+}'
+```
+#### 应答
+##### 数据说明
+- token0     交易对第一个代币
+- token1     交易对第二个代币
+- reserve0   交易对第一个代币金额 最小单位
+- reserve1   交易对第二代币金额 最小单位
+- symbol0    交易对第一个代币 符号  小数位数  名称
+- symbol1    交易对第二个代币 符号  小数位数  名称
+#####
+```
+[{
+	"token0": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "181770607384324442704",
+	"reserve1": "778745031",
+	"symbol0": ["SNX", "18", "Synthetix Network Token"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "4564586842946243751392",
+	"reserve1": "1000000000",
+	"symbol0": ["LRC", "18", "LoopringCoin V2"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xa1d0E215a23d7030842FC67cE582a6aFa3CCaB83",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "373267414950770637",
+	"reserve1": "1440839239",
+	"symbol0": ["YFII", "18", "YFII.finance"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0x47BeD2cdF27995e861B2E0c5ACd930C7E4AEFFe2",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "709879592570081188083451",
+	"reserve1": "13247725645",
+	"symbol0": ["BSB", "18", "BSBEXToken"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "99824843937808192635",
+	"reserve1": "35891174823",
+	"symbol0": ["WETH", "18", "Wrapped Ether"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "67224461111",
+	"reserve1": "67140226715",
+	"symbol0": ["USDC", "6", "USD Coin"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "2318336076704455268619",
+	"reserve1": "2366712848",
+	"symbol0": ["DAI", "18", "Dai Stablecoin"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "596456475208",
+	"reserve1": "500000000",
+	"symbol0": ["AMPL", "9", "Ampleforth"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0x04abEdA201850aC0124161F037Efd70c74ddC74C",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "515664020887381862917106",
+	"reserve1": "31622035708",
+	"symbol0": ["NEST", "18", "NEST"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"token1": "0xdc38a4846d811572452cB4CE747dc9F5F509820f",
+	"reserve0": "1499922283",
+	"reserve1": "100626982172171385520",
+	"symbol0": ["USDT", "6", "Tether USD"],
+	"symbol1": ["SYFI", "18", "SimpleYFI Token"]
+}]
+```
+
+
+
+### 6.5 提交领取指定周期时间戳
 #### 请求
 ##### 参数说明：
 - method  方法名称 finish_epoch
@@ -176,7 +294,7 @@ curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application
 ```
 
 
-### 6.5 提交领取名单MerkleRoot
+### 6.6 提交领取名单MerkleRoot
 #### 请求
 ##### 参数说明：
 - method  方法名称 seed_allocations
@@ -207,23 +325,44 @@ curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application
 
 ```
 
+curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_pairs_info"
+}'
+
 
 curl  -X POST --url  http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
 	"method": "finish_epoch",
-	"epoch": "3"
+	"epoch": "2"
 }'
 
+curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "seed_allocations",
+	"epoch": "1",
+    "issue":1
+}'
+
+
+curl  -X POST --url  http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "finish_epoch",
+	"epoch": "4"
+}'
+
+
+curl  -X POST --url  http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "finish_epoch",
+	"epoch": "7"
+}'
 
 
 curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "seed_allocations",
-	"epoch": "2",
-    "issue":1
+	"epoch": "6",
+    "issue":0
 }'
 
 curl  -X POST --url  http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
 	"method": "seed_allocations",
-	"epoch": "2",
+	"epoch": "6",
     "issue":0
 }'
 
@@ -250,5 +389,8 @@ curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application
 	"method": "claim_all_rewards",
 	"address": "0x929378dbc9a1fdc0d05529e48097ff65c6902231"
 }'
+
+
+
 
 ```

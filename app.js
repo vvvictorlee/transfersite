@@ -25,6 +25,11 @@ app.post('/claim/', function (req, res) {
     console.log(JSON.stringify(req.body));
 
     let handlers = {
+        "get_pairs_info": (async function () {
+            let pairsInfo = await app_handler.getPairsInfo();
+            res.json(pairsInfo);
+
+        }),
         "get_swp_info": (async function () {
             // let swpInfo = await app_handler.getSwpInfoByAddress(req.body.address);
             swpInfo = { "result": "The  'get_swp_info' interface is disabled temporarily" };
@@ -46,7 +51,7 @@ app.post('/claim/', function (req, res) {
         //     res.json({ "result": "success" });
         // }),
         "seed_allocations": (async function () {
-            await app_handler.disburse_by_epoch(req.body.epoch, 1, req.body.issue, req.body.gas_limit);
+            await app_handler.disburse_by_epoch(req.body.epoch, 1, req.body.issue);
             res.json({ "result": "success" });
         }),
         "default": (async function () {

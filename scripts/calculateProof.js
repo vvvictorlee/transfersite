@@ -4,7 +4,7 @@
 // const { MerkleTree } = require("../lib/merkleTree");
 // const fs = require("fs");
 const { loadTrees } = require("./loadTrees");
-const { sentSignedTx } = require("./sentSignedTx");
+const { sendSignedTx } = require("./sendSignedTx");
 const sleep = require('sleep');
 
 const claimProof = async (para, address, balances) => {
@@ -49,7 +49,7 @@ const claimProof = async (para, address, balances) => {
                         address,
                         cycle, token, balance, proof
                     ).encodeABI();//send({ from: para.admin });
-                    await sentSignedTx(para, abi);
+                    await sendSignedTx(para, abi);
                     sleep.msleep(para.symbol_interval);
                 }
             }

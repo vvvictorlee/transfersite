@@ -1,5 +1,5 @@
 const { loadTrees } = require("./loadTrees");
-const { sentSignedTx } = require("./sentSignedTx");
+const { sendSignedTx } = require("./sendSignedTx");
 
 const finishEpoch = async (para, epochNum, blockNum) => {
 
@@ -23,7 +23,7 @@ const finishEpoch = async (para, epochNum, blockNum) => {
                 block.timestamp,
                 block.hash
             ).encodeABI();
-            await sentSignedTx(para, abi);
+            await sendSignedTx(para, abi);
         }
         else {
             // private

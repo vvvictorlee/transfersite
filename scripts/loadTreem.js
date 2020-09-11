@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require('path');
-const { sentSignedTx } = require("./sentSignedTx");
+const { sendSignedTx } = require("./sendSignedTx");
 
 
 const loadTreem = async (para, fullfileName) => {
@@ -25,7 +25,7 @@ const loadTreem = async (para, fullfileName) => {
             if (para.chain_id<99) {
                 const abi = await para.contract.methods.issue(token, supply).encodeABI();
                 console.log("+++++++++ issue ", token, supply);
-                await sentSignedTx(para, abi);
+                await sendSignedTx(para, abi);
             }
             else {
                 await para.web3.eth.personal.unlockAccount(para.admin, para.password);
