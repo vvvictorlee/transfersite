@@ -127,7 +127,7 @@ async function getPairsInfo() {
 
     tokens = await get_pair_token_symbol(tokens);
 
-    tokens.push({
+    tokens.unshift({
 	"token0": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
 	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
 	"reserve0": "181770607384324442704",
