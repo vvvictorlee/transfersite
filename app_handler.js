@@ -192,17 +192,13 @@ async function hasToken(token, token_symbols) {
 
 async function getSwpInfoByAddress(addr) {
     try {
-
         const token = process.env.SWP_ADDRESS;
-        let erc20 = new web3.eth.Contract(erc20_abi, token);
+        let erc20 = new mainnetweb3.eth.Contract(erc20_abi, token);
         let balance = await erc20.methods.balanceOf(addr).call();
         let released = await erc20.methods.totalSupply().call();
-        // const utoken = process.env.SWP_USDT_ADDRESS;
-        // let stoken = new web3.eth.Contract(stoken_abi, utoken);
-        // let reserves = await stoken.methods.getReserves().call();
-        // const price = reserves[0]/(reserves[1]+1);
-        const price = 1.68;
-        // return {balance:balance,price:price,released:released};
+        let stoken = new mainnetweb3.eth.Contract(stoken_abi, process.env.SWP_USDT_PAIR_ADDRESS, { "from": admin });
+        const r = await stoken.methods.getReserves().call();
+        const price = (r._reserve1 / r._reserve0).toFixed(6);
 
         return { balance: web3.utils.fromWei(balance), price: price, released: web3.utils.fromWei(released) };
 

@@ -189,16 +189,44 @@ curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: applic
 [{
 	"token0": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
 	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-	"reserve0": "181770607384324442704",
-	"reserve1": "778745031",
-	"symbol0": ["SNX", "18", "Synthetix Network Token"],
+	"reserve0": "0",
+	"reserve1": "0",
+	"symbol0": ["SWP", "18", "Swapx Token"],
 	"symbol1": ["USDT", "6", "Tether USD"]
 }, {
-	"token0": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
+	"token0": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
 	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-	"reserve0": "4564586842946243751392",
-	"reserve1": "1000000000",
-	"symbol0": ["LRC", "18", "LoopringCoin V2"],
+	"reserve0": "68497876999",
+	"reserve1": "69939135154",
+	"symbol0": ["USDC", "6", "USD Coin"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "127076212338491049429",
+	"reserve1": "46384280975",
+	"symbol0": ["WETH", "18", "Wrapped Ether"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0x04abEdA201850aC0124161F037Efd70c74ddC74C",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "515655248318954198600932",
+	"reserve1": "31923206185",
+	"symbol0": ["NEST", "18", "NEST"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0x47BeD2cdF27995e861B2E0c5ACd930C7E4AEFFe2",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "900218984255613191646760",
+	"reserve1": "15169064081",
+	"symbol0": ["BSB", "18", "BSBEXToken"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "13228114151118519241379",
+	"reserve1": "13504145507",
+	"symbol0": ["DAI", "18", "Dai Stablecoin"],
 	"symbol1": ["USDT", "6", "Tether USD"]
 }, {
 	"token0": "0xa1d0E215a23d7030842FC67cE582a6aFa3CCaB83",
@@ -208,32 +236,25 @@ curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: applic
 	"symbol0": ["YFII", "18", "YFII.finance"],
 	"symbol1": ["USDT", "6", "Tether USD"]
 }, {
-	"token0": "0x47BeD2cdF27995e861B2E0c5ACd930C7E4AEFFe2",
+	"token0": "0xdc38a4846d811572452cB4CE747dc9F5F509820f",
 	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-	"reserve0": "709879592570081188083451",
-	"reserve1": "13247725645",
-	"symbol0": ["BSB", "18", "BSBEXToken"],
+	"reserve0": "133995681302500940759",
+	"reserve1": "1127671629",
+	"symbol0": ["SYFI", "18", "SimpleYFI Token"],
 	"symbol1": ["USDT", "6", "Tether USD"]
 }, {
-	"token0": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+	"token0": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
 	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-	"reserve0": "99824843937808192635",
-	"reserve1": "35891174823",
-	"symbol0": ["WETH", "18", "Wrapped Ether"],
+	"reserve0": "4564586842946243751392",
+	"reserve1": "1000000000",
+	"symbol0": ["LRC", "18", "LoopringCoin V2"],
 	"symbol1": ["USDT", "6", "Tether USD"]
 }, {
-	"token0": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+	"token0": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
 	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-	"reserve0": "67224461111",
-	"reserve1": "67140226715",
-	"symbol0": ["USDC", "6", "USD Coin"],
-	"symbol1": ["USDT", "6", "Tether USD"]
-}, {
-	"token0": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-	"reserve0": "2318336076704455268619",
-	"reserve1": "2366712848",
-	"symbol0": ["DAI", "18", "Dai Stablecoin"],
+	"reserve0": "181770607384324442704",
+	"reserve1": "778745031",
+	"symbol0": ["SNX", "18", "Synthetix Network Token"],
 	"symbol1": ["USDT", "6", "Tether USD"]
 }, {
 	"token0": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
@@ -242,20 +263,6 @@ curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: applic
 	"reserve1": "500000000",
 	"symbol0": ["AMPL", "9", "Ampleforth"],
 	"symbol1": ["USDT", "6", "Tether USD"]
-}, {
-	"token0": "0x04abEdA201850aC0124161F037Efd70c74ddC74C",
-	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-	"reserve0": "515664020887381862917106",
-	"reserve1": "31622035708",
-	"symbol0": ["NEST", "18", "NEST"],
-	"symbol1": ["USDT", "6", "Tether USD"]
-}, {
-	"token0": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-	"token1": "0xdc38a4846d811572452cB4CE747dc9F5F509820f",
-	"reserve0": "1499922283",
-	"reserve1": "100626982172171385520",
-	"symbol0": ["USDT", "6", "Tether USD"],
-	"symbol1": ["SYFI", "18", "SimpleYFI Token"]
 }]
 ```
 
