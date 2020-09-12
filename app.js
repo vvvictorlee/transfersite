@@ -31,8 +31,14 @@ app.post('/claim/', function (req, res) {
 
         }),
         "get_swp_info": (async function () {
-            // let swpInfo = await app_handler.getSwpInfoByAddress(req.body.address);
-            swpInfo = { "result": "The  'get_swp_info' interface is disabled temporarily" };
+            let swpInfo = await app_handler.getSwpInfo();
+            // swpInfo = { "result": "The  'get_swp_info' interface is disabled temporarily" };
+            res.json(swpInfo);
+
+        }),
+        "get_swp_balance": (async function () {
+            let swpInfo = await app_handler.getSwpBalanceByAddress(req.body.address);
+            // swpInfo = { "result": "The  'get_swp_info' interface is disabled temporarily" };
             res.json(swpInfo);
 
         }),
@@ -45,7 +51,7 @@ app.post('/claim/', function (req, res) {
             const result = data.length > 0 ? "success" : "fail";
             res.json({ "result": result, "data": data });
         }),
-        // mainnet 禁用内部操作
+        // mainnet 禁用内部操作 begin
         "finish_epoch": (async function () {
             await app_handler.disburse_by_epoch(req.body.epoch, 0, req.body.issue);
             res.json({ "result": "success" });
@@ -54,6 +60,7 @@ app.post('/claim/', function (req, res) {
             await app_handler.disburse_by_epoch(req.body.epoch, 1, req.body.issue);
             res.json({ "result": "success" });
         }),
+        // mainnet 禁用内部操作  end
         "default": (async function () {
             res.json({ "result": "unknown method or method is empty" });
         })

@@ -128,39 +128,62 @@ curl  -X POST --url  https://appswapx.99ss.ml/claim/  -H "Content-Type: applicat
 ```
 
 
-### 6.3 获取指定账户SWP余额及其他信息
+### 6.3 获取SWP信息
 #### 请求
 ##### 参数说明：
 - method  方法名称 get_swp_info
-- address 账户地址
 ##### 请求示例
 ```
 curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_info",
-	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
 
 
 curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_info",
+}'
+```
+#### 应答
+##### 数据说明
+- price     SWP价格
+- released  SWP已发行量
+#####
+```
+{
+	"price": 1.68,
+	"released": "2000000000000000000000"
+}
+```
+
+
+### 6.3 获取指定账户SWP余额
+#### 请求
+##### 参数说明：
+- method  方法名称 get_swp_balance
+- address 账户地址
+##### 请求示例
+```
+curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_balance",
+	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
+}'
+
+
+curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_balance",
 	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
 ```
 #### 应答
 ##### 数据说明
 - balance   指定账户SWP余额
-- price     SWP价格
-- released  SWP已发行量
 #####
 ```
 {
-	"balance": "0",
-	"price": 1.68,
-	"released": "2000000000000000000000"
+	"balance": "0"
 }
 ```
 
-git 
 ### 6.4 获取主网交易对信息
 #### 请求
 ##### 参数说明：
@@ -331,6 +354,17 @@ curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application
 
 
 ```
+
+curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_info"
+}'
+
+
+curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_balance",
+	"address": "0xbec1c22fa669bf17b9d2326beb9adce4fc697614"
+}'
+
 
 curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
 	"method": "get_pairs_info"
