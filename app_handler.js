@@ -128,7 +128,7 @@ async function getPairsInfo() {
     tokens = await get_pair_token_symbol(tokens);
 
     var compare = function (obj1, obj2) {
-        return obj2.reserve0 - obj1.reserve0;
+        return obj2.reserve1 - obj1.reserve1;
     }
 
     tokens.sort(compare);
