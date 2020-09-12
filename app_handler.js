@@ -165,7 +165,7 @@ async function get_pair_token_symbol(token_list) {
         if (token.symbol0 == "USDT") {
             [token.token0, token.token1] = [token.token1, token.token0];
             [token.reserve0, token.reserve1] = [token.reserve1, token.reserve0];
-            [token.symbol0, token.symbol1] = [token.symbol1, token.symbol2];
+            [token.symbol0, token.symbol1] = [token.symbol1, token.symbol0];
         }
     }
 
