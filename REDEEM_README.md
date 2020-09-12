@@ -160,7 +160,7 @@ curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: applic
 }
 ```
 
-
+git 
 ### 6.4 获取主网交易对信息
 #### 请求
 ##### 参数说明：
