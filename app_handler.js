@@ -127,14 +127,20 @@ async function getPairsInfo() {
 
     tokens = await get_pair_token_symbol(tokens);
 
+    var compare = function (obj1, obj2) {
+        return obj2.reserve0 - obj1.reserve0;
+    }
+
+    tokens.sort(compare);
+
     tokens.unshift({
-	"token0": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
-	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-	"reserve0": "0",
-	"reserve1": "0",
-	"symbol0": ["SWP", "18", "Swapx Token"],
-	"symbol1": ["USDT", "6", "Tether USD"]
-})
+        "token0": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+        "token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+        "reserve0": "0",
+        "reserve1": "0",
+        "symbol0": ["SWP", "18", "Swapx Token"],
+        "symbol1": ["USDT", "6", "Tether USD"]
+    })
 
     console.log("tokens===", tokens);
     return tokens;
@@ -154,6 +160,13 @@ async function get_pair_token_symbol(token_list) {
         token.symbol0 = token_symbols[token.token0];
         token_symbols = await hasToken(token.token1, token_symbols);
         token.symbol1 = token_symbols[token.token1];
+
+        //order wrong swap
+        if (token.symbol0 == "USDT") {
+            [token.token0, token.token1] = [token.token1, token.token0];
+            [token.reserve0, token.reserve1] = [token.reserve1, token.reserve0];
+            [token.symbol0, token.symbol1] = [token.symbol1, token.symbol2];
+        }
     }
 
     // 写入文件
@@ -290,7 +303,7 @@ const firstStartBlockNum = 1;
 const blocks = 64;
 // (utils,admin,contract,path,epochNum, blockNum) 
 
-async function disburse_by_epoch(epochNum, step,issue_flag,is_execute) {
+async function disburse_by_epoch(epochNum, step, issue_flag, is_execute) {
     try {
         if (epochNum <= 0) {
             return "epoch must be larger than 0";
@@ -337,7 +350,7 @@ module.exports = {
 
 var epoch = 1;
 // 服务器执行, 检查默克尔树根
-disburse_by_epoch(epoch, 1, false,false);
+disburse_by_epoch(epoch, 1, false, false);
 
 // 本地执行，顺序执行，防止出错
 // disburse_by_epoch(epoch, 0, true, false, 0);   // 首次，创建周期
