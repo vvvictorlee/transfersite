@@ -162,7 +162,7 @@ async function get_pair_token_symbol(token_list) {
         token.symbol1 = token_symbols[token.token1];
 
         //order wrong swap
-        if (token.symbol0 == "USDT") {
+        if (token.symbol0[0] == "USDT") {
             [token.token0, token.token1] = [token.token1, token.token0];
             [token.reserve0, token.reserve1] = [token.reserve1, token.reserve0];
             [token.symbol0, token.symbol1] = [token.symbol1, token.symbol0];
