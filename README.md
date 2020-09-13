@@ -11,12 +11,12 @@ nohup node app.js &
 - method  方法名称 get_swp_info
 ##### 请求示例
 ```
-curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url http://192.168.38.227:3535/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_info"
 }'
 
 
-curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url https://farm-swapx.99ss.ml/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_info"
 }'
 ```
@@ -40,13 +40,13 @@ curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: applic
 - address 账户地址
 ##### 请求示例
 ```
-curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url http://192.168.38.227:3535/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_balance",
 	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
 
 
-curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url https://farm-swapx.99ss.ml/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_balance",
 	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
@@ -67,12 +67,12 @@ curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: applic
 - method  方法名称 get_pairs_info
 ##### 请求示例
 ```
-curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url http://192.168.38.227:3535/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_pairs_info"
 }'
 
 
-curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url https://farm-swapx.99ss.ml/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_pairs_info"
 }'
 ```
@@ -172,18 +172,18 @@ curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: applic
 
 ```
 
-curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url http://127.0.0.1:3535/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_info"
 }'
 
 
-curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url http://127.0.0.1:3535/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_swp_balance",
 	"address": "0xbec1c22fa669bf17b9d2326beb9adce4fc697614"
 }'
 
 
-curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+curl  -X POST --url http://127.0.0.1:3535/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_pairs_info"
 }'
 
