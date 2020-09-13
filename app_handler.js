@@ -139,7 +139,35 @@ async function getPairsInfo() {
     tokens.unshift(item);
 
     console.log("tokens===", tokens);
+
+    tokens = await calculateApy(tokens);
+
     return tokens;
+}
+
+async  function calculateApy(tokens)
+{
+    // 6144 * 30 * swp单价 * (池子资金 * 挖矿速率 / （1池资金 * 挖矿速率 + 2池资金* 挖矿速率 + ...））/  池子资金 这是日化， 前端可以直接根据日化再去* 365
+    const factor1 = 6144;
+    const factor2 = 30;
+    const year = 365;
+    const miningRate5 = 5;
+    const miningRate = 1;
+    const r = tokens[0];
+    const swpprice = (r.reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r.reserve0)).toFixed(6);
+    let total = tokens.reduce((acc, cur) => acc + cur.reserve1, 0);
+    var tokens = tokens.map((token) => {
+        let rate = miningRate;
+        if (token.symbol0[0] == "SWP") {
+            rate = miningRate5;
+        }
+        token.apy = factor1 * factor2 * swpprice * token.reserve1 * rate / total / token.reserve1;
+        return token
+    });
+
+    console.table(tokens);
+    return tokens;
+
 }
 
 async function get_pair_token_symbol(token_list) {
@@ -195,7 +223,7 @@ async function getSwpInfo() {
         let stoken = new mainnetweb3.eth.Contract(stoken_abi, process.env.SWP_USDT_PAIR_ADDRESS, { "from": admin });
         const r = await stoken.methods.getReserves().call();
         console.log(r);
-        const price = (r._reserve1*Math.pow(10,-6) / web3.utils.fromWei(r._reserve0)).toFixed(6);
+        const price = (r._reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r._reserve0)).toFixed(6);
         const token = process.env.SWP_ADDRESS;
         let erc20 = new mainnetweb3.eth.Contract(erc20_abi, token);
         let released = await erc20.methods.totalSupply().call();

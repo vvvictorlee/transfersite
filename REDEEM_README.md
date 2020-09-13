@@ -135,12 +135,12 @@ curl  -X POST --url  https://appswapx.99ss.ml/claim/  -H "Content-Type: applicat
 ##### 请求示例
 ```
 curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
-	"method": "get_swp_info",
+	"method": "get_swp_info"
 }'
 
 
 curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
-	"method": "get_swp_info",
+	"method": "get_swp_info"
 }'
 ```
 #### 应答
