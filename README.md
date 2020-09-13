@@ -1,142 +1,192 @@
-# Mining Scripts V2
-
-> v1.2
-
-
-
-## 0. 配置
-
-1、创建MySQL数据库，建库脚本参见 `sql/eth_data.sql`
-
-2、修改配置文件：`conf/const.js`
-
-
-
-## 1. 获取链上数据
+修改服务端口 .env  APP_PORT
+后台
 
 ```
-node 1_get_block_data.js
+nohup node app.js &  
 ```
 
+### 1.1 获取SWP信息
+#### 请求
+##### 参数说明：
+- method  方法名称 get_swp_info
+##### 请求示例
+```
+curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_info"
+}'
 
 
-可以修改 `data/conf.json` 文件中的 `lastBlock`，设置本次开始同步的块号
-
-```json
+curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_info"
+}'
+```
+#### 应答
+##### 数据说明
+- price     SWP价格
+- released  SWP已发行量
+#####
+```
 {
-  "lastBlock": 607254,
-  "updatedBlocks": [
-    0
-  ]
+	"price": 1.68,
+	"released": "2000000000000000000000"
 }
 ```
 
 
-
-## 2. 生成快照块
-
+### 1.2 获取指定账户SWP余额
+#### 请求
+##### 参数说明：
+- method  方法名称 get_swp_balance
+- address 账户地址
+##### 请求示例
 ```
-node 2_snapshot.js
+curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_balance",
+	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
+}'
+
+
+curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_balance",
+	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
+}'
 ```
-
-
-
-可以修改 `data/cycle.json` 文件，设置：奖励周期，开始块，结束块，本周期最大块号（一天为96）
-
-```json
-[
-  [1, 8567000, 8567220, 96],
-  [2, 8567382, 8573463, 96]
-]
+#### 应答
+##### 数据说明
+- balance   指定账户SWP余额
+#####
 ```
-
-生成的快照块在 `data/snapshot.json` 文件中
-
-
-
-## 3. 挖矿
-
-```
-node 3_machining_data.js
-```
-
-
-
-挖矿程序默认运行最近一个周期的奖励，可以修改最后一行代码运行其他奖励周期
-
-```js
-miningCycle(cycle_index); // cycle_index是奖励周期的索引号，从0开始
+{
+	"balance": "0"
+}
 ```
 
-这里的 `cycle_index` 是奖励周期的索引号，一般是：奖励周期号-1
+### 1.3 获取主网交易对信息
+#### 请求
+##### 参数说明：
+- method  方法名称 get_pairs_info
+##### 请求示例
+```
+curl  -X POST --url http://192.168.38.227:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_pairs_info"
+}'
+
+
+curl  -X POST --url https://farm-swapx.99ss.ml/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_pairs_info"
+}'
+```
+#### 应答
+##### 数据说明
+- token0     交易对第一个代币
+- token1     交易对第二个代币
+- reserve0   交易对第一个代币金额 最小单位
+- reserve1   交易对第二代币金额 最小单位
+- symbol0    交易对第一个代币 符号  小数位数  名称
+- symbol1    交易对第二个代币 符号  小数位数  名称
+#####
+```
+[{
+	"token0": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "0",
+	"reserve1": "0",
+	"symbol0": ["SWP", "18", "Swapx Token"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "68497876999",
+	"reserve1": "69939135154",
+	"symbol0": ["USDC", "6", "USD Coin"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "127076212338491049429",
+	"reserve1": "46384280975",
+	"symbol0": ["WETH", "18", "Wrapped Ether"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0x04abEdA201850aC0124161F037Efd70c74ddC74C",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "515655248318954198600932",
+	"reserve1": "31923206185",
+	"symbol0": ["NEST", "18", "NEST"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0x47BeD2cdF27995e861B2E0c5ACd930C7E4AEFFe2",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "900218984255613191646760",
+	"reserve1": "15169064081",
+	"symbol0": ["BSB", "18", "BSBEXToken"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "13228114151118519241379",
+	"reserve1": "13504145507",
+	"symbol0": ["DAI", "18", "Dai Stablecoin"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xa1d0E215a23d7030842FC67cE582a6aFa3CCaB83",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "373267414950770637",
+	"reserve1": "1440839239",
+	"symbol0": ["YFII", "18", "YFII.finance"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xdc38a4846d811572452cB4CE747dc9F5F509820f",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "133995681302500940759",
+	"reserve1": "1127671629",
+	"symbol0": ["SYFI", "18", "SimpleYFI Token"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "4564586842946243751392",
+	"reserve1": "1000000000",
+	"symbol0": ["LRC", "18", "LoopringCoin V2"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "181770607384324442704",
+	"reserve1": "778745031",
+	"symbol0": ["SNX", "18", "Synthetix Network Token"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}, {
+	"token0": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
+	"token1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+	"reserve0": "596456475208",
+	"reserve1": "500000000",
+	"symbol0": ["AMPL", "9", "Ampleforth"],
+	"symbol1": ["USDT", "6", "Tether USD"]
+}]
+```
 
 
 
-## 4. 验证奖励周期的挖矿结果
+
 
 ```
-node 4_check_data.js
-```
+
+curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_info"
+}'
 
 
-
-验证奖励结果可以在 `check_data.js` 中执行以下函数（该检查已包含在 `machining_data.js` 中）：
-
-```
-block_db.checkCycleData();
-```
-
-基本规则：
-1、每个币种的总奖励 <= 总发行量（570万）
-2、每个币种的本周期奖励 <= 本周期最大奖励（19.2万）
-3、每个币种的总领取数量 <= 当前总发行量
+curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_swp_balance",
+	"address": "0xbec1c22fa669bf17b9d2326beb9adce4fc697614"
+}'
 
 
+curl  -X POST --url http://127.0.0.1:3536/claim/   -H "Content-Type: application/json"  -d '{
+	"method": "get_pairs_info"
+}'
 
-## 5. 生成结果数据
 
-### 5.1 执行方式
 
 ```
-node 5_create_cycle_report.js
-```
-
-
-
-可以在 `create_cycle_report.js` 文件中修改要生成结果的周期
-
-```js
-createReport(cycle);	// cycle为奖励周期
-```
-
-
-
-### 5.2 代码说明
-
-根据 `cycle_reward` 表可以获取奖励指定周期的所有数据
-
-```sql
-SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND type=0
-```
-
-其中 `type=0` 为地址的类型，用于屏蔽部分地址的奖励：
-
-1、如果奖励的地址为合约地址，则奖励应不发放，否则该合约无法领取奖励
-
-2、不发放的奖励，将会暂停处理，等待社区决议
-
-
-
-### 5.3 挖矿奖励报告
-
-生成的报告在 `reports` 文件夹中，每个周期以 `CR_周期号` 命名
-
-每个文件以币种进行划分，文件名命名规则为：`周期_本期发行总量_Token地址.json`
-
-每个文件中是本币种获得奖励的地址和具体金额
-
-
-
-## 6. SWP倍率奖励
-
-在获取链上数据 `get_block_data` 完成之后，可以在数据库的 `token_list` 表中，设置币种的 `verified` 字段为相应的倍率，然后计算挖矿奖励即可。

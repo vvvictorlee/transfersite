@@ -10,9 +10,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var timeout = require('connect-timeout'); //express v4
 const t = process.env.TIME_OUT || 360000;
 app.use(timeout(t));
-app.use(haltOnTimedout);
+app.use(haltOnTimeout);
 
-function haltOnTimedout(req, res, next) {
+function haltOnTimeout(req, res, next) {
     if (!req.timedout) next();
 }
 
@@ -21,7 +21,7 @@ app.use(function (req, res, next) {
     next()
 })
 
-app.post('/claim/', function (req, res) {
+app.post('/farm/', function (req, res) {
     console.log(JSON.stringify(req.body));
 
     let handlers = {
