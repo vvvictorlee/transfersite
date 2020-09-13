@@ -42,25 +42,6 @@ app.post('/farm/', function (req, res) {
             res.json(swpInfo);
 
         }),
-        "get_reward_list": (async function () {
-            let rewardList = await app_handler.getRewardListByAddress(req.body.address);
-            res.json(rewardList);
-        }),
-        "claim_all_rewards": (async function () {
-            const data = await app_handler.claim_all(req.body.address, req.body.gas_limit);
-            const result = data.length > 0 ? "success" : "fail";
-            res.json({ "result": result, "data": data });
-        }),
-        // mainnet 禁用内部操作 begin
-        "finish_epoch": (async function () {
-            await app_handler.disburse_by_epoch(req.body.epoch, 0, req.body.issue);
-            res.json({ "result": "success" });
-        }),
-        "seed_allocations": (async function () {
-            await app_handler.disburse_by_epoch(req.body.epoch, 1, req.body.issue);
-            res.json({ "result": "success" });
-        }),
-        // mainnet 禁用内部操作  end
         "default": (async function () {
             res.json({ "result": "unknown method or method is empty" });
         })
