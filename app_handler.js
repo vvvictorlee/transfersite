@@ -155,13 +155,14 @@ async  function calculateApy(tokens)
     const miningRate = 1;
     const r = tokens[0];
     const swpprice = (r.reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r.reserve0)).toFixed(6);
-    let total = tokens.reduce((acc, cur) => acc + cur.reserve1, 0);
+    let total = tokens.reduce((acc, cur) => acc + cur.reserve1* Math.pow(10, -6), 0);
     var tokens = tokens.map((token) => {
         let rate = miningRate;
         if (token.symbol0[0] == "SWP") {
             rate = miningRate5;
         }
-        token.apy = (factor1 * factor2 * swpprice * token.reserve1 * rate / total / token.reserve1).toFixed(4);
+        let reserve1 = token.reserve1* Math.pow(10, -6);
+        token.apy = (factor1 * factor2 * swpprice *reserve1 * rate / total / reserve1).toFixed(4);
         return token
     });
 
