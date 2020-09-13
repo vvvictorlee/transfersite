@@ -161,7 +161,7 @@ async  function calculateApy(tokens)
         if (token.symbol0[0] == "SWP") {
             rate = miningRate5;
         }
-        token.apy = factor1 * factor2 * swpprice * token.reserve1 * rate / total / token.reserve1;
+        token.apy = (factor1 * factor2 * swpprice * token.reserve1 * rate / total / token.reserve1).toFixed(4);
         return token
     });
 
