@@ -4,11 +4,11 @@ var util = require('./util');
 
 
 
-var mainnetweb3 = new Web3();
-mainnetweb3.setProvider(new Web3.providers.HttpProvider(process.env.MAINNET_HTTP_PROVIDER));
+var web3 = new Web3();
+web3.setProvider(new Web3.providers.HttpProvider(process.env.MAINNET_HTTP_PROVIDER));
 
 var factory_abi = util.loadJson('abi/Factory.json');
-var factory = new mainnetweb3.eth.Contract(factory_abi, process.env.MAINNET_CONTRACT_FACTORY);
+var factory = new web3.eth.Contract(factory_abi, process.env.MAINNET_CONTRACT_FACTORY);
 
 var stoken_abi = util.loadJson('abi/SToken.json');
 var erc20_abi = util.loadJson('abi/ERC20.json');
@@ -19,14 +19,14 @@ var pair_token_symbols_json = 'data/pair_token_symbols.json';
 async function getPairsInfo() {
     console.log("=====pairs=======");
 
-    let len = await factory.methods.allPairsLength().call({ from: admin });
+    let len = await factory.methods.allPairsLength().call();
     console.log(len);
 
     let tokens = [];
     for (let i = 0; i < len; i++) {
         const s = await factory.methods.allPairs(i).call();
         console.log(i, s);
-        let stoken = new mainnetweb3.eth.Contract(stoken_abi, s, { "from": admin });
+        let stoken = new web3.eth.Contract(stoken_abi, s, { });
         // console.log(stoken.methods);
         const r = await stoken.methods.getReserves().call();
         console.log("getReserves==", r);
@@ -109,7 +109,7 @@ async function get_pair_token_symbol(token_list) {
         token.symbol1 = token_symbols[token.token1];
 
         //order wrong swap
-        if (token.symbol0[0] == "USDT") {
+        if (token.symbol1[0] != "USDT") {
             [token.token0, token.token1] = [token.token1, token.token0];
             [token.reserve0, token.reserve1] = [token.reserve1, token.reserve0];
             [token.symbol0, token.symbol1] = [token.symbol1, token.symbol0];
@@ -125,7 +125,7 @@ async function get_pair_token_symbol(token_list) {
 async function hasToken(token, token_symbols) {
     if (!token_symbols.hasOwnProperty(token)) {
         try {
-            let erc20 = new mainnetweb3.eth.Contract(erc20_abi, token);
+            let erc20 = new web3.eth.Contract(erc20_abi, token);
             let symbol = await erc20.methods.symbol().call();
             let decimals = await erc20.methods.decimals().call();
             let name = await erc20.methods.name().call();
@@ -143,12 +143,12 @@ async function hasToken(token, token_symbols) {
 
 async function getSwpInfo() {
     try {
-        let stoken = new mainnetweb3.eth.Contract(stoken_abi, process.env.SWP_USDT_PAIR_ADDRESS, { "from": admin });
+        let stoken = new web3.eth.Contract(stoken_abi, process.env.SWP_USDT_PAIR_ADDRESS, {  });
         const r = await stoken.methods.getReserves().call();
         console.log(r);
         const price = (r._reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r._reserve0)).toFixed(6);
         const token = process.env.SWP_ADDRESS;
-        let erc20 = new mainnetweb3.eth.Contract(erc20_abi, token);
+        let erc20 = new web3.eth.Contract(erc20_abi, token);
         let released = await erc20.methods.totalSupply().call();
 
         return { price: price, released: web3.utils.fromWei(released) };
@@ -162,7 +162,7 @@ async function getSwpInfo() {
 async function getSwpBalanceByAddress(addr) {
     try {
         const token = process.env.SWP_ADDRESS;
-        let erc20 = new mainnetweb3.eth.Contract(erc20_abi, token);
+        let erc20 = new web3.eth.Contract(erc20_abi, token);
         let balance = await erc20.methods.balanceOf(addr).call();
 
         return { balance: web3.utils.fromWei(balance) };
