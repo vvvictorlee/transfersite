@@ -26,7 +26,7 @@ async function getPairsInfo() {
     for (let i = 0; i < len; i++) {
         const s = await factory.methods.allPairs(i).call();
         console.log(i, s);
-        let stoken = new web3.eth.Contract(stoken_abi, s, { });
+        let stoken = new web3.eth.Contract(stoken_abi, s, {});
         // console.log(stoken.methods);
         const r = await stoken.methods.getReserves().call();
         console.log("getReserves==", r);
@@ -50,6 +50,9 @@ async function getPairsInfo() {
     tokens = await get_pair_token_symbol(tokens);
 
     var compare = function (obj1, obj2) {
+        if (obj2.symbol1[0] != "USDT") {
+            return -1;
+        }
         return obj2.reserve1 - obj1.reserve1;
     }
 
@@ -67,24 +70,27 @@ async function getPairsInfo() {
     return tokens;
 }
 
-async  function calculateApy(tokens)
-{
+async function calculateApy(tokens) {
     // 6144 * 30 * swp单价 * (池子资金 * 挖矿速率 / （1池资金 * 挖矿速率 + 2池资金* 挖矿速率 + ...））/  池子资金 这是日化， 前端可以直接根据日化再去* 365
     const factor1 = 6144;
     const factor2 = 30;
     const year = 365;
     const miningRate5 = 5;
     const miningRate = 1;
+    const miningRate0 = 0;
     const r = tokens[0];
     const swpprice = (r.reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r.reserve0)).toFixed(6);
-    let total = tokens.reduce((acc, cur) => acc + cur.reserve1* Math.pow(10, -6), 0);
+    let total = tokens.reduce((acc, cur) => acc + cur.reserve1 * Math.pow(10, -6), 0);
     var tokens = tokens.map((token) => {
         let rate = miningRate;
         if (token.symbol0[0] == "SWP") {
             rate = miningRate5;
         }
-        let reserve1 = token.reserve1* Math.pow(10, -6);
-        token.apy = (factor1 * factor2 * swpprice *reserve1 * rate / total / reserve1).toFixed(4);
+        else if (token.symbol1[0] != "USDT") {
+            rate = miningRate0;
+        }
+        let reserve1 = token.reserve1 * Math.pow(10, -6);
+        token.apy = (factor1 * factor2 * swpprice * reserve1 * rate / total / reserve1).toFixed(4);
         return token
     });
 
@@ -143,7 +149,7 @@ async function hasToken(token, token_symbols) {
 
 async function getSwpInfo() {
     try {
-        let stoken = new web3.eth.Contract(stoken_abi, process.env.SWP_USDT_PAIR_ADDRESS, {  });
+        let stoken = new web3.eth.Contract(stoken_abi, process.env.SWP_USDT_PAIR_ADDRESS, {});
         const r = await stoken.methods.getReserves().call();
         console.log(r);
         const price = (r._reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r._reserve0)).toFixed(6);
