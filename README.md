@@ -1,142 +1,166 @@
-# Mining Scripts V2
-
-> v1.2
-
-
-
-## 0. 配置
-
-1、创建MySQL数据库，建库脚本参见 `sql/eth_data.sql`
-
-2、修改配置文件：`conf/const.js`
-
-
-
-## 1. 获取链上数据
+修改服务端口 .env  APP_PORT
+后台
 
 ```
-node 1_get_block_data.js
+nohup node app.js &  
+```
+
+### 部署注意事项
+#### EPOCH_REPORTS_PATH
+EPOCH_REPORTS_PATH 指定向挖矿算法程序 的reports文件夹
+mining-scripts-v2/reports/CR_
+
+
+#### TOKENS_LIST_JSON_PATH
+TOKENS_LIST_JSON_PATH 指定向挖矿算法程序 的tokens_list文件夹
+mining-scripts-v2/data/token_list.json
+
+
+#### mysql 新用户
+在ubuntu nodejs 连接mysql 不能用root连接 ，需要创建新用户 sql 如下
+```
+CREATE USER 'swapxminer'@'%' IDENTIFIED BY 'password';
+```
+
+授予所有权限
+```
+GRANT ALL PRIVILEGES ON *.* TO 'swapxminer'@'%' WITH GRANT OPTION;
 ```
 
 
+## 6 领取收益接口
 
-可以修改 `data/conf.json` 文件中的 `lastBlock`，设置本次开始同步的块号
+### 6.1 获取指定账户收益列表
+#### 请求
+##### 参数说明：
+- method  方法名称 get_reward_list
+- address 提供流动性的账户地址
+##### 请求示例
+```
+curl  -X POST --url http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "get_reward_list",
+	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
+}'
 
-```json
+
+curl  -X POST --url https://appswapx.99ss.ml/claim/  -H "Content-Type: application/json"  -d '{
+ "method": "get_reward_list",
+ "address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
+}'
+
+
+curl  -X POST --url https://appswapx.99ss.ml/claim/  -H "Content-Type: application/json"  -d '{
+ "method": "get_reward_list",
+ "address": "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
+}'
+```
+#### 应答
+##### 数据说明
+- name  代币符号名称
+- address 代币合约地址
+- value   代币领取收益金额
+##### 应答示例
+```
+[{
+	"name": "TLTBTBTCX",
+	"address": "0x1df382c017c2aae21050d61a5ca8bc918772f419",
+	"value": "0.000000000000002"
+}, {
+	"name": "TLTATBTCX",
+	"address": "0x4cf4d866dcc3a615d258d6a84254aca795020a2b",
+	"value": "0.000000000000003"
+}, {
+	"name": "TLTDTBTCX",
+	"address": "0x6c50d50fafb9b42471e1fcabe9bf485224c6a199",
+	"value": "0.000000000000004"
+}, {
+	"name": "TLTCTBTCX",
+	"address": "0x71805940991e64222f75cc8a907353f2a60f892e",
+	"value": "0.000000000000001"
+}]
+```
+
+### 6.2 提交领取指定账户收益
+#### 请求
+##### 参数说明：
+- method  方法名称 claim_all_rewards
+- address 提供流动性的账户地址
+##### 请求示例
+```
+curl  -X POST --url  http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "claim_all_rewards",
+	"address": "0xa4a4005a9497548427a141d53ad8869829fb9ec7"
+}'
+
+
+curl  -X POST --url  http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "claim_all_rewards",
+	"address": "0x0DB1bB1097ac3b7e26B3A4Cf35E2f19E07d24568"
+}'
+
+
+
+
+curl  -X POST --url  http://192.168.38.227:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "claim_all_rewards",
+	"address": "0x929378dbc9a1fdc0d05529e48097ff65c6902231"
+}'
+
+curl  -X POST --url  https://appswapx.99ss.ml/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "claim_all_rewards",
+	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
+}'
+```
+
+#### 应答
+##### 数据说明
+- result  执行结果 成功success
+- data  合约地址方法调用.编码ABI encodedABI（）获得用于sendTransaction data参数
+##### 应答示例
+```
 {
-  "lastBlock": 607254,
-  "updatedBlocks": [
-    0
-  ]
+	"result": "success",
+	"data": [
+		["1", "0x06403d9dc00b7cf577023d49f96f899aed86d6c0", "849999999999999915000", ["0x0badda19b347f0b15db105449d8672b3883ce72473914721dd8bf61ea396d8be", "0xa84a67e0121ba5fd44e2ed16f39882029bc2f3b970b99dfb60c86a8a3b0f67e6", "0x9fcf9615e449bcd29857d532ddc3690253cd13f2813d02a26bd6b4cb7c035025", "0xfbeab35daca2333e778d0f489449730fb16df3be4ad428c0d8d7594a2af895d3"]],
+		["1", "0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5", "5099999999999999490000", ["0xdbe3c13ded62ab79d32b81c7257696a95f65bf3a47b16e3cfe6a7dc6f7937012", "0x06f84f12431c90111107f30c9625d6e870832409133460daf31933621b28dccf", "0xfc60d60805351b8a051565987bb612b18a5c759a8a79d875636392ddf0b6533d", "0x37d46ea9ba28347acde174b63d3ffa8a4e8b56adbba5866ba0eabe144ea21149"]],
+		["1", "0xc5201589361c2da2b07df626f1cab71b4255b16e", "13326116107670796930250", ["0xb3225ee3d40be86be15975f8600016a588d94ec994caa4a27137b154c228c57f", "0x39e675a0fbbdc84e690aa56477659c7deebed8faea64f911c6ce386e4264f46c", "0x2d0ff114104c9726096197f01b5c845f71603a0bc36dfd9b5fba9f518fceffe4", "0xfbeab35daca2333e778d0f489449730fb16df3be4ad428c0d8d7594a2af895d3"]],
+		["2", "0x06403d9dc00b7cf577023d49f96f899aed86d6c0", "77705359625718111774006", ["0xe4b7ad736dcc37e02df97e3825dca43b54aaa94f8dd6c71e71fc1c5fec9dc7bf", "0xffc1c60e44b81b9cba1a23372447b4f7614e4c2ece6c49949755480f0b589744", "0x4a21ea52ca13af3dc5b10fbb9d50646b48ce0ec21a5584fc186a8bbb2c74ec01", "0x3d00b8858f58efc9805110f02c582c351e3d27d2b2728e8661cdca2dc7267684"]],
+		["2", "0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5", "159799999999999984020000", ["0x8809bcf4953b78333242386e43b58b7945a0d74eabb5adefc1d88d40cd8af3b7", "0xdf44f5e8cb1700395dfba78aaf22c2693fe4a61e3bec842cecbc2fce0989e82a", "0x65d21c6fdeecc72e3f53d568df74dc20e2739c1926e3d9461e14a505f89829e5", "0x58aa5b23258100fd504b5811bb63446bfa79c69c65685473044e8d59029d2823"]],
+		["2", "0xc5201589361c2da2b07df626f1cab71b4255b16e", "159961545035522359362960", ["0x7f29941cebbd61fce9d702cce81289354fa2d5f98f62efcd1f579fd29b0c0782", "0x180f0217814aaee70b58bb3f18a17233dbb34edf40b3efd7d4b9d79bb0fb60ff", "0x65d21c6fdeecc72e3f53d568df74dc20e2739c1926e3d9461e14a505f89829e5", "0x58aa5b23258100fd504b5811bb63446bfa79c69c65685473044e8d59029d2823"]]
+	]
 }
+
+```
+
+
+
+
 ```
 
 
+curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "get_reward_list",
+	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
+}'
 
-## 2. 生成快照块
-
-```
-node 2_snapshot.js
-```
-
-
-
-可以修改 `data/cycle.json` 文件，设置：奖励周期，开始块，结束块，本周期最大块号（一天为96）
-
-```json
-[
-  [1, 8567000, 8567220, 96],
-  [2, 8567382, 8573463, 96]
-]
-```
-
-生成的快照块在 `data/snapshot.json` 文件中
+curl  -X POST --url http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "get_reward_list",
+	"address": "0x4174c253eec92d711e62e6dce0f0b334c4785a57"
+}'
 
 
-
-## 3. 挖矿
-
-```
-node 3_machining_data.js
-```
+curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "claim_all_rewards",
+	"address": "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e"
+}'
 
 
+curl  -X POST --url  http://127.0.0.1:3536/claim/  -H "Content-Type: application/json"  -d '{
+	"method": "claim_all_rewards",
+	"address": "0x4174c253eec92d711e62e6dce0f0b334c4785a57"
+}'
 
-挖矿程序默认运行最近一个周期的奖励，可以修改最后一行代码运行其他奖励周期
-
-```js
-miningCycle(cycle_index); // cycle_index是奖励周期的索引号，从0开始
-```
-
-这里的 `cycle_index` 是奖励周期的索引号，一般是：奖励周期号-1
-
-
-
-## 4. 验证奖励周期的挖矿结果
-
-```
-node 4_check_data.js
-```
-
-
-
-验证奖励结果可以在 `check_data.js` 中执行以下函数（该检查已包含在 `machining_data.js` 中）：
-
-```
-block_db.checkCycleData();
-```
-
-基本规则：
-1、每个币种的总奖励 <= 总发行量（570万）
-2、每个币种的本周期奖励 <= 本周期最大奖励（19.2万）
-3、每个币种的总领取数量 <= 当前总发行量
-
-
-
-## 5. 生成结果数据
-
-### 5.1 执行方式
-
-```
-node 5_create_cycle_report.js
-```
 
 
 
-可以在 `create_cycle_report.js` 文件中修改要生成结果的周期
-
-```js
-createReport(cycle);	// cycle为奖励周期
 ```
-
-
-
-### 5.2 代码说明
-
-根据 `cycle_reward` 表可以获取奖励指定周期的所有数据
-
-```sql
-SELECT addr,token,amount FROM cycle_reward WHERE cycle=? AND type=0
-```
-
-其中 `type=0` 为地址的类型，用于屏蔽部分地址的奖励：
-
-1、如果奖励的地址为合约地址，则奖励应不发放，否则该合约无法领取奖励
-
-2、不发放的奖励，将会暂停处理，等待社区决议
-
-
-
-### 5.3 挖矿奖励报告
-
-生成的报告在 `reports` 文件夹中，每个周期以 `CR_周期号` 命名
-
-每个文件以币种进行划分，文件名命名规则为：`周期_本期发行总量_Token地址.json`
-
-每个文件中是本币种获得奖励的地址和具体金额
-
-
-
-## 6. SWP倍率奖励
-
-在获取链上数据 `get_block_data` 完成之后，可以在数据库的 `token_list` 表中，设置币种的 `verified` 字段为相应的倍率，然后计算挖矿奖励即可。

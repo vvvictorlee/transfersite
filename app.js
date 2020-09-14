@@ -1,7 +1,6 @@
 require('dotenv').config();
 var express = require('express');
 var bodyParser = require('body-parser');
-var block_db = require('./block_db');
 let app_handler = require("./app_handler");
 var app = express();
 
@@ -10,10 +9,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var timeout = require('connect-timeout'); //express v4
 const t = process.env.TIME_OUT || 360000;
 app.use(timeout(t));
-app.use(haltOnTimedout);
+app.use(haltOnTimeout);
 
-function haltOnTimedout(req, res, next) {
-    if (!req.timedout) next();
+function haltOnTimeout(req, res, next) {
+    if (!req.timeout) next();
 }
 
 app.use(function (req, res, next) {
@@ -25,23 +24,6 @@ app.post('/claim/', function (req, res) {
     console.log(JSON.stringify(req.body));
 
     let handlers = {
-        "get_pairs_info": (async function () {
-            let pairsInfo = await app_handler.getPairsInfo();
-            res.json(pairsInfo);
-
-        }),
-        "get_swp_info": (async function () {
-            let swpInfo = await app_handler.getSwpInfo();
-            // swpInfo = { "result": "The  'get_swp_info' interface is disabled temporarily" };
-            res.json(swpInfo);
-
-        }),
-        "get_swp_balance": (async function () {
-            let swpInfo = await app_handler.getSwpBalanceByAddress(req.body.address);
-            // swpInfo = { "result": "The  'get_swp_info' interface is disabled temporarily" };
-            res.json(swpInfo);
-
-        }),
         "get_reward_list": (async function () {
             let rewardList = await app_handler.getRewardListByAddress(req.body.address);
             res.json(rewardList);
@@ -51,16 +33,6 @@ app.post('/claim/', function (req, res) {
             const result = data.length > 0 ? "success" : "fail";
             res.json({ "result": result, "data": data });
         }),
-        // mainnet 禁用内部操作 begin
-        "finish_epoch": (async function () {
-            await app_handler.disburse_by_epoch(req.body.epoch, 0, req.body.issue);
-            res.json({ "result": "success" });
-        }),
-        "seed_allocations": (async function () {
-            await app_handler.disburse_by_epoch(req.body.epoch, 1, req.body.issue);
-            res.json({ "result": "success" });
-        }),
-        // mainnet 禁用内部操作  end
         "default": (async function () {
             res.json({ "result": "unknown method or method is empty" });
         })

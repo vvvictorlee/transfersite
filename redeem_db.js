@@ -1,8 +1,8 @@
+require('dotenv').config();
+
 //引入数据库
 var mysql = require('mysql');
 var wrapper = require('co-mysql');
-var co = require('co');
-require('./conf/db_conf');
 
 
 module.exports = {
@@ -10,6 +10,13 @@ module.exports = {
     getRewardListByAddress,
     getCycleRewardsByAddress,
 };
+
+const DB_CONFIG = {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE
+}
 
 //实现本地链接
 var pool = mysql.createPool(DB_CONFIG);
