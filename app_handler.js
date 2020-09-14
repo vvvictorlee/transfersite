@@ -13,19 +13,37 @@ var factory = new web3.eth.Contract(factory_abi, process.env.MAINNET_CONTRACT_FA
 var stoken_abi = util.loadJson('abi/SToken.json');
 var erc20_abi = util.loadJson('abi/ERC20.json');
 
+// 合约abi
+var redeem_abi = util.loadJson('abi/MerkleRedeem.json');
+var redeem = new web3.eth.Contract(redeem_abi, process.env.CONTRACT_REDEEM);
+
 var pair_token_symbols_json = 'data/pair_token_symbols.json';
 
 
 async function getPairsInfo() {
     console.log("=====pairs=======");
+    //get verified pool token list
+    const vt = await redeem.methods.verifiedTokens().call();   
+    console.log(vt);
+    const vts = new Set(vt);
 
+    //get all pairs from factory
     let len = await factory.methods.allPairsLength().call();
     console.log(len);
 
     let tokens = [];
     for (let i = 0; i < len; i++) {
+        //get pair 
         const s = await factory.methods.allPairs(i).call();
         console.log(i, s);
+        //get pooltoken contract address by pair contract address
+        const p2t = await factory.methods.pair2Token(s).call();
+        if (!vts.has(p2t)) {
+            console.log("skip unverified pool token", s);
+            continue;
+        }
+
+        //get pair token instance by pair  contract address 
         let stoken = new web3.eth.Contract(stoken_abi, s, {});
         // console.log(stoken.methods);
         const r = await stoken.methods.getReserves().call();

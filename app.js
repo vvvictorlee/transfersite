@@ -12,7 +12,7 @@ app.use(timeout(t));
 app.use(haltOnTimeout);
 
 function haltOnTimeout(req, res, next) {
-    if (!req.timedout) next();
+    if (!req.timeout) next();
 }
 
 app.use(function (req, res, next) {
