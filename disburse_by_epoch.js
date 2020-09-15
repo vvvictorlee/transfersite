@@ -15,14 +15,6 @@ const { fstat } = require("fs");
 var web3 = new Web3();
 web3.setProvider(new Web3.providers.HttpProvider(global.HTTP_PROVIDER));
 
-// let HDWalletProvider = require('truffle-hdwallet-provider')
-
-// let terms = util.loadJson('secrets/admin.json');
-
-// // //3.设置测试网络 infura
-// // let netIp = global.HTTP_PROVIDER
-// // let provider = new HDWalletProvider(terms, netIp)
-// // web3.setProvider(provider);
 
 var mainnetweb3 = new Web3();
 mainnetweb3.setProvider(new Web3.providers.HttpProvider(process.env.MAINNET_HTTP_PROVIDER));
@@ -52,89 +44,6 @@ const is_issue = process.env.IS_ISSUE;
 const claim_exec_by_admin = process.env.CLAIM_EXEC_BY_ADMIN;
 const gasLimit = process.env.GAS_LIMIT;
 
-
-
-async function getRewardListByAddress(addr) {
-    try {
-        addr = addr.toLowerCase();
-
-        await redeem_db.updateClaimStatusByAddress(addr, redeem);
-        const token_symbols = await get_token_symbol();
-        // console.log(token_symbols);
-        return await redeem_db.getRewardListByAddress(addr, token_symbols, web3);
-    } catch (error) {
-        console.log(error);
-    }
-    return { "result": "unkonwn error" };
-}
-
-async function claim_all(addr) {
-
-    try {
-        addr = addr.toLowerCase();
-
-        await redeem_db.updateClaimStatusByAddress(addr, redeem);
-
-        let sizebalances = await redeem_db.getCycleRewardsByAddress(addr);
-        if (sizebalances[0] == 0) {
-            return {};
-        }
-        let balances = sizebalances[1];
-        const para = {
-            web3: web3,
-            admin: admin,
-            contract: redeem,
-            erc20_abi: erc20_abi,
-            contractAddress: global.CONTRACT_REDEEM,
-            path: epoch_reports_path,
-            password: password,
-            admin_secrets: admin_secrets,
-            chain_id: chain_id,
-            symbol_interval: symbol_interval,
-            claim_exec_by_admin: claim_exec_by_admin,
-        };
-
-        const encodedAbi = await claimProof(para, addr, balances);
-        console.log("claim list====", encodedAbi);
-        return encodedAbi;
-    }
-    catch (error) {
-        console.error(error);
-    }
-    return "";
-}
-
-async function get_token_symbol() {
-    let token_list = util.loadJson(file_tokens);
-
-    let token_symbols = {};
-    try {
-        token_symbols = util.loadJson(token_symbols_json);
-    } catch (error) {
-        console.error(error);
-    }
-
-    token_symbols[process.env.SWP_ADDRESS] = process.env.SWP_SYMBOL || "SWP";
-
-    for (let token of token_list.pTokens) {
-        if (!token_symbols.hasOwnProperty(token)) {
-            try {
-                let erc20 = new web3.eth.Contract(erc20_abi, token);
-                let symbol = await erc20.methods.symbol().call();
-                token_symbols[token] = symbol;
-                sleep.msleep(symbol_interval);
-            }
-            catch (error) {
-                console.error(error);
-            }
-        }
-    }
-
-    // 写入文件
-    util.writeFile(token_symbols_json, token_symbols);
-
-    return token_symbols;
-}
 
 const firstStartBlockNum = 1;
 const blocks = 64;
@@ -176,9 +85,6 @@ async function disburse_by_epoch(epochNum, step, issue_flag, is_execute) {
 }
 
 module.exports = {
-    getRewardListByAddress,
-    claim_all,
-    get_token_symbol,
     disburse_by_epoch,
 };
 
