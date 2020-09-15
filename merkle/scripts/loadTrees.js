@@ -13,7 +13,7 @@ const loadTrees = (utils,filePath) => {
   let balance;
   let nextElements;
 
-  Object.keys(jsonFiles).forEach(fileName => {
+  jsonFiles.forEach(fileName => {
     nextElements = loadTreem(utils,fileName);
     elements.concat(nextElements);
   });

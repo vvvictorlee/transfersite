@@ -42,7 +42,7 @@ contract TToken is SwapXPTStorage, IERC20, ISwapXToken {
     }
 
     // called once by the factory at time of deployment
-    function initialize(string memory name, string memory sym, uint maxSupply) onlyOwner public override{
+    function initialize(string memory name, string memory sym, uint256 maxSupply) onlyOwner public override{
         _symbol = sym;
         _name = name;
         //        _name = 'Pair Token';

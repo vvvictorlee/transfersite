@@ -18,7 +18,6 @@ contract Redeem {
   uint latestTimeTimestamp;
   bytes32 latestTimeBlockHash;
   mapping(address => mapping(address => uint)) vestedTokenBalances;
-  mapping(address => mapping(address => uint)) vestedTokenBalances;
   mapping(address => uint) vestedBalances;
   mapping(address => uint) pendingBalances;
   address[] usersWithPendingBalances;

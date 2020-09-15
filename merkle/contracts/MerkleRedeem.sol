@@ -164,7 +164,9 @@ contract MerkleRedeem {
         public
     {
         Claim memory claim;
-        address[] memory _tokens;
+        uint256 len = claims.length + 1;
+        uint256 index = 0;
+        address[] memory _tokens = new address[](len);
         for (uint256 i = 0; i < claims.length; i++) {
             claim = claims[i];
             require(
@@ -195,7 +197,7 @@ contract MerkleRedeem {
             );
 
             if (tokenTotalBalances[claim.token] == uint256(0)) {
-                _tokens[_tokens.length] = claim.token;
+                _tokens[index++] = claim.token;
             }
 
             tokenTotalBalances[claim.token] += claim.balance;
@@ -204,13 +206,17 @@ contract MerkleRedeem {
         }
 
         for (uint256 i = 0; i < _tokens.length; i++) {
+            if (_tokens[i] == address(0)) {
+                break;
+            }
+            address t =  _tokens[i];
             disburse(
                 _liquidityProvider,
-                _tokens[i],
-                tokenTotalBalances[_tokens[i]]
+                t,
+                tokenTotalBalances[t]
             );
 
-            delete tokenTotalBalances[_tokens[i]];
+            delete tokenTotalBalances[t];
         }
         delete _tokens;
     }

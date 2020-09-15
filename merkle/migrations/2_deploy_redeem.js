@@ -5,13 +5,15 @@ const { utils } = web3;
 module.exports = (deployer, network, accounts) => {
   const admin = accounts[0]; // "0x77c845E6A61F37cB7B237de90a74fbc3679FcF06"; // on Kovan
   deployer.then(async () => {
-    await deployer.deploy(TToken, "Test vBal", "VBAL", 18);
+    await deployer.deploy(TToken);
     const token = await TToken.deployed();
-    await token.mint(admin, utils.toWei("145000"));
-
-    await deployer.deploy(TToken, "Testr Bal", "RBAL", 18);
+    await token.initialize("Test vBal", "DVBAL", 180000);
+    // await token.issue(admin, utils.toWei("145"));
+   
+    await deployer.deploy(TToken);
     const token1 = await TToken.deployed();
-    await token1.mint(admin, utils.toWei("145000"));
+    await token.initialize("Testr Bal", "DRBAL", 1800000);
+    // await token1.issue(admin, utils.toWei("14"));
 
     await deployer.deploy(Redeem);
     const redeem = await Redeem.deployed();
