@@ -33,7 +33,7 @@ async function getSwpTotalByPToken() {
     }
     console.log('getSwpTotalByPToken :', rows.length);
 
-    return [rows.length, cycle_tokens];
+    return cycle_tokens;
 }
 
 

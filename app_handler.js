@@ -32,15 +32,18 @@ async function getPairTokensInfo(addr) {
     //get all pairs from factory
     let len = await factory.methods.allPairsLength().call();
     console.log(len);
-    let yswps = farm_db.getSwpTotalByPToken();
+    let yswps = await farm_db.getSwpTotalByPToken();
+    console.log("ysw=", yswps);
     let tokens = [];
     for (let i = 0; i < len; i++) {
         //get pair 
         const p = await factory.methods.pairTokens(i).call();
         console.log(i, p);
-        if (!vts.has(p)) {
-            console.log("skip unverified pair token", p);
-            continue;
+        let verified = false;
+        if (vts.has(p)) {
+            // console.log("skip unverified pair token", p);
+            // continue;
+            verified = true;
         }
 
         //get pair token instance by pair  contract address 
@@ -54,21 +57,29 @@ async function getPairTokensInfo(addr) {
         if (addr != undefined && addr.length > 0) {
             balance = await ptoken.methods.balanceOf(addr).call();
             balance = web3.utils.fromWei(balance);
-            share = balance / released * 100;
+            share = "0";
+            if (released > 0) {
+                share = (balance / released * 100).toFixed(2);
+            }
         }
 
         const swp = process.env.SWP_ADDRESS;
         let swpins = new web3.eth.Contract(erc20_abi, swp);
         const blocksOfDay = 5760;
         const lastBlock = await web3.eth.getBlock("latest");
+        let ys = "0";
 
+        if (yswps[p] != undefined) {
+            ys = yswps[p].toString();
+        }
 
         o = {
             symbol: symbol,
             released: released,
-            ydays_swps: web3.utils.fromWei(yswps[p]),
+            ydays_swps: web3.utils.fromWei(ys),
             yourbalance: balance,
             yourshare: share,
+            verified: verified
         };
 
         tokens.push(o);
@@ -103,9 +114,14 @@ async function getPairsInfo() {
         console.log(i, s);
         //get pairtoken contract address by pair contract address
         const p2t = await factory.methods.pair2Token(s).call();
-        if (!vts.has(p2t) || filter_set.has(s)) {
+        if (filter_set.has(s)) {
             console.log("skip unverified pair token", s);
             continue;
+        }
+
+        let rate = 0;
+        if (vts.has(p2t)) {
+            rate = 1;
         }
 
         //get pair token instance by pair  contract address 
@@ -125,6 +141,7 @@ async function getPairsInfo() {
             token1: t1,
             reserve0: r._reserve0,
             reserve1: r._reserve1,
+            rate: rate
         };
 
         tokens.push(o);
@@ -133,9 +150,13 @@ async function getPairsInfo() {
     tokens = await get_pair_token_symbol(tokens);
 
     var compare = function (obj1, obj2) {
-        if (obj2.symbol1[0] != "USDT") {
+        if ((0 != obj1.rate && 0 == obj2.rate) || ((obj1.rate == obj2.rate) && obj1.symbol1[0] == "USDT" && obj2.symbol1[0] != "USDT")) {
             return -1;
         }
+        if (0 == obj1.rate && 0 != obj2.rate) {
+            return 1;
+        }
+
         return obj2.reserve1 - obj1.reserve1;
     }
 
@@ -144,6 +165,7 @@ async function getPairsInfo() {
     let index = tokens.findIndex(token => token.symbol0[0] == "SWP");
     let item = tokens[index];
     tokens.splice(index, 1);
+    item.rate = 5;
     tokens.unshift(item);
 
     console.log("tokens===", tokens);
@@ -158,21 +180,12 @@ async function calculateApy(tokens) {
     const factor1 = 6144;
     const factor2 = 30;
     const year = 365;
-    const miningRate5 = 5;
-    const miningRate = 1;
-    const miningRate0 = 0;
     const r = tokens[0];
     const swpprice = (r.reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r.reserve0)).toFixed(6);
     let total = tokens.reduce((acc, cur) => acc + cur.reserve1 * Math.pow(10, -6), 0);
     var tokens = tokens.map((token) => {
-        let rate = miningRate;
-        if (token.symbol0[0] == "SWP") {
-            rate = miningRate5;
-        }
-        else if (token.symbol1[0] != "USDT") {
-            rate = miningRate0;
-        }
         let reserve1 = token.reserve1 * Math.pow(10, -6);
+        let rate = token.rate;
         token.apy = (factor1 * factor2 * swpprice * reserve1 * rate / total / reserve1).toFixed(4);
         return token
     });
