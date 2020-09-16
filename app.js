@@ -24,6 +24,11 @@ app.post('/farm/', function (req, res) {
     console.log(JSON.stringify(req.body));
 
     let handlers = {
+        "get_pairtokens_info": (async function () {
+            let pairTokensInfo = await app_handler.getPairTokensInfo();
+            res.json(pairTokensInfo);
+
+        }),
         "get_pairs_info": (async function () {
             let pairsInfo = await app_handler.getPairsInfo();
             res.json(pairsInfo);

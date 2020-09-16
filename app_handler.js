@@ -1,7 +1,7 @@
 require('dotenv').config();
 var Web3 = require("web3");
 var util = require('./util');
-
+let farm_db = require('./farm_db');
 
 
 var web3 = new Web3();
@@ -18,28 +18,93 @@ var redeem_abi = util.loadJson('abi/MerkleRedeem.json');
 var redeem = new web3.eth.Contract(redeem_abi, process.env.CONTRACT_REDEEM);
 
 var pair_token_symbols_json = 'data/pair_token_symbols.json';
+var pair_token_filter_json = 'data/filter.json';
 
 
-async function getPairsInfo() {
-    console.log("=====pairs=======");
-    //get verified pool token list
-    const vt = await redeem.methods.verifiedTokens().call();   
+async function getPairTokensInfo(addr) {
+    console.log("=====getPairTokensInfo=======");
+
+    //get verified pair token list
+    const vt = await redeem.methods.verifiedTokens().call();
     console.log(vt);
     const vts = new Set(vt);
 
     //get all pairs from factory
     let len = await factory.methods.allPairsLength().call();
     console.log(len);
+    let yswps = farm_db.getSwpTotalByPToken();
+    let tokens = [];
+    for (let i = 0; i < len; i++) {
+        //get pair 
+        const p = await factory.methods.pairTokens(i).call();
+        console.log(i, p);
+        if (!vts.has(p)) {
+            console.log("skip unverified pair token", p);
+            continue;
+        }
 
+        //get pair token instance by pair  contract address 
+        let ptoken = new web3.eth.Contract(erc20_abi, p, {});
+        // console.log(stoken.methods);
+        let released = await ptoken.methods.totalSupply().call();
+        const symbol = await ptoken.methods.symbol().call();
+        released = web3.utils.fromWei(released);
+        let balance = "-";
+        let share = "-";
+        if (addr != undefined && addr.length > 0) {
+            balance = await ptoken.methods.balanceOf(addr).call();
+            balance = web3.utils.fromWei(balance);
+            share = balance / released * 100;
+        }
+
+        const swp = process.env.SWP_ADDRESS;
+        let swpins = new web3.eth.Contract(erc20_abi, swp);
+        const blocksOfDay = 5760;
+        const lastBlock = await web3.eth.getBlock("latest");
+
+
+        o = {
+            symbol: symbol,
+            released: released,
+            ydays_swps: web3.utils.fromWei(yswps[p]),
+            yourbalance: balance,
+            yourshare: share,
+        };
+
+        tokens.push(o);
+    }
+
+    console.log("tokens===", tokens);
+
+
+    return tokens;
+}
+
+
+async function getPairsInfo() {
+    console.log("=====pairs=======");
+    //get verified pair token list
+    const vt = await redeem.methods.verifiedTokens().call();
+    console.log(vt);
+    const vts = new Set(vt);
+
+    //get all pairs from factory
+    let len = await factory.methods.allPairsLength().call();
+    console.log(len);
+    let filter_set = new Set();
+    const token_filter = util.loadJson(pair_token_filter_json);
+    if (token_filter != undefined && token_filter.length > 0) {
+        filter_set = new Set(token_filter);
+    }
     let tokens = [];
     for (let i = 0; i < len; i++) {
         //get pair 
         const s = await factory.methods.allPairs(i).call();
         console.log(i, s);
-        //get pooltoken contract address by pair contract address
+        //get pairtoken contract address by pair contract address
         const p2t = await factory.methods.pair2Token(s).call();
-        if (!vts.has(p2t)) {
-            console.log("skip unverified pool token", s);
+        if (!vts.has(p2t) || filter_set.has(s)) {
+            console.log("skip unverified pair token", s);
             continue;
         }
 
@@ -200,6 +265,7 @@ async function getSwpBalanceByAddress(addr) {
 
 
 module.exports = {
+    getPairTokensInfo,
     getPairsInfo,
     getSwpInfo,
     getSwpBalanceByAddress,
