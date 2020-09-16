@@ -19,18 +19,33 @@ app.use(function (req, res, next) {
     console.log('req ' + JSON.stringify(req.body))
     next()
 })
+// 总量页面缓存
+var request_cache = {
+    interval: 6000,
+    pairs_info_time: 0,
+    pairs_info_data: null
+}
 
 app.post('/farm/', function (req, res) {
     console.log(JSON.stringify(req.body));
-
     let handlers = {
+        "get_eth_pairs": (async function () {
+            let ethPairs = await app_handler.getEthPairs(req.body.address); 
+            res.json(ethPairs);
+
+        }),
         "get_pairtokens_info": (async function () {
             let pairTokensInfo = await app_handler.getPairTokensInfo(req.body.address);
             res.json(pairTokensInfo);
 
         }),
         "get_pairs_info": (async function () {
-            let pairsInfo = await app_handler.getPairsInfo();
+            let pairsInfo = request_cache.pairs_info_data;
+            if (Date.now() > request_cache.pairs_info_time) {
+                request_cache.pairs_info_time = Date.now() + request_cache.interval;
+                pairsInfo = await app_handler.getPairsInfo();
+                request_cache.pairs_info_data = pairsInfo;
+            }
             res.json(pairsInfo);
 
         }),

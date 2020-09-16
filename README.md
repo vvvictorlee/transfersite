@@ -355,4 +355,11 @@ curl  -X POST --url http://127.0.0.1:3535/farm/   -H "Content-Type: application/
 }'
 
 
+curl  -X POST --url http://127.0.0.1:3535/farm/   -H "Content-Type: application/json"  -d '{
+	"method": "get_eth_pairs",
+	"address": "0xbec1c22fa669bf17b9d2326beb9adce4fc697614"
+}'
+
+
+
 ```

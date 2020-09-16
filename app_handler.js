@@ -20,6 +20,81 @@ var redeem = new web3.eth.Contract(redeem_abi, process.env.CONTRACT_REDEEM);
 var pair_token_symbols_json = 'data/pair_token_symbols.json';
 var pair_token_filter_json = 'data/filter.json';
 
+async function getEthPairs(addr) {
+    if (addr == undefined || addr == null || addr == "") {
+        return { "result": "invalid address" };
+    }
+
+    console.log("=====getEthPairs=======");
+
+
+
+    // let wutoken = new web3.eth.Contract(stoken_abi, process.env.WETH_USDT_PAIR_ADDRESS, {});
+    // const r = await wutoken.methods.getReserves().call();
+    // console.log(r);
+    // const ethPrice = (r._reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r._reserve0)).toFixed(6);
+    // console.log("ethPrice===",ethPrice);
+
+    let ethPrice = 1;
+    let ethPairs = util.loadJson('data/eth_pairs.json');
+    let pair_addresses = Object.entries(ethPairs);
+
+    let tokens = [];
+    for (let pa of pair_addresses) {
+        console.log(pa);
+        //get pair token instance by pair  contract address 
+        let stoken = new web3.eth.Contract(stoken_abi, pa[1], {});
+        // console.log(stoken.methods);
+        const r = await stoken.methods.getReserves().call();
+        console.log("getReserves==", r);
+        console.log("_reserve0==", r._reserve0);
+        console.log("_reserve1==", r._reserve1);
+
+        let reserve0 = web3.utils.fromWei(r._reserve0);
+        let reserve1 = web3.utils.fromWei(r._reserve1);
+        if (pa[0].indexOf("USDC") == 0) {
+            console.log(pa[0]);
+            reserve0 = r._reserve0 * Math.pow(10, -6);
+        }
+        let price = 0;
+
+        if (pa[0].indexOf("USDT") == 0) {
+            console.log(pa[0]);
+            reserve1 = r._reserve1 * Math.pow(10, -6);
+            price = (reserve1 / reserve0).toFixed(6) * ethPrice;
+            ethPrice = price;
+        }
+        else {
+            price = (reserve1 / reserve0).toFixed(6) * ethPrice;
+        }
+
+        let balance = await stoken.methods.balanceOf(addr).call();
+        let released = await stoken.methods.totalSupply().call();
+        let share = 0;
+        if (released > 0) {
+            share = (balance / released * 100).toFixed(2);
+        }
+
+        o = {
+            pair: pa[0],
+            price: price,
+            share: share
+        };
+
+        tokens.push(o);
+    }
+
+
+
+
+    console.log("tokens===", tokens);
+
+
+    return tokens;
+}
+
+
+
 
 async function getPairTokensInfo(addr) {
     console.log("=====getPairTokensInfo=======");
@@ -278,6 +353,7 @@ async function getSwpBalanceByAddress(addr) {
 
 
 module.exports = {
+    getEthPairs,
     getPairTokensInfo,
     getPairsInfo,
     getSwpInfo,
