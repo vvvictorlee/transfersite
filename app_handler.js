@@ -56,6 +56,10 @@ async function getEthPairs(addr) {
             console.log(pa[0]);
             reserve0 = r._reserve0 * Math.pow(10, -6);
         }
+        if (pa[0].indexOf("WBTC") == 0) {
+            console.log(pa[0]);
+            reserve0 = r._reserve0 * Math.pow(10, -8);
+        }
         let price = 0;
 
         if (pa[0].indexOf("USDT") == 0) {
@@ -75,17 +79,33 @@ async function getEthPairs(addr) {
             share = (balance / released * 100).toFixed(2);
         }
 
-        o = {
+        let o = {
             pair: pa[0],
-            price: price,
+            price: Number(price).toFixed(2),
+            balance: balance,
             share: share
         };
 
         tokens.push(o);
     }
 
-
-
+    let stoken = new web3.eth.Contract(stoken_abi, process.env.SWP_USDT_PAIR_ADDRESS, {});
+    const r = await stoken.methods.getReserves().call();
+    console.log(r);
+    const price = (r._reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r._reserve0)).toFixed(6);
+    let balance = await stoken.methods.balanceOf(addr).call();
+    let released = await stoken.methods.totalSupply().call();
+    let share = 0;
+    if (released > 0) {
+        share = (balance / released * 100).toFixed(2);
+    }
+    let o = {
+        pair: "SWP-USDT",
+        price: Number(price).toFixed(2),
+        balance: balance,
+        share: share
+    };
+    tokens.unshift(o);
 
     console.log("tokens===", tokens);
 
@@ -148,7 +168,7 @@ async function getPairTokensInfo(addr) {
             ys = yswps[p].toString();
         }
 
-        o = {
+        let o = {
             symbol: symbol,
             released: released,
             ydays_swps: web3.utils.fromWei(ys),
@@ -159,6 +179,8 @@ async function getPairTokensInfo(addr) {
 
         tokens.push(o);
     }
+
+
 
     console.log("tokens===", tokens);
 
@@ -211,7 +233,7 @@ async function getPairsInfo() {
         console.log("t0==", t0);
         const t1 = await stoken.methods.token1().call();
         console.log("t1==", t1);
-        o = {
+        let o = {
             token0: t0,
             token1: t1,
             reserve0: r._reserve0,
