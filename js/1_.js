@@ -1,10 +1,11 @@
-var fs = require('fs');
+var debug = require('debug')('app');
 
 module.exports = {
     loadJson,
 };
 
-function loadJson(fileName){
-
+function loadJson(fileName) {
+    debug(process.env.APP_PORT);
 }
 
+loadJson("1");

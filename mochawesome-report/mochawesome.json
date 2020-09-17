@@ -1,0 +1,668 @@
+{
+  "stats": {
+    "suites": 13,
+    "tests": 4,
+    "passes": 0,
+    "pending": 0,
+    "failures": 4,
+    "start": "2020-09-17T06:06:16.868Z",
+    "end": "2020-09-17T06:06:22.911Z",
+    "duration": 6043,
+    "testsRegistered": 12,
+    "passPercent": 0,
+    "pendingPercent": 0,
+    "other": 4,
+    "hasOther": true,
+    "skipped": 8,
+    "hasSkipped": true
+  },
+  "results": [
+    {
+      "uuid": "8f58f356-7c66-47f1-93e5-f0bc5a8ba340",
+      "title": "",
+      "fullFile": "",
+      "file": "",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "1dc1ede2-7288-45e1-8c1a-909dc381e7ac",
+          "title": "userAuthentication",
+          "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+          "file": "/test/expressutcase.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "0a9b389f-a7ea-4f34-94bb-8cf362f0462c",
+              "title": "UserRegister",
+              "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+              "file": "/test/expressutcase.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [],
+              "suites": [
+                {
+                  "uuid": "4c8db2e0-5827-4bce-a00b-5da5bddd4406",
+                  "title": "POST /register",
+                  "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+                  "file": "/test/expressutcase.js",
+                  "beforeHooks": [],
+                  "afterHooks": [],
+                  "tests": [
+                    {
+                      "title": "register success",
+                      "fullTitle": "userAuthentication UserRegister POST /register register success",
+                      "timedOut": false,
+                      "duration": 15,
+                      "state": "failed",
+                      "speed": null,
+                      "pass": false,
+                      "fail": true,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/register')\n  .send(user)\n  .expect(200)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      message: 'User registered successful'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {
+                        "message": "TypeError: Cannot read property 'body' of undefined",
+                        "estack": "TypeError: Cannot read property 'body' of undefined\n    at Test.<anonymous> (test/expressutcase.js:49:17)\n    at Test.assert (node_modules/supertest/lib/test.js:181:6)\n    at localAssert (node_modules/supertest/lib/test.js:131:12)\n    at /Users/lisheng/mygit/vvvictorlee/transfersite/node_modules/supertest/lib/test.js:128:5\n    at Test.Request.callback (node_modules/superagent/lib/node/index.js:728:3)\n    at ClientRequest.<anonymous> (node_modules/superagent/lib/node/index.js:647:10)\n    at Socket.socketErrorListener (_http_client.js:406:9)\n    at emitErrorNT (internal/streams/destroy.js:91:8)\n    at emitErrorAndCloseNT (internal/streams/destroy.js:59:3)\n    at processTicksAndRejections (internal/process/task_queues.js:80:21)",
+                        "diff": null
+                      },
+                      "uuid": "c315bd65-1d35-4092-8833-72f8f5743ba7",
+                      "parentUUID": "4c8db2e0-5827-4bce-a00b-5da5bddd4406",
+                      "isHook": false,
+                      "skipped": false
+                    },
+                    {
+                      "title": "repeated registration failure.",
+                      "fullTitle": "userAuthentication UserRegister POST /register repeated registration failure.",
+                      "timedOut": false,
+                      "duration": 2,
+                      "state": "failed",
+                      "speed": null,
+                      "pass": false,
+                      "fail": true,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/register')\n  .send(user)\n  .expect(500)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      err: 'REGISTER_FAILURE'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {
+                        "message": "TypeError: Cannot read property 'body' of undefined",
+                        "estack": "TypeError: Cannot read property 'body' of undefined\n    at Test.<anonymous> (test/expressutcase.js:62:17)\n    at Test.assert (node_modules/supertest/lib/test.js:181:6)\n    at localAssert (node_modules/supertest/lib/test.js:131:12)\n    at /Users/lisheng/mygit/vvvictorlee/transfersite/node_modules/supertest/lib/test.js:128:5\n    at Test.Request.callback (node_modules/superagent/lib/node/index.js:728:3)\n    at ClientRequest.<anonymous> (node_modules/superagent/lib/node/index.js:647:10)\n    at Socket.socketErrorListener (_http_client.js:406:9)\n    at emitErrorNT (internal/streams/destroy.js:91:8)\n    at emitErrorAndCloseNT (internal/streams/destroy.js:59:3)\n    at processTicksAndRejections (internal/process/task_queues.js:80:21)",
+                        "diff": null
+                      },
+                      "uuid": "4cdaee74-d485-437e-9994-07f3ccfd9544",
+                      "parentUUID": "4c8db2e0-5827-4bce-a00b-5da5bddd4406",
+                      "isHook": false,
+                      "skipped": false
+                    }
+                  ],
+                  "suites": [],
+                  "passes": [],
+                  "failures": [
+                    "c315bd65-1d35-4092-8833-72f8f5743ba7",
+                    "4cdaee74-d485-437e-9994-07f3ccfd9544"
+                  ],
+                  "pending": [],
+                  "skipped": [],
+                  "duration": 17,
+                  "root": false,
+                  "rootEmpty": false,
+                  "_timeout": 2000
+                }
+              ],
+              "passes": [],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 0,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            },
+            {
+              "uuid": "39edee9d-77e6-4557-8a41-ef439aabd9e9",
+              "title": "UserLogin",
+              "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+              "file": "/test/expressutcase.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [],
+              "suites": [
+                {
+                  "uuid": "efcba76d-466c-42b2-881c-12021ac0f443",
+                  "title": "POST /login",
+                  "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+                  "file": "/test/expressutcase.js",
+                  "beforeHooks": [],
+                  "afterHooks": [],
+                  "tests": [
+                    {
+                      "title": "login success",
+                      "fullTitle": "userAuthentication UserLogin POST /login login success",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": "failed",
+                      "speed": null,
+                      "pass": false,
+                      "fail": true,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/login')\n  .send(user)\n  .expect(200)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      message: 'Authentication Success'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {
+                        "message": "TypeError: Cannot read property 'body' of undefined",
+                        "estack": "TypeError: Cannot read property 'body' of undefined\n    at Test.<anonymous> (test/expressutcase.js:80:17)\n    at Test.assert (node_modules/supertest/lib/test.js:181:6)\n    at localAssert (node_modules/supertest/lib/test.js:131:12)\n    at /Users/lisheng/mygit/vvvictorlee/transfersite/node_modules/supertest/lib/test.js:128:5\n    at Test.Request.callback (node_modules/superagent/lib/node/index.js:728:3)\n    at ClientRequest.<anonymous> (node_modules/superagent/lib/node/index.js:647:10)\n    at Socket.socketErrorListener (_http_client.js:406:9)\n    at emitErrorNT (internal/streams/destroy.js:91:8)\n    at emitErrorAndCloseNT (internal/streams/destroy.js:59:3)\n    at processTicksAndRejections (internal/process/task_queues.js:80:21)",
+                        "diff": null
+                      },
+                      "uuid": "56396acc-398c-48ff-a7a3-1c5837b049d5",
+                      "parentUUID": "efcba76d-466c-42b2-881c-12021ac0f443",
+                      "isHook": false,
+                      "skipped": false
+                    },
+                    {
+                      "title": "USER_NOT_EXIST.",
+                      "fullTitle": "userAuthentication UserLogin POST /login USER_NOT_EXIST.",
+                      "timedOut": false,
+                      "duration": 1,
+                      "state": "failed",
+                      "speed": null,
+                      "pass": false,
+                      "fail": true,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/login')\n  .send({\n    username: 'a',\n    password: 'admin'\n  })\n  .expect(200)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      err: 'USER_NOT_EXIST'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {
+                        "message": "TypeError: Cannot read property 'body' of undefined",
+                        "estack": "TypeError: Cannot read property 'body' of undefined\n    at Test.<anonymous> (test/expressutcase.js:96:17)\n    at Test.assert (node_modules/supertest/lib/test.js:181:6)\n    at localAssert (node_modules/supertest/lib/test.js:131:12)\n    at /Users/lisheng/mygit/vvvictorlee/transfersite/node_modules/supertest/lib/test.js:128:5\n    at Test.Request.callback (node_modules/superagent/lib/node/index.js:728:3)\n    at ClientRequest.<anonymous> (node_modules/superagent/lib/node/index.js:647:10)\n    at Socket.socketErrorListener (_http_client.js:406:9)\n    at emitErrorNT (internal/streams/destroy.js:91:8)\n    at emitErrorAndCloseNT (internal/streams/destroy.js:59:3)\n    at processTicksAndRejections (internal/process/task_queues.js:80:21)",
+                        "diff": null
+                      },
+                      "uuid": "e25f5e5a-3c79-4b6e-bc25-3fbd90efb3a8",
+                      "parentUUID": "efcba76d-466c-42b2-881c-12021ac0f443",
+                      "isHook": false,
+                      "skipped": false
+                    }
+                  ],
+                  "suites": [],
+                  "passes": [],
+                  "failures": [
+                    "56396acc-398c-48ff-a7a3-1c5837b049d5",
+                    "e25f5e5a-3c79-4b6e-bc25-3fbd90efb3a8"
+                  ],
+                  "pending": [],
+                  "skipped": [],
+                  "duration": 1,
+                  "root": false,
+                  "rootEmpty": false,
+                  "_timeout": 2000
+                }
+              ],
+              "passes": [],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 0,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            },
+            {
+              "uuid": "fa97bd56-2fde-439d-b176-089038a898c6",
+              "title": "UserAuthInfo",
+              "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+              "file": "/test/expressutcase.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [],
+              "suites": [
+                {
+                  "uuid": "af98fdda-dfad-4e81-be4f-7109bc066460",
+                  "title": "GET /api/v1/auth/",
+                  "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+                  "file": "/test/expressutcase.js",
+                  "beforeHooks": [
+                    {
+                      "title": "\"before each\" hook for \"The current User was not login.\"",
+                      "fullTitle": "userAuthentication UserAuthInfo GET /api/v1/auth/ \"before each\" hook for \"The current User was not login.\"",
+                      "timedOut": true,
+                      "duration": 2005,
+                      "state": "failed",
+                      "speed": null,
+                      "pass": false,
+                      "fail": true,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/login')\n  .send(user)\n  .set('Accept', 'application/json')\n  .end(function(err, res) {\n    if (!err) {\n      userCookie = res.header['set-cookie'];\n      done();\n    }\n  });",
+                      "err": {
+                        "message": "Error: Timeout of 2000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves. (/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js)",
+                        "estack": "Error: Timeout of 2000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves. (/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js)\n    at listOnTimeout (internal/timers.js:531:17)\n    at processTimers (internal/timers.js:475:7)",
+                        "diff": null
+                      },
+                      "uuid": "087d6ea9-24c2-4f91-96b2-1085d3c36c23",
+                      "parentUUID": "af98fdda-dfad-4e81-be4f-7109bc066460",
+                      "isHook": true,
+                      "skipped": false
+                    }
+                  ],
+                  "afterHooks": [],
+                  "tests": [
+                    {
+                      "title": "The current User was not login.",
+                      "fullTitle": "userAuthentication UserAuthInfo GET /api/v1/auth/ The current User was not login.",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": null,
+                      "speed": null,
+                      "pass": false,
+                      "fail": false,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .get('/api/v1/auth/')\n  .set('Accept', 'application/json')\n  .expect('Content-Type', /json/)\n  .expect(401)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      err: 'NOT_LOGIN'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {},
+                      "uuid": "5ea93f7e-abfb-4626-a995-43422764c8c7",
+                      "parentUUID": "af98fdda-dfad-4e81-be4f-7109bc066460",
+                      "isHook": false,
+                      "skipped": true
+                    },
+                    {
+                      "title": "The username of the current user.",
+                      "fullTitle": "userAuthentication UserAuthInfo GET /api/v1/auth/ The username of the current user.",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": null,
+                      "speed": null,
+                      "pass": false,
+                      "fail": false,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .get('/api/v1/auth/')\n  .set('Cookie', userCookie)\n  .expect(200)\n  .end(function(err, res) {\n    res.body.should.have.keys('username');\n    if (err) throw err;\n    done();\n  });",
+                      "err": {},
+                      "uuid": "4fb79e63-3749-4d0c-9066-0c90b370a836",
+                      "parentUUID": "af98fdda-dfad-4e81-be4f-7109bc066460",
+                      "isHook": false,
+                      "skipped": true
+                    }
+                  ],
+                  "suites": [],
+                  "passes": [],
+                  "failures": [],
+                  "pending": [],
+                  "skipped": [
+                    "5ea93f7e-abfb-4626-a995-43422764c8c7",
+                    "4fb79e63-3749-4d0c-9066-0c90b370a836"
+                  ],
+                  "duration": 0,
+                  "root": false,
+                  "rootEmpty": false,
+                  "_timeout": 2000
+                }
+              ],
+              "passes": [],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 0,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            },
+            {
+              "uuid": "db05a193-e7b3-414f-8753-365626c08ed0",
+              "title": "UserLogout",
+              "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+              "file": "/test/expressutcase.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [],
+              "suites": [
+                {
+                  "uuid": "151016d4-bc68-4a36-8d17-68f500b0be61",
+                  "title": "GET /logout",
+                  "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+                  "file": "/test/expressutcase.js",
+                  "beforeHooks": [
+                    {
+                      "title": "\"before each\" hook for \"NOT_LOGIN.\"",
+                      "fullTitle": "userAuthentication UserLogout GET /logout \"before each\" hook for \"NOT_LOGIN.\"",
+                      "timedOut": true,
+                      "duration": 2003,
+                      "state": "failed",
+                      "speed": null,
+                      "pass": false,
+                      "fail": true,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/login')\n  .send(user)\n  .set('Accept', 'application/json')\n  .end(function(err, res) {\n    if (!err) {\n      userCookie = res.header['set-cookie'];\n      done();\n    }\n  });",
+                      "err": {
+                        "message": "Error: Timeout of 2000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves. (/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js)",
+                        "estack": "Error: Timeout of 2000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves. (/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js)\n    at listOnTimeout (internal/timers.js:531:17)\n    at processTimers (internal/timers.js:475:7)",
+                        "diff": null
+                      },
+                      "uuid": "0786da59-e6ca-4c3d-9fa7-5874f3f20bdb",
+                      "parentUUID": "151016d4-bc68-4a36-8d17-68f500b0be61",
+                      "isHook": true,
+                      "skipped": false
+                    }
+                  ],
+                  "afterHooks": [],
+                  "tests": [
+                    {
+                      "title": "NOT_LOGIN.",
+                      "fullTitle": "userAuthentication UserLogout GET /logout NOT_LOGIN.",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": null,
+                      "speed": null,
+                      "pass": false,
+                      "fail": false,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .get('/api/v1/auth/logout')\n  .expect(401)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      err: 'NOT_LOGIN'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {},
+                      "uuid": "a0d231ea-7b33-4ad6-801b-5a356c130cbc",
+                      "parentUUID": "151016d4-bc68-4a36-8d17-68f500b0be61",
+                      "isHook": false,
+                      "skipped": true
+                    },
+                    {
+                      "title": "logout successful.",
+                      "fullTitle": "userAuthentication UserLogout GET /logout logout successful.",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": null,
+                      "speed": null,
+                      "pass": false,
+                      "fail": false,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .get('/api/v1/auth/logout')\n  .set('Cookie', userCookie)\n  .expect(200)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      message: 'logout successful'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {},
+                      "uuid": "a844fa24-b163-42f2-96a8-989ad1ba7234",
+                      "parentUUID": "151016d4-bc68-4a36-8d17-68f500b0be61",
+                      "isHook": false,
+                      "skipped": true
+                    }
+                  ],
+                  "suites": [],
+                  "passes": [],
+                  "failures": [],
+                  "pending": [],
+                  "skipped": [
+                    "a0d231ea-7b33-4ad6-801b-5a356c130cbc",
+                    "a844fa24-b163-42f2-96a8-989ad1ba7234"
+                  ],
+                  "duration": 0,
+                  "root": false,
+                  "rootEmpty": false,
+                  "_timeout": 2000
+                }
+              ],
+              "passes": [],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 0,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            },
+            {
+              "uuid": "66a85229-2af7-452e-a779-92a6653b1752",
+              "title": "UserChangePassword",
+              "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+              "file": "/test/expressutcase.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [],
+              "suites": [
+                {
+                  "uuid": "cb75b757-a096-4a6c-bbd0-b158ae503fd3",
+                  "title": "POST /changepassword",
+                  "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+                  "file": "/test/expressutcase.js",
+                  "beforeHooks": [
+                    {
+                      "title": "\"before all\" hook for \"change password successful\"",
+                      "fullTitle": "userAuthentication UserChangePassword POST /changepassword \"before all\" hook for \"change password successful\"",
+                      "timedOut": false,
+                      "duration": 1,
+                      "state": "failed",
+                      "speed": null,
+                      "pass": false,
+                      "fail": true,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/register')\n  .send(user2)\n  .end(function(err, res) {\n    if (err) throw err;\n    done();\n  });",
+                      "err": {
+                        "message": "Error: ECONNREFUSED: Connection refused",
+                        "estack": "Error: ECONNREFUSED: Connection refused\n    at Test.assert (node_modules/supertest/lib/test.js:165:15)\n    at localAssert (node_modules/supertest/lib/test.js:131:12)\n    at /Users/lisheng/mygit/vvvictorlee/transfersite/node_modules/supertest/lib/test.js:128:5\n    at Test.Request.callback (node_modules/superagent/lib/node/index.js:728:3)\n    at ClientRequest.<anonymous> (node_modules/superagent/lib/node/index.js:647:10)\n    at Socket.socketErrorListener (_http_client.js:406:9)\n    at emitErrorNT (internal/streams/destroy.js:91:8)\n    at emitErrorAndCloseNT (internal/streams/destroy.js:59:3)\n    at processTicksAndRejections (internal/process/task_queues.js:80:21)",
+                        "diff": null
+                      },
+                      "uuid": "fbd8dddf-55c2-49ba-8660-e9662be434ac",
+                      "parentUUID": "cb75b757-a096-4a6c-bbd0-b158ae503fd3",
+                      "isHook": true,
+                      "skipped": false
+                    },
+                    {
+                      "title": "\"before all\" hook",
+                      "fullTitle": "userAuthentication UserChangePassword POST /changepassword \"before all\" hook",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": null,
+                      "speed": null,
+                      "pass": false,
+                      "fail": false,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/login')\n  .send(user2)\n  .set('Accept', 'application/json')\n  .end(function(err, res) {\n    if (!err) {\n      userCookie = res.header['set-cookie'];\n      done();\n    }\n  });",
+                      "err": {},
+                      "uuid": "19e04939-2164-4bab-aef3-d95888cc0627",
+                      "parentUUID": "cb75b757-a096-4a6c-bbd0-b158ae503fd3",
+                      "isHook": true,
+                      "skipped": false
+                    }
+                  ],
+                  "afterHooks": [],
+                  "tests": [
+                    {
+                      "title": "change password successful",
+                      "fullTitle": "userAuthentication UserChangePassword POST /changepassword change password successful",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": null,
+                      "speed": null,
+                      "pass": false,
+                      "fail": false,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/changepassword')\n  .set('Cookie', userCookie)\n  .send(newUser2)\n  .expect(200)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      message: 'change password successful'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {},
+                      "uuid": "035fc48d-21aa-46fa-adb5-05cee5972cbf",
+                      "parentUUID": "cb75b757-a096-4a6c-bbd0-b158ae503fd3",
+                      "isHook": false,
+                      "skipped": true
+                    },
+                    {
+                      "title": "AUTHENTICATE_FAILURE",
+                      "fullTitle": "userAuthentication UserChangePassword POST /changepassword AUTHENTICATE_FAILURE",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": null,
+                      "speed": null,
+                      "pass": false,
+                      "fail": false,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/changepassword')\n  .set('Cookie', userCookie)\n  .send(newUser2)\n  .expect(401)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      err: 'AUTHENTICATE_FAILURE'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {},
+                      "uuid": "dc64925a-1102-4f70-bc62-1450d4a86d80",
+                      "parentUUID": "cb75b757-a096-4a6c-bbd0-b158ae503fd3",
+                      "isHook": false,
+                      "skipped": true
+                    }
+                  ],
+                  "suites": [],
+                  "passes": [],
+                  "failures": [],
+                  "pending": [],
+                  "skipped": [
+                    "035fc48d-21aa-46fa-adb5-05cee5972cbf",
+                    "dc64925a-1102-4f70-bc62-1450d4a86d80"
+                  ],
+                  "duration": 0,
+                  "root": false,
+                  "rootEmpty": false,
+                  "_timeout": 2000
+                }
+              ],
+              "passes": [],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 0,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            },
+            {
+              "uuid": "f8f4051d-761f-40c0-a536-6b71b9c0a868",
+              "title": "UserDelete",
+              "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+              "file": "/test/expressutcase.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [],
+              "suites": [
+                {
+                  "uuid": "ebd77611-619e-40de-b734-a3f61896ff8e",
+                  "title": "DELETE /user/:username",
+                  "fullFile": "/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js",
+                  "file": "/test/expressutcase.js",
+                  "beforeHooks": [
+                    {
+                      "title": "\"before each\" hook for \"NOT_LOGIN.\"",
+                      "fullTitle": "userAuthentication UserDelete DELETE /user/:username \"before each\" hook for \"NOT_LOGIN.\"",
+                      "timedOut": true,
+                      "duration": 2001,
+                      "state": "failed",
+                      "speed": null,
+                      "pass": false,
+                      "fail": true,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .post('/api/v1/auth/login')\n  .send(user)\n  .set('Accept', 'application/json')\n  .end(function(err, res) {\n    if (!err) {\n      userCookie = res.header['set-cookie'];\n      done();\n    }\n  });",
+                      "err": {
+                        "message": "Error: Timeout of 2000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves. (/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js)",
+                        "estack": "Error: Timeout of 2000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves. (/Users/lisheng/mygit/vvvictorlee/transfersite/test/expressutcase.js)\n    at listOnTimeout (internal/timers.js:531:17)\n    at processTimers (internal/timers.js:475:7)",
+                        "diff": null
+                      },
+                      "uuid": "63f61d63-7f69-436f-bc3f-ce218d6913b8",
+                      "parentUUID": "ebd77611-619e-40de-b734-a3f61896ff8e",
+                      "isHook": true,
+                      "skipped": false
+                    }
+                  ],
+                  "afterHooks": [],
+                  "tests": [
+                    {
+                      "title": "NOT_LOGIN.",
+                      "fullTitle": "userAuthentication UserDelete DELETE /user/:username NOT_LOGIN.",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": null,
+                      "speed": null,
+                      "pass": false,
+                      "fail": false,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .delete(`/api/v1/auth/user/${user.username}`)\n  .expect(401)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      err: 'NOT_LOGIN'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {},
+                      "uuid": "fe66480b-cacf-453b-9aa0-7f21ab75f79b",
+                      "parentUUID": "ebd77611-619e-40de-b734-a3f61896ff8e",
+                      "isHook": false,
+                      "skipped": true
+                    },
+                    {
+                      "title": "delete user success",
+                      "fullTitle": "userAuthentication UserDelete DELETE /user/:username delete user success",
+                      "timedOut": false,
+                      "duration": 0,
+                      "state": null,
+                      "speed": null,
+                      "pass": false,
+                      "fail": false,
+                      "pending": false,
+                      "context": null,
+                      "code": "request(url)\n  .delete(`/api/v1/auth/user/${user.username}`)\n  .set('Cookie', userCookie)\n  .expect(200)\n  .end(function(err, res) {\n    res.body.should.containEql({\n      message: 'Delete User Successful'\n    });\n    if (err) throw err;\n    done();\n  });",
+                      "err": {},
+                      "uuid": "baaa0561-ba02-4e5c-820b-94ecf028fc42",
+                      "parentUUID": "ebd77611-619e-40de-b734-a3f61896ff8e",
+                      "isHook": false,
+                      "skipped": true
+                    }
+                  ],
+                  "suites": [],
+                  "passes": [],
+                  "failures": [],
+                  "pending": [],
+                  "skipped": [
+                    "fe66480b-cacf-453b-9aa0-7f21ab75f79b",
+                    "baaa0561-ba02-4e5c-820b-94ecf028fc42"
+                  ],
+                  "duration": 0,
+                  "root": false,
+                  "rootEmpty": false,
+                  "_timeout": 2000
+                }
+              ],
+              "passes": [],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 0,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "8.1.3"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "6.1.1"
+    },
+    "marge": {
+      "options": null,
+      "version": "5.1.0"
+    }
+  }
+}

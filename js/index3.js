@@ -5,6 +5,14 @@
 // let b = s.substr(s.lastIndexOf("_")+1);
 // console.log(b);
 
+// const mySet = new Set();
+// mySet.add(1); // [1]
+// mySet.add(5); // [1, 5]
+// mySet.add(5); // [1, 5]，重複的元素不會被加進去，依然是
+// // mySet.add(obj); // [ 1, 5, { foo: 'bar' } ]
+
+// console.log(mySet.has(5)); // true
+// return 
 // let handlers = {
 //     "get_reward_list": (async function () {
 //         console.log("a");
@@ -33,8 +41,15 @@
 // }
 
 const Web3 = require('web3');
+const jq = require('node-jq');
+const Debug = require('Debug');
 const util = require('./util');
 var BigNumber = require('bignumber.js')
+
+jq.run('.', {"2":"3","3":"4"},{ input: 'json' }).then(console.log);
+
+
+
 // // // Connect to local Ethereum node
 // const web3 = new Web3(new Web3.providers.HttpProvider("http://192.168.38.227:18045"));
 
@@ -66,7 +81,7 @@ const adminr_secrets = secrets.key;
 const REDEEM = "0x99B9Bc4Ca03C227d9cBe0960c416adDE7146026F";//"0x2a103D4F9d64B4124F0a2Dd556DEee0926A92527";//redeem.address;
 const REDEEM_ROPSTEN = "0x72c09d4fd187b4336fa4ab66e4360f626619483b";//"0x2a103D4F9d64B4124F0a2Dd556DEee0926A92527";//redeem.address;
 
-const TTOKEN_ = "0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5";
+const TTOKEN_ = "0x7e56c279f2cf775b8dda7cb334d5cef3f79aa8be";//"0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5";
 
 // const BN = require('BigNumber.js');
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/206de317234e48e28a7dd1abbd914e26'));
@@ -101,190 +116,12 @@ let tokens = ["0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5",
 
 (async function () {
 
-    // console.log("============");
-    // const r = await Redeem_Ropsten.methods._verifiedTokens(0).call();
-    // console.log(r);
-    // for (let i = 0; i < 3; i++) {
-    //     const s = await Redeem_Ropsten.methods.epochTimestamps(i + 1).call();
-    //     console.log(i,s);
-    // }
-    // const b = await web3.eth.getBlock("latest");//.toNumber();
-    // console.log(b.gasLimit);
-    // console.log(b);
-    // console.log("============");
-
-    // let result1 = await Redeem_Ropsten.methods.merkleRoots(1, 3).call({ from: user1 });
-    // console.log(result1);
-    // tokens.push(token);
-    // for (const t of tokens) {
-    //     result1 = await Redeem_Ropsten.methods.claimStatus(user1, t, 1, 3).call({ from: user1 });
-    //     console.log(t, result1);
-
-    //     let tc = new web3.eth.Contract(tabi, t);//0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63
-
-    //     let symbol = await tc.methods.symbol().call();
-    //     console.log("symbol==", symbol);
-    //     result1 = await tc.methods.balanceOf(user1).call();
-    //     console.log("user1 balance==", result1);
-    //     result1 = await tc.methods.balanceOf(REDEEM_ROPSTEN).call();
-    //     console.log("REDEEM_ROPSTEN balance==", result1);
-    // }
-
-
-    // result1 = await Redeem_Ropsten.methods.verifiedTokens().call({ from: admin });
-    // console.log("verifiedTokens", result1);
-
-
-    // var transactionObject = {
-    //             from: ownerAddress,
-    //             to: contractAddress,
-    //             gasLimit: web3.utils.toHex(3000000),
-    //             data: encodedABI,
-    //             value: value,
-    //             chainId: chainId,
-    //           nonce:nonce,
-    //         };
-
-    //   web3.eth.accounts.signTransaction(transactionObject, privateKey, function (err, signed) {
-    //             console.log("signTransaction err: " + err);
-    //             console.log("signTransaction signed: " + signed.rawTransaction);
-    //             web3.eth.sendSignedTransaction(signed.rawTransaction, function (err, res) {
-    //                 console.log(res,err)
-    //                 if (err == false) {
-    //                     var queryUpdate = "update withdrawals set status='sent', amount= " + row.amount + " where id=" + row.id
-    //                     connection.query(queryUpdate, function (error, results, fields) {
-    //                         if (error) {
-    //                             throw error;
-    //                         }
-    //                         console.log('The solution is: ', results);
-    //                     })
-    //                 }
-    //                 console.log("sendSignedTransaction  res: " + res);
-    //             });
-
-
-
-
-    //     let accounts = await web3.eth.getAccounts();
-
-    //     // console.log(accounts);
-
-    //     await web3.eth.personal.unlockAccount(admin, password);
-
-    //     let lastBlock = (await web3.eth.getBlock("latest"));
-    //     // console.log(lastBlock);
-    //     let firstBlock = (await web3.eth.getBlock(1));
-    //     let week2Block = (await web3.eth.getBlock(weekblocks));
-    //     // console.log(firstBlock);
-    //     // console.log(Redeem.methods);
-    //     // await Redeem.methods.finishWeek(1, firstBlock.timestamp, firstBlock.hash).send({from:admin});
-    //     // await Redeem.methods.seedAllocation(1, accounts[1], web3.utils.toWei("1000")).send({from:admin});
-    //     // await Redeem.methods.finishWeek(2, week2Block.timestamp, week2Block.hash).send({from:admin});
-
-    //     // await web3.eth.personal.unlockAccount(accounts[1], password);
-    //     // // let result = await Redeem.methods.balanceOf(accounts[1]).call({from:admin});
-    //     // // console.log(result);
-
-
-    //     // // await Redeem.methods.claim().send({ from: accounts[1] });
-
-    //     // // let result = await tbal.balanceOf(accounts[1]);
-    //     // let result = await TToken.methods.balanceOf(accounts[1]).call({ from: accounts[1] });
-    //     // console.log(result);
-
-    claim_list =
-        [
-            [
-                '2',
-                '0x8d3acd2969ca969188bd8b227dfca09e1691e263',
-                '163199999999999997823968',
-                [
-                    '0x52b04ba5fc6fd08885046c3fee1fb5bdc32ea25a56a512bdf2eba5d24c05bde6',
-                    '0xf894f4fa5b01663a5c96757d6995ecec708f9bcb342425b3f0066ddc8dbdfbc9',
-                    '0x55b1fafefb692848ab8d5df389af07cf6cc5bbdc7a99e0d12df8e373408afe0b',
-                    '0x58aa5b23258100fd504b5811bb63446bfa79c69c65685473044e8d59029d2823'
-                ]
-            ],
-            [
-                '2',
-                '0xc5201589361c2da2b07df626f1cab71b4255b16e',
-                '2149919969215164723726',
-                [
-                    '0xddc358c03df38abf2c03e668ce35439b46330f5225d7edeead5811585fe361c8',
-                    '0x3bfa036d6a370510e14915ff46793c1d395e3c22c43a353fc77e500add570dd6',
-                    '0xdfe85a982b198e0249e2ad7cedbd7a6b76fba12a3fb2b05dafa409607bcc3932',
-                    '0x3d00b8858f58efc9805110f02c582c351e3d27d2b2728e8661cdca2dc7267684'
-                ]
-            ],
-            [
-                '2',
-                '0xd044a67cbb3cbaa5219cb4e2ed165351c010f828',
-                '151299999999999998487000',
-                [
-                    '0xb340817a8517358add3cf3682801ace8ee7f41dc96bac379c4384cb0ad983142',
-                    '0xdf44f5e8cb1700395dfba78aaf22c2693fe4a61e3bec842cecbc2fce0989e82a',
-                    '0x65d21c6fdeecc72e3f53d568df74dc20e2739c1926e3d9461e14a505f89829e5',
-                    '0x58aa5b23258100fd504b5811bb63446bfa79c69c65685473044e8d59029d2823'
-                ]
-            ],
-            [
-                '2',
-                '0xe59eb769a705443936a043b07ec1892b448ca24d',
-                '163199999999999999852928',
-                [
-                    '0x6425d09182a9fd81ceee391e5fc5c34608654c1d0b4b182bfe0bbfe68937468f',
-                    '0xf894f4fa5b01663a5c96757d6995ecec708f9bcb342425b3f0066ddc8dbdfbc9',
-                    '0x55b1fafefb692848ab8d5df389af07cf6cc5bbdc7a99e0d12df8e373408afe0b',
-                    '0x58aa5b23258100fd504b5811bb63446bfa79c69c65685473044e8d59029d2823'
-                ]
-            ]
-        ];
-
-    // const gas = await Redeem_Ropsten.methods.claimEpochs(
-    //     user1,
-    //     claim_list
-    // ).estimateGas({ from: adminr });
-    // console.log(gas);
-
-    for (const ctbp of claim_list) {
-        const [cycle, token, balance, proof] = ctbp;
-        console.log("ctbp===", ctbp);
-
-        let result = await Redeem_Ropsten.methods.verifyClaim(user1, cycle, token, balance, proof).call({ from: user1 });
-        console.log("verifyClaim==",result);
-
-        const gas = await Redeem_Ropsten.methods.claimEpoch(
-            user1,
-            cycle, token, balance, proof
-        ).estimateGas({ from: user1 });
-        console.log("claimEpoch  gas ==",gas);
-
-        // sleep.msleep(para.symbol_interval);
-    }
-
-
-    // const abi = await Redeem_Ropsten.methods.verify(
-    //     tokens[1],
-    // ).estimateGas({from:adminr,gas:web3.utils.toHex(2100000),value:0x00});
-
+console.log("---------");
+let jsonstr= await jq.run('.', 'data/token_symbols.json', { output: 'pretty' });
+console.log(jsonstr);
+// const user = "0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB"
+// let balance =  await erc20.methods.balanceOf(user).call();
+// console.log(balance);
+  const block = web3.eth.getBlock("latest");
 
 })();
-
-// const {getJsonFileList} = require("./getJsonFileList.js")
-
-// const s = getJsonFileList("/Users/lisheng/mygit/vvvictorlee/transfersite1");
-// console.log(s);
-
-
-// const weekblocks = 40320 + 10;
-
-// //step 1
-// instanceToken();
-// //step 2
-// instanceRedeem();
-
-// //step 3
-// //mint(admin);
-
-// //step 4 tran
-

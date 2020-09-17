@@ -4,12 +4,21 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "deploy": ""
+    "mochawesome": "./node_modules/.bin/mocha --reporter mochawesome",
+    "dev": "node index.js",
+    "start:dev": "node  -r dotenv/config index.js dotenv_config_path=.env.dev",
+    "build:one": "node --inspect-brk -r dotenv/config scripts/build.js dotenv_config_path=.env.one",
+    "test": "node scripts/test.js"
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",
     "dotenv": "^8.2.0",
+    "mocha": "^8.1.3",
+    "mochawesome": "^6.1.1",
+    "node-jq": "^1.11.2",
+    "should": "^13.2.3",
     "solc": "^0.5.12",
+    "supertest": "^4.0.2",
     "web3": "^1.2.11"
   }
 }
