@@ -29,8 +29,8 @@ var request_cache = {
 app.post('/farm/', function (req, res) {
     console.log(JSON.stringify(req.body));
     let handlers = {
-        "get_eth_pairs": (async function () {
-            let ethPairs = await app_handler.getEthPairs(req.body.address); 
+        "get_eth_pairs_info": (async function () {
+            let ethPairs = await app_handler.getEthPairsInfo(req.body.address); 
             res.json(ethPairs);
 
         }),

@@ -20,9 +20,11 @@ var redeem = new web3.eth.Contract(redeem_abi, process.env.CONTRACT_REDEEM);
 var pair_token_symbols_json = 'data/pair_token_symbols.json';
 var pair_token_filter_json = 'data/filter.json';
 
-async function getEthPairs(addr) {
-    if (addr == undefined || addr == null || addr == "") {
-        return { "result": "invalid address" };
+async function getEthPairsInfo(addr) {
+    let address = "";
+    if (addr != undefined) {
+        // return { "result": "invalid address" };
+        address = addr;
     }
 
     console.log("=====getEthPairs=======");
@@ -72,13 +74,17 @@ async function getEthPairs(addr) {
             price = (reserve1 / reserve0).toFixed(6) * ethPrice;
         }
 
-        let balance = await stoken.methods.balanceOf(addr).call();
-        let released = await stoken.methods.totalSupply().call();
+        let balance = "0";
         let share = 0;
-        if (released > 0) {
-            share = (balance / released * 100).toFixed(2);
-        }
 
+        if (address != "") {
+            balance = await stoken.methods.balanceOf(address).call();
+            let released = await stoken.methods.totalSupply().call();
+
+            if (released > 0) {
+                share = (balance / released * 100).toFixed(2);
+            }
+        }
         let o = {
             pair: pa[0],
             price: Number(price).toFixed(2),
@@ -93,12 +99,16 @@ async function getEthPairs(addr) {
     const r = await stoken.methods.getReserves().call();
     console.log(r);
     const price = (r._reserve1 * Math.pow(10, -6) / web3.utils.fromWei(r._reserve0)).toFixed(6);
-    let balance = await stoken.methods.balanceOf(addr).call();
-    let released = await stoken.methods.totalSupply().call();
+    let balance = 0;
     let share = 0;
-    if (released > 0) {
-        share = (balance / released * 100).toFixed(2);
+    if (address != "") {
+        balance = await stoken.methods.balanceOf(address).call();
+        let released = await stoken.methods.totalSupply().call();
+        if (released > 0) {
+            share = (balance / released * 100).toFixed(2);
+        }
     }
+
     let o = {
         pair: "SWP-USDT",
         price: Number(price).toFixed(2),
@@ -107,7 +117,7 @@ async function getEthPairs(addr) {
     };
     tokens.unshift(o);
 
-    console.log("tokens===", tokens);
+    console.table(tokens);
 
 
     return tokens;
@@ -182,7 +192,7 @@ async function getPairTokensInfo(addr) {
 
 
 
-    console.log("tokens===", tokens);
+    console.table( tokens);
 
 
     return tokens;
@@ -265,9 +275,9 @@ async function getPairsInfo() {
     item.rate = 5;
     tokens.unshift(item);
 
-    console.log("tokens===", tokens);
-
     tokens = await calculateApy(tokens);
+
+    console.table(tokens);
 
     return tokens;
 }
@@ -287,7 +297,6 @@ async function calculateApy(tokens) {
         return token
     });
 
-    console.table(tokens);
     return tokens;
 
 }
@@ -375,7 +384,7 @@ async function getSwpBalanceByAddress(addr) {
 
 
 module.exports = {
-    getEthPairs,
+    getEthPairsInfo,
     getPairTokensInfo,
     getPairsInfo,
     getSwpInfo,
