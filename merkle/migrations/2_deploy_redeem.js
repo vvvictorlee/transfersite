@@ -1,5 +1,6 @@
 const TToken = artifacts.require("./TToken.sol");
 const Redeem = artifacts.require("./MerkleRedeem.sol");
+const RedeemHelper = artifacts.require("./MerkleRedeemHelper.sol");
 const { utils } = web3;
 
 module.exports = (deployer, network, accounts) => {
@@ -17,6 +18,10 @@ module.exports = (deployer, network, accounts) => {
 
     await deployer.deploy(Redeem);
     const redeem = await Redeem.deployed();
+
+    await deployer.deploy(RedeemHelper);
+    const redeemHelper = await RedeemHelper.deployed();
+    redeemHelper.setAddress(redeem.address);
 
     // await token.transfer(redeem.address, utils.toWei("20000"));
   });

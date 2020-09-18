@@ -209,12 +209,8 @@ contract MerkleRedeem {
             if (_tokens[i] == address(0)) {
                 break;
             }
-            address t =  _tokens[i];
-            disburse(
-                _liquidityProvider,
-                t,
-                tokenTotalBalances[t]
-            );
+            address t = _tokens[i];
+            disburse(_liquidityProvider, t, tokenTotalBalances[t]);
 
             delete tokenTotalBalances[t];
         }
