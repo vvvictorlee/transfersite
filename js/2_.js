@@ -6,7 +6,7 @@ module.exports = {
 
 function loadJson2(fileName) {
     debug(fileName);
-    debug(process.env.APP_PORT);
+    debug(2,process.env.APP_PORT);
 }
 
 loadJson2("2");

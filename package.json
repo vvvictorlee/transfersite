@@ -6,9 +6,13 @@
   "scripts": {
     "mochawesome": "./node_modules/.bin/mocha --reporter mochawesome",
     "dev": "node index.js",
-    "start:dev": "node  -r dotenv/config index.js dotenv_config_path=.env.dev",
+    "s": " DEBUG=app node  -r dotenv/config index.js dotenv_config_path=.env.dev",
+    "start:dev": "export DEBUG=app && node  -r dotenv/config index.js dotenv_config_path=.env.dev",
     "build:one": "node --inspect-brk -r dotenv/config scripts/build.js dotenv_config_path=.env.one",
-    "test": "node scripts/test.js"
+    "tests": "node scripts/test.js",
+    "test": "export NODE_ENV=test PORT=3300 && mocha 'test/**/*.test.js' --exit",
+    "t": "export NODE_ENV=test PORT=3300 && mocha -g 'aa' --exit",
+    "cov": "export NODE_ENV=test PORT=3300 && nyc mocha --timeout 100000'test/**/*.test.js' --exit"
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",
@@ -16,6 +20,7 @@
     "mocha": "^8.1.3",
     "mochawesome": "^6.1.1",
     "node-jq": "^1.11.2",
+    "power-assert": "^1.6.1",
     "should": "^13.2.3",
     "solc": "^0.5.12",
     "supertest": "^4.0.2",

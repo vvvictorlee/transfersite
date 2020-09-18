@@ -6,6 +6,6 @@ const { loadJson4 } = require("./js/4_");
 
 
 loadJson("i1");
-loadJson("i2");
-loadJson("i3");
-loadJson("i4");
+loadJson2("i2");
+loadJson3("i3");
+loadJson4("i4");

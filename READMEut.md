@@ -6,6 +6,11 @@ npm install --save-dev mocha mochawesome should supertest
 ```
 复制代码在scripts中添加命令
 ```
+ "scripts": {
+    "start": "SET NODE_ENV=dev && node server.js",
+    "test": "mocha --timeout 10000"
+  }
+
 "mochawesome": "./node_modules/.bin/mocha --reporter mochawesome",
 "dev": "node index.js"
 ```
@@ -313,9 +318,6 @@ mocha 的 --grep 选项:
 1
 -g, --grep <pattern>            only run tests matching <pattern>
 还可以使用正则表达式进行匹配，例如 test.js:
-
-
-
 
 
 

@@ -5,7 +5,8 @@ module.exports = {
 };
 
 function loadJson(fileName) {
-    debug(process.env.APP_PORT);
+    debug(fileName);
+    debug(1,process.env.APP_PORT);
 }
 
 loadJson("1");
