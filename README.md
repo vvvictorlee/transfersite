@@ -29,6 +29,7 @@ curl  -X POST --url https://farm-swapx.99ss.ml/farm/   -H "Content-Type: applica
 	"method": "get_swp_info"
 }'
 ```
+
 #### 应答
 ##### 数据说明
 - price     SWP价格
@@ -77,6 +78,15 @@ curl  -X POST --url https://farm-swapx.99ss.ml/farm/   -H "Content-Type: applica
 ##### 请求示例
 ```
 curl  -X POST --url http://192.168.38.227:3535/farm/   -H "Content-Type: application/json"  -d '{
+	"method": "get_pairs_info"
+}'
+
+
+curl  -X POST --url http://3.215.71.54:3535/farm/   -H "Content-Type: application/json"  -d '{
+	"method": "get_pairs_info"
+}'
+
+curl  -X POST --url https://app.swapx.org/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_pairs_info"
 }'
 

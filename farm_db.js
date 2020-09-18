@@ -23,7 +23,7 @@ var conn = wrapper(pool);
 
 // 获取奖励
 async function getSwpTotalByPToken() {
-    let sql_detail = "SELECT p_token,sum(swp_awards) amount FROM eth_data_ropsten.mining_data where cycle=(select max(cycle) from  eth_data_ropsten.mining_data) group by p_token;";
+    let sql_detail = "SELECT p_token,sum(swp_awards) amount FROM mining_data where cycle=(select max(cycle) from  mining_data) group by p_token;";
 
     var rows = await conn.query(sql_detail, null);
 
