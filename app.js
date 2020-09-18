@@ -77,3 +77,5 @@ app.listen(PORT, function () {
     console.log('mining redeem claim app listening on port ', PORT);
 });
 
+
+module.exports = app;
