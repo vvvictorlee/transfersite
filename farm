@@ -1,0 +1,9 @@
+require('dotenv').config();
+const app = require('./app');
+const PORT = process.env.APP_PORT;
+app.listen(PORT, function () {
+    console.log('mining redeem claim app listening on port ', PORT);
+});
+
+
+module.exports = app;
