@@ -1,8 +1,7 @@
 修改服务端口 .env  APP_PORT
 后台
-
 ```
-nohup node app.js &  
+nohup node  farm  &  
 ```
 修改数据库连接信息
 ```
@@ -704,7 +703,7 @@ curl  -X POST --url http://127.0.0.1:3535/farm/   -H "Content-Type: application/
 
 
 curl  -X POST --url http://127.0.0.1:3535/farm/   -H "Content-Type: application/json"  -d '{
-	"method": "get_eth_pairs",
+	"method": "get_eth_pairs_info",
 	"address": "0xbec1c22fa669bf17b9d2326beb9adce4fc697614"
 }'
 

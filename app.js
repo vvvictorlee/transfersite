@@ -19,63 +19,88 @@ app.use(function (req, res, next) {
     console.log('req ' + JSON.stringify(req.body))
     next()
 })
-// 总量页面缓存
-var request_cache = {
-    interval: 6000,
-    pairs_info_time: 0,
-    pairs_info_data: null
+const interval = process.env.CACHE_INTERVAL_MS || 6000;
+
+
+let cachedData = {};
+
+async function getData(key) {
+    let flag = cachedData.hasOwnProperty(key);
+    if (!flag) {
+        return null;
+    }
+    let data = cachedData[key];
+    if (data != undefined && data != null && data.info_data != null && Date.now() < data.info_time) {
+        return data.info_data;
+    }
+
+    return null;
 }
+
+async function putData(key, info_data) {
+    cachedData[key] = {
+        info_time: Date.now() + interval,
+        info_data: info_data
+    };
+}
+
 
 app.post('/farm/', function (req, res) {
     console.log(JSON.stringify(req.body));
     let handlers = {
         "get_eth_pairs_info": (async function () {
-            let ethPairs = await app_handler.getEthPairsInfo(req.body.address); 
-            res.json(ethPairs);
-
+            console.log("get eth pairs info");
+            let data = await app_handler.getEthPairsInfo(req.body.address);
+            return data;
         }),
         "get_pairtokens_info": (async function () {
-            let pairTokensInfo = await app_handler.getPairTokensInfo(req.body.address);
-            res.json(pairTokensInfo);
-
+            let data = await app_handler.getPairTokensInfo(req.body.address);
+            return data;
         }),
         "get_pairs_info": (async function () {
-            let pairsInfo = request_cache.pairs_info_data;
-            if (Date.now() > request_cache.pairs_info_time) {
-                request_cache.pairs_info_time = Date.now() + request_cache.interval;
-                pairsInfo = await app_handler.getPairsInfo();
-                request_cache.pairs_info_data = pairsInfo;
-            }
-            res.json(pairsInfo);
-
+            let data = await app_handler.getPairsInfo();
+            return data;
         }),
         "get_swp_info": (async function () {
             let swpInfo = await app_handler.getSwpInfo();
-            // swpInfo = { "result": "The  'get_swp_info' interface is disabled temporarily" };
-            res.json(swpInfo);
-
+            return data;
         }),
         "get_swp_balance": (async function () {
-            let swpInfo = await app_handler.getSwpBalanceByAddress(req.body.address);
-            // swpInfo = { "result": "The  'get_swp_info' interface is disabled temporarily" };
-            res.json(swpInfo);
-
+            let data = await app_handler.getSwpBalanceByAddress(req.body.address);
+            return data;
         }),
         "default": (async function () {
             res.json({ "result": "unknown method or method is empty" });
         })
 
     };
+    const key = req.body.method;
+    const handler = handlers[key] || handlers["default"];
+    (async function () {
+        let flag = handlers.hasOwnProperty(key);
+        let data = null;
+        if (!flag) {
+            await handler();
+            return;
+        }
 
-    const handler = handlers[req.body.method] || handlers["default"];
-    handler();
+        data = await getData(key);
+        if (null == data) {
+            console.log("null == data");
+            data = await handler();
+            await putData(key, data);
+        }
+        res.json(data);
+
+
+    })();
 
 });
 
-const PORT = process.env.APP_PORT;
-app.listen(PORT, function () {
-    console.log('mining redeem claim app listening on port ', PORT);
-});
+// const PORT = process.env.APP_PORT;
+// app.listen(PORT, function () {
+//     console.log('mining redeem claim app listening on port ', PORT);
+// });
 
 
 module.exports = app;

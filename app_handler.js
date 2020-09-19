@@ -20,7 +20,63 @@ var redeem = new web3.eth.Contract(redeem_abi, process.env.CONTRACT_REDEEM);
 var pair_token_symbols_json = 'data/pair_token_symbols.json';
 var pair_token_filter_json = 'data/filter.json';
 
-async function getEthPairsInfo(addr) {
+
+async function getEthPairsInfo() {
+
+    console.log("=====getEthPairs=======");
+
+
+    let ethPrice = 1;
+    let ethPairs = util.loadJson('data/eth_pairs.json');
+    let pair_addresses = Object.entries(ethPairs);
+
+    let tokens = [];
+    for (let pa of pair_addresses) {
+        //get pair token instance by pair  contract address 
+        let stoken = new web3.eth.Contract(stoken_abi, pa[1], {});
+        // console.log(stoken.methods);
+        const r = await stoken.methods.getReserves().call();
+        let ethreserve = web3.utils.fromWei(r._reserve1);
+
+        if (pa[0].indexOf("USDT") == 0) {
+            ethreserve = web3.utils.fromWei(r._reserve0);
+            ethPrice = (r._reserve1 * Math.pow(10, -6) / ethreserve).toFixed(6) * ethPrice;
+        }
+
+        // LP的单价=ETH数量/LP总量*2*ETH价格
+        let total = await stoken.methods.totalSupply().call();
+
+       let  price = ethreserve / web3.utils.fromWei(total)* 2 * ethPrice;
+
+        let o = {
+            pair: pa[0],
+            price: Number(price).toFixed(2)
+        };
+
+        tokens.push(o);
+    }
+
+    let stoken = new web3.eth.Contract(stoken_abi, process.env.SWP_USDT_PAIR_ADDRESS, {});
+    const r = await stoken.methods.getReserves().call();
+    const usdtreserve = r._reserve1 * Math.pow(10, -6);
+
+    let total = await stoken.methods.totalSupply().call();
+    const price = usdtreserve / web3.utils.fromWei(total) * 2;
+
+    let o = {
+        pair: "SWP-USDT",
+        price: Number(price).toFixed(2),
+    };
+    tokens.unshift(o);
+
+    console.table(tokens);
+
+
+    return tokens;
+}
+
+///////////////////////////
+async function getEthPairsInfoo(addr) {
     let address = "";
     if (addr != undefined) {
         // return { "result": "invalid address" };
@@ -28,7 +84,7 @@ async function getEthPairsInfo(addr) {
     }
 
     console.log("=====getEthPairs=======");
-
+    // LP的单价=ETH数量/LP总量*2*ETH价格
 
 
     // let wutoken = new web3.eth.Contract(stoken_abi, process.env.WETH_USDT_PAIR_ADDRESS, {});
@@ -192,7 +248,7 @@ async function getPairTokensInfo(addr) {
 
 
 
-    console.table( tokens);
+    console.table(tokens);
 
 
     return tokens;
