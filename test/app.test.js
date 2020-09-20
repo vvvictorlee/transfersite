@@ -32,7 +32,7 @@ describe('# test router api merchant', function () {
             .post(prefix) // 接口地址
             .send({
                 "method": "get_pairtokens_info",
-                "address": "0xbec1c22fa669bf17b9d2326beb9adce4fc697614"
+                "address": "0xFC9C4C0e17c3A3139a77d86282eCf18687C14780"
             })
             .expect(200) // 判断状态码
             .end(function (err, res) { // 请求结束后拿到返回的数据

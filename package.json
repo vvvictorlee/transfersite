@@ -11,7 +11,7 @@
     "t1": "export NODE_ENV=test PORT=3300 && mocha --timeout 100000 -g 'get_pairs_info'  --exit",
     "t2": "export NODE_ENV=test PORT=3300 && mocha --timeout 100000 -g 'get_swp_info'  --exit",
     "t3": "export NODE_ENV=test PORT=3300 && mocha --timeout 100000 -g 'get_swp_balance'  --exit",
-    "t4": "export NODE_ENV=test PORT=3300 && mocha --timeout 100000 -g 'get_pairtokens_info'  --exit",
+    "t4": "export NODE_ENV=test PORT=3300 && mocha --timeout 1000000 -g 'get_pairtokens_info'  --exit",
     "cov": "export NODE_ENV=test PORT=3300 && nyc mocha -f 'option'  --exit",
     "h": "mocha --help --exit"
   },

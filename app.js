@@ -52,8 +52,9 @@ app.post('/farm/', function (req, res) {
         })
 
     };
-    const key = req.body.method;
-    const handler = handlers[key] || handlers["default"];
+    const handler = handlers[req.body.method] || handlers["default"];
+    const key = req.body.method+"-"+(req.body.address==undefined?"":req.body.address);
+
     (async function () {
         let flag = handlers.hasOwnProperty(key);
         let data = null;
