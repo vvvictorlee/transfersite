@@ -192,7 +192,6 @@ async function getPairTokensInfo(addr) {
 
     //get all pairs from factory
     let len = await factory.methods.allPairsLength().call();
-    console.log(len);
     let yswps = await farm_db.getSwpTotalByPToken();
     console.log("ysw=", yswps);
     let tokens = [];
@@ -291,14 +290,9 @@ async function getPairsInfo() {
         let stoken = new web3.eth.Contract(stoken_abi, s, {});
         // console.log(stoken.methods);
         const r = await stoken.methods.getReserves().call();
-        console.log("getReserves==", r);
-        console.log("_reserve0==", r._reserve0);
-        console.log("_reserve1==", r._reserve1);
 
         const t0 = await stoken.methods.token0().call();
-        console.log("t0==", t0);
         const t1 = await stoken.methods.token1().call();
-        console.log("t1==", t1);
         let o = {
             token0: t0,
             token1: t1,

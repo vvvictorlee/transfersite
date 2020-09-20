@@ -86,4 +86,19 @@ describe('# test router api merchant', function () {
             });
     });
 
+    it('default', function (done) {
+        request
+            .post(prefix) // 接口地址
+            .send({
+                "method": "unknown method"
+            })
+            .expect(200) // 判断状态码
+            .end(function (err, res) { // 请求结束后拿到返回的数据
+                if (err) return done(err);
+                console.log(res.body);
+                done();
+            });
+    });
+
+
 });
