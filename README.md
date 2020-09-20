@@ -2,7 +2,7 @@
 后台
 
 ```
-nohup node app.js &  
+nohup node claim &  
 ```
 
 ### 部署注意事项

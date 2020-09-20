@@ -2,6 +2,7 @@ require('dotenv').config();
 var express = require('express');
 var bodyParser = require('body-parser');
 let app_handler = require("./app_handler");
+let cachedata = require("./cachedata");
 var app = express();
 
 app.use(bodyParser.json());
@@ -25,13 +26,13 @@ app.post('/claim/', function (req, res) {
 
     let handlers = {
         "get_reward_list": (async function () {
-            let rewardList = await app_handler.getRewardListByAddress(req.body.address);
-            res.json(rewardList);
+            const data = await app_handler.getRewardListByAddress(req.body.address);
+            return data;
         }),
         "claim_all_rewards": (async function () {
-            const data = await app_handler.claim_all(req.body.address, req.body.gas_limit);
+            const data = await app_handler.claimAllRewards(req.body.address, req.body.gas_limit);
             const result = data.length > 0 ? "success" : "fail";
-            res.json({ "result": result, "data": data });
+            return { "result": result, "data": data };
         }),
         "default": (async function () {
             res.json({ "result": "unknown method or method is empty" });
@@ -39,13 +40,33 @@ app.post('/claim/', function (req, res) {
 
     };
 
-    const handler = handlers[req.body.method] || handlers["default"];
-    handler();
+    const key = req.body.method;
+    const handler = handlers[key] || handlers["default"];
+    (async function () {
+        let flag = handlers.hasOwnProperty(key);
+        let data = null;
+        if (!flag) {
+            await handler();
+            return;
+        }
+
+        data = await cachedata.getData(key);
+        if (null == data) {
+            data = await handler();
+            await cachedata.putData(key, data);
+        }
+        res.json(data);
+
+
+    })();
 
 });
 
-const PORT = process.env.APP_PORT;
-app.listen(PORT, function () {
-    console.log('mining redeem claim app listening on port ', PORT);
-});
+// const PORT = process.env.APP_PORT;
+// app.listen(PORT, function () {
+//     console.log('mining redeem claim app listening on port ', PORT);
+// });
 
+
+
+module.exports = app;

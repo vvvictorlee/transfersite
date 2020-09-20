@@ -2,6 +2,7 @@ require('dotenv').config();
 var Web3 = require("web3");
 var util = require('./util');
 var redeem_db = require('./redeem_db');
+let cachedata = require("./cachedata");
 
 var sleep = require('sleep');
 
@@ -16,7 +17,7 @@ var redeem = new web3.eth.Contract(redeem_abi, process.env.CONTRACT_REDEEM);
 
 var erc20_abi = util.loadJson('abi/ERC20.json');
 
-var file_tokens = (process.env.TOKENS_LIST_JSON_PATH || "./")+'data/token_list.json';
+var file_tokens = (process.env.TOKENS_LIST_JSON_PATH || "./") + 'data/token_list.json';
 var token_symbols_json = './data/token_symbols.json';
 // const secrets = util.loadJson('data/secrets.json');
 
@@ -25,28 +26,52 @@ const password = process.env.PASSWORD;
 const epoch_reports_path = process.env.EPOCH_REPORTS_PATH || "/Users/lisheng/mygitddesk/mining-scripts-v2/reports/CR_";
 const admin_secrets = process.env.ADMIN_SECRETS;//secrets.key;//
 const chain_id = process.env.CHAIN_ID;
-const symbol_interval = process.env.SYMBOL_INTERVAL_MS;
-const claim_exec_by_admin  = 0;
+const symbol_interval = process.env.SYMBOL_INTERVAL_MS || 1000;
+const claim_exec_by_admin = 0;
+
+async function checkClaimStatus(addr) {
+    const flag = await cachedata.hasAddress(addr);
+    if (!flag) {
+        return;
+    }
+
+    const updateFlag = await redeem_db.updateClaimStatusByAddress(addr, redeem);
+
+    if (updateFlag) {
+        await cachedata.putAddress(addr, 0);
+        return;
+    }
+    await cachedata.putAddress(addr, Date.now());
+
+
+}
+
+/**
+ * 
+ * @param {*} addr   Account address
+ */
 async function getRewardListByAddress(addr) {
+    let err = "";
     try {
         addr = addr.toLowerCase();
 
-        await redeem_db.updateClaimStatusByAddress(addr, redeem);
+        await checkClaimStatus(addr);
+
         const token_symbols = await get_token_symbol();
         // console.log(token_symbols);
         return await redeem_db.getRewardListByAddress(addr, token_symbols, web3);
     } catch (error) {
         console.log(error);
+        err = error;
     }
-    return { "result": "unkonwn error" };
+    return { "result": "unkonwn error" + err };
 }
 
-async function claim_all(addr) {
-
+async function claimAllRewards(addr) {
+    let err = "";
     try {
         addr = addr.toLowerCase();
-
-        await redeem_db.updateClaimStatusByAddress(addr, redeem);
+        await checkClaimStatus(addr);
 
         let sizebalances = await redeem_db.getCycleRewardsByAddress(addr);
         if (sizebalances[0] == 0) {
@@ -69,12 +94,15 @@ async function claim_all(addr) {
 
         const encodedAbi = await claimProof(para, addr, balances);
         console.log("claim list====", encodedAbi);
+        await cachedata.putAddress(addr, 1);
+
         return encodedAbi;
     }
     catch (error) {
         console.error(error);
+        err = error;
     }
-    return "";
+    return err;
 }
 
 async function get_token_symbol() {
@@ -112,7 +140,7 @@ async function get_token_symbol() {
 
 module.exports = {
     getRewardListByAddress,
-    claim_all,
+    claimAllRewards ,
     get_token_symbol,
 };
 

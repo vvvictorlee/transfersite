@@ -1,9 +1,9 @@
 require('dotenv').config();
-
+let sleep = require('sleep');
 //引入数据库
 var mysql = require('mysql');
 var wrapper = require('co-mysql');
-
+const symbol_interval = process.env.SYMBOL_INTERVAL_MS||1000;
 
 module.exports = {
     updateClaimStatusByAddress,
@@ -28,19 +28,24 @@ async function updateClaimStatusByAddress(address, contract) {
     let sql_total = "SELECT  min(cycle) mincycle ,max(cycle) maxcycle,token  FROM cycle_reward WHERE addr=?  AND flag=0 GROUP BY token ORDER BY token";
 
     let tokens = await conn.query(sql_total, [address]);
-
+    let claimedFlag = false;
     let token_list = [];
     for (let i = 0; i < tokens.length; i++) {
         const mincycle = tokens[i].mincycle;
         const maxcycle = tokens[i].maxcycle;
         const token = tokens[i].token;
+        if (i > 0) {
+            sleep.msleep(symbol_interval);
+        }
         const results = await contract.methods.claimStatus(address, token, mincycle, maxcycle).call({ from: address });
         for (let j = 0; j < results.length; j++) {
             if (results[j]) {
                 //claimed
+                claimedFlag = true;
                 token_list.push([address, mincycle + j, token]);
             }
         }
+
     }
     console.log('getUnclaimedRewardListByAddress', token_list.length);
 
@@ -50,6 +55,8 @@ async function updateClaimStatusByAddress(address, contract) {
         let result = await conn.query(sql_update, token_list[i]);
         // console.log('updateClaimStatusByAddress', result);
     }
+
+    return claimedFlag;
 }
 
 // 获取指定账户地址奖励列表
@@ -98,7 +105,7 @@ async function getCycleRewardsByAddress(address) {
     }
     console.log('getCycleRewardsByAddress :', rows.length);
 
-    return [rows.length,cycle_tokens];
+    return [rows.length, cycle_tokens];
 }
 
 

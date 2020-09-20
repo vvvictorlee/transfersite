@@ -1,4 +1,17 @@
 {
+  "scripts": {
+    "mochawesome": "./node_modules/.bin/mocha --reporter mochawesome",
+    "dev": "node index.js",
+    "start:dev": "node  -r dotenv/config index.js dotenv_config_path=.env.dev",
+    "start:test": "node -r dotenv/config index.js dotenv_config_path=.env.test",
+    "build:one": "node --inspect-brk -r dotenv/config scripts/build.js dotenv_config_path=.env.one",
+    "tests": "node scripts/test.js",
+    "test": "export NODE_ENV=test PORT=3300 && mocha --timeout 100000 'test/**/*.test.js' --exit",
+    "t": "export NODE_ENV=test PORT=3300 && mocha --timeout 100000 -g 'get_eth_pairs_info'  --exit",
+    "tt": "export NODE_ENV=test PORT=3300 && mocha --timeout 100000 -g 'get_pairs_info'  --exit",
+    "cov": "export NODE_ENV=test PORT=3300 && nyc mocha -f 'option'  --exit",
+    "h": "mocha --help --exit"
+  },
   "dependencies": {
     "co": "^4.6.0",
     "co-mysql": "^1.0.0",
