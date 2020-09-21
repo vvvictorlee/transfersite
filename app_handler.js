@@ -228,9 +228,9 @@ async function getPairTokensInfo(addr) {
         const blocksOfDay = 5760;
         const lastBlock = await web3.eth.getBlock("latest");
         let ys = "0";
-
-        if (yswps[p] != undefined) {
-            ys = yswps[p].toString();
+        let pp = p.toLowerCase();
+        if (yswps[pp] != undefined) {
+            ys = yswps[pp].toString();
         }
 
         let o = {
