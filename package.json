@@ -10,6 +10,7 @@
     "start:dev": "export DEBUG=app && node  -r dotenv/config index.js dotenv_config_path=.env.dev",
     "build:one": "node --inspect-brk -r dotenv/config scripts/build.js dotenv_config_path=.env.one",
     "tests": "node scripts/test.js",
+    "helper": "node js/testmerkleredeemhelper.js ",
     "test": "export NODE_ENV=test PORT=3300 && mocha 'test/**/*.test.js' --exit",
     "t": "export NODE_ENV=test PORT=3300 && mocha -g 'aa' --exit",
     "cov": "export NODE_ENV=test PORT=3300 && nyc mocha --timeout 100000'test/**/*.test.js' --exit"

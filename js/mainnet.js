@@ -90,9 +90,11 @@ const latest_cycle = 8;
     // await tokebalances();
     // await merkleRoots();
     // await epochtimestamps();
-    await pairs();
+    // await pairs();
     // 写入文件
     // util.writeFile(token_symbols_json, []);
+  const block = await  web3.eth.getBlock("latest");
+    console.log(block.number);
 })();
 async function usageFunc() {
     console.log("Usage:b --buildSql epoch");

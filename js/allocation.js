@@ -26,8 +26,6 @@ const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-ropsten.alche
 
 // // wei是以太坊上的的最小单位，ether小数点后18位为一个wei
 
-// 
-
 let abi = require("../json/Redeem_Ropsten.json");///Users/lisheng/Downloads/defi/balancer/balancer-core-master/build/contracts/BFactory.json
 let Redeem_Ropsten = new web3.eth.Contract(abi, REDEEM_ROPSTEN, { "from": admin });//0x54e92B8C0a7Ea8DE6404A0F43DA1a90398467E63
 
