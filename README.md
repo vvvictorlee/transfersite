@@ -1,7 +1,9 @@
 修改服务端口 .env  APP_PORT
 后台
 ```
-nohup node  farm  &  
+nohup npm  farm:prod &  
+
+nohup yarn  farm:prod &  
 ```
 修改数据库连接信息
 ```
