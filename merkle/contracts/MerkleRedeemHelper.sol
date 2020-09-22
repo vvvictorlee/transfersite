@@ -16,7 +16,7 @@ contract MerkleRedeemHelper {
         _;
     }
 
-    function setAddress(address redeem) external onlyOwner {
+    function setRedeemAddress(address redeem) external onlyOwner {
         if (merkleRedeemAddress != redeem) {
             merkleRedeemAddress = redeem;
         } else {
