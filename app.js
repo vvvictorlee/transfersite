@@ -33,6 +33,7 @@ app.post('/farm/', function (req, res) {
         }),
         "get_pairtokens_info": (async function () {
             let data = await app_handler.getPairTokensInfo(req.body.address);
+            console.log(req.body.method);
             return data;
         }),
         "get_pairs_info": (async function () {
@@ -52,22 +53,27 @@ app.post('/farm/', function (req, res) {
         })
 
     };
-    const handler = handlers[req.body.method] || handlers["default"];
-    const key = req.body.method+"-"+(req.body.address==undefined?"":req.body.address);
+    const method = req.body.method||"";
+    const handler = handlers[method] || handlers["default"];
 
     (async function () {
-        let flag = handlers.hasOwnProperty(key);
+        let flag = handlers.hasOwnProperty(method);
         let data = null;
         if (!flag) {
             await handler();
             return;
         }
 
+        const key = method+ "-" + (req.body.address == undefined ? "" : req.body.address);
         data = await cachedata.getData(key);
         if (null == data) {
+            console.log(1,req.body.method);
             data = await handler();
+            console.log(2,req.body.method);
             await cachedata.putData(key, data);
+            console.log(req.body.method);
         }
+        console.log("res.json(data);");
         res.json(data);
 
 
