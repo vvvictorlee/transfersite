@@ -261,8 +261,9 @@ async function hasfilterTokens(ptoken) {
     let filter_set = new Set();
     if (!is_loaded_filter_json) {
         try {
-            const token_filter = util.loadJson(pair_token_filter_json);
+            let token_filter = util.loadJson(pair_token_filter_json);
             if (token_filter != undefined && token_filter.length > 0) {
+                token_filter = token_filter.map((token) => token.toLowerCase());
                 filter_set = new Set(token_filter);
             }
         } catch (error) {
@@ -270,7 +271,7 @@ async function hasfilterTokens(ptoken) {
         }
     }
 
-    if (filter_set.has(ptoken)) {
+    if (filter_set.has(ptoken.toLowerCase())) {
         return true;
     }
 
