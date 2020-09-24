@@ -44,31 +44,31 @@ curl  -X POST --url https://farm-swapx.99ss.ml/farm/   -H "Content-Type: applica
 ```
 
 
-### 1.2 获取指定账户SWP余额
+### 1.2 获取指定账户未领取SWP收益
 #### 请求
 ##### 参数说明：
-- method  方法名称 get_swp_balance
+- method  方法名称 get_unclaimed_swp_rewards
 - address 账户地址
 ##### 请求示例
 ```
 curl  -X POST --url http://192.168.38.227:3535/farm/   -H "Content-Type: application/json"  -d '{
-	"method": "get_swp_balance",
+	"method": "get_unclaimed_swp_rewards",
 	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
 
 
 curl  -X POST --url https://farm-swapx.99ss.ml/farm/   -H "Content-Type: application/json"  -d '{
-	"method": "get_swp_balance",
+	"method": "get_unclaimed_swp_rewards",
 	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
 }'
 ```
 #### 应答
 ##### 数据说明
-- balance   指定账户SWP余额
+- unclaimed_swp_rewards   指定账户SWP未领取SWP收益
 #####
 ```
-{
-	"balance": "0"
+{ 
+    unclaimed_swp_rewards: '566.178742328045483567' 
 }
 ```
 
