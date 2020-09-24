@@ -53,13 +53,13 @@ curl  -X POST --url https://farm-swapx.99ss.ml/farm/   -H "Content-Type: applica
 ```
 curl  -X POST --url http://192.168.38.227:3535/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_unclaimed_swp_rewards",
-	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
+	"address": "0x929378dbc9a1fdc0d05529e48097ff65c6902231"
 }'
 
 
 curl  -X POST --url https://farm-swapx.99ss.ml/farm/   -H "Content-Type: application/json"  -d '{
 	"method": "get_unclaimed_swp_rewards",
-	"address": "0x72c09d4fd187b4336fa4ab66e4360f626619483b"
+	"address": "0x929378dbc9a1fdc0d05529e48097ff65c6902231"
 }'
 ```
 #### 应答

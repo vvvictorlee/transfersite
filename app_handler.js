@@ -445,8 +445,8 @@ async function getSwpInfo() {
 
 async function getUnclaimedSwpRewardsByAddress(addr) {
     try {
-  
-        let unclaimed_swp_rewards = await farm_db.getUnclaimedSwpByAddress(addr.toLowerCase());
+        const swp_address = (process.env.SWP_ADDRESS||"0x0").toLowerCase();
+        let unclaimed_swp_rewards = await farm_db.getUnclaimedSwpByAddress(addr.toLowerCase(),swp_address);
 
         return { unclaimed_swp_rewards: web3.utils.fromWei(unclaimed_swp_rewards) };
 
