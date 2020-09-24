@@ -46,7 +46,7 @@ async function getEthPairsInfo() {
         // LP的单价=ETH数量/LP总量*2*ETH价格
         let total = await stoken.methods.totalSupply().call();
 
-       let  price = ethreserve / web3.utils.fromWei(total)* 2 * ethPrice;
+        let price = ethreserve / web3.utils.fromWei(total) * 2 * ethPrice;
 
         let o = {
             pair: pa[0],
@@ -199,10 +199,13 @@ async function getPairTokensInfo(addr) {
         //get pair 
         const p = await factory.methods.pairTokens(i).call();
         console.log(i, p);
+        const flag = await hasfilterTokens(p);
+        if (flag) {
+            console.log("filter unverified pair token", p);
+            continue;
+        }
         let verified = false;
         if (vts.has(p)) {
-            // console.log("skip unverified pair token", p);
-            // continue;
             verified = true;
         }
 
@@ -253,6 +256,27 @@ async function getPairTokensInfo(addr) {
     return tokens;
 }
 
+let is_loaded_filter_json = false;
+async function hasfilterTokens(ptoken) {
+    let filter_set = new Set();
+    if (!is_loaded_filter_json) {
+        try {
+            const token_filter = util.loadJson(pair_token_filter_json);
+            if (token_filter != undefined && token_filter.length > 0) {
+                filter_set = new Set(token_filter);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    if (filter_set.has(ptoken)) {
+        return true;
+    }
+
+    return false;
+}
+
 
 async function getPairsInfo() {
     console.log("=====pairs=======");
@@ -264,22 +288,19 @@ async function getPairsInfo() {
     //get all pairs from factory
     let len = await factory.methods.allPairsLength().call();
     console.log(len);
-    let filter_set = new Set();
-    const token_filter = util.loadJson(pair_token_filter_json);
-    if (token_filter != undefined && token_filter.length > 0) {
-        filter_set = new Set(token_filter);
-    }
+
     let tokens = [];
     for (let i = 0; i < len; i++) {
         //get pair 
         const s = await factory.methods.allPairs(i).call();
-        console.log(i, s);
-        //get pairtoken contract address by pair contract address
-        const p2t = await factory.methods.pair2Token(s).call();
-        if (filter_set.has(s)) {
+        const flag = await hasfilterTokens(s);
+        if (flag) {
             console.log("skip unverified pair token", s);
             continue;
         }
+        console.log(i, s);
+        //get pairtoken contract address by pair contract address
+        const p2t = await factory.methods.pair2Token(s).call();
 
         let rate = 0;
         if (vts.has(p2t)) {
@@ -320,9 +341,13 @@ async function getPairsInfo() {
     tokens.sort(compare);
 
     let index = tokens.findIndex(token => token.symbol0[0] == "SWP");
+    if (-1 == index) {
+        console.error("can't find swp pairs");
+        return [];
+    }
     let item = tokens[index];
     tokens.splice(index, 1);
-    item.rate =  Number(process.env.SWP_RATE||5);
+    item.rate = Number(process.env.SWP_RATE || 5);
     tokens.unshift(item);
 
     tokens = await calculateApy(tokens);
