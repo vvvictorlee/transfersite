@@ -322,7 +322,7 @@ async function getPairsInfo() {
     let index = tokens.findIndex(token => token.symbol0[0] == "SWP");
     let item = tokens[index];
     tokens.splice(index, 1);
-    item.rate = 5;
+    item.rate =  Number(process.env.SWP_RATE||5);
     tokens.unshift(item);
 
     tokens = await calculateApy(tokens);
