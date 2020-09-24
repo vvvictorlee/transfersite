@@ -6,7 +6,8 @@ var wrapper = require('co-mysql');
 
 
 module.exports = {
-    getSwpTotalByPToken
+    getSwpTotalByPToken,
+    getUnclaimedSwpByAddress
 };
 
 const DB_CONFIG = {
@@ -37,4 +38,18 @@ async function getSwpTotalByPToken() {
 }
 
 
+
+// 获取指定账户地址未领取SWP奖励
+async function getUnclaimedSwpByAddress(addr) {
+    let sql_detail = "SELECT CONCAT(SUM(amount)) amount FROM cycle_reward where  addr = ? and flag=0 and type=0;";
+
+    var rows = await conn.query(sql_detail, [addr]);
+
+    var amount = "0";
+    if (rows.length > 0) {
+       amount = rows[0].amount.toString();
+    }
+
+    return amount;
+}
 

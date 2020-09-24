@@ -43,8 +43,8 @@ app.post('/farm/', function (req, res) {
             let data = await app_handler.getSwpInfo();
             return data;
         }),
-        "get_swp_balance": (async function () {
-            let data = await app_handler.getSwpBalanceByAddress(req.body.address);
+        "get_unclaimed_swp_rewards": (async function () {
+            let data = await app_handler.getUnclaimedSwpRewardsByAddress(req.body.address);
             return data;
         }),
         "default": (async function () {

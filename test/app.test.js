@@ -57,12 +57,12 @@ describe('# test router api merchant', function () {
     });
 
 
-    it('get_swp_balance', function (done) {
+    it('get_unclaimed_swp_rewards', function (done) {
         request
             .post(prefix) // 接口地址
             .send({
-                "method": "get_swp_balance",
-                "address": "0xbec1c22fa669bf17b9d2326beb9adce4fc697614"
+                "method": "get_unclaimed_swp_rewards",
+                "address": "0x43f4eddcff83856941b10dab61a30b676a2c5bd6"
             })
             .expect(200) // 判断状态码
             .end(function (err, res) { // 请求结束后拿到返回的数据

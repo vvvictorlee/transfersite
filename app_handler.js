@@ -443,18 +443,17 @@ async function getSwpInfo() {
     return { price: 0, released: 0 };
 }
 
-async function getSwpBalanceByAddress(addr) {
+async function getUnclaimedSwpRewardsByAddress(addr) {
     try {
-        const token = process.env.SWP_ADDRESS;
-        let erc20 = new web3.eth.Contract(erc20_abi, token);
-        let balance = await erc20.methods.balanceOf(addr).call();
+  
+        let unclaimed_swp_rewards = await farm_db.getUnclaimedSwpByAddress(addr.toLowerCase());
 
-        return { balance: web3.utils.fromWei(balance) };
+        return { unclaimed_swp_rewards: web3.utils.fromWei(unclaimed_swp_rewards) };
 
     } catch (error) {
         console.error(error);
     }
-    return { balance: 0 };
+    return { unclaimed_swp_rewards: "0" };
 }
 
 
@@ -464,6 +463,6 @@ module.exports = {
     getPairTokensInfo,
     getPairsInfo,
     getSwpInfo,
-    getSwpBalanceByAddress,
+    getUnclaimedSwpRewardsByAddress,
 };
 
