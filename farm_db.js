@@ -44,9 +44,9 @@ async function getUnclaimedSwpByAddress(addr,swp_address) {
     let sql_detail = "SELECT CONCAT(SUM(amount)) amount FROM cycle_reward where  addr = ? and token=? and flag=0 and type=0;";
 
     var rows = await conn.query(sql_detail, [addr,swp_address]);
-
+    console.log(rows);
     var amount = "0";
-    if (rows.length > 0) {
+    if (rows.length > 0 && rows[0].amount != null) {
        amount = rows[0].amount.toString();
     }
 
