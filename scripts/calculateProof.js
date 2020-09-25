@@ -23,7 +23,6 @@ const claimProof = async (para, address, balances) => {
 
         for (const tb of balances[cycle]) {
             const token = tb.token;
-            console.log("token===" + token);
             const balance = tb.balance;
             console.log("====(address, token, balance)==", address, "====", token, "====", balance, "=== end====");
             let leaf = para.web3.utils.soliditySha3(address, token, balance);

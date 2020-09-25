@@ -1,5 +1,5 @@
 require('dotenv').config();
-const interval = process.env.CACHE_INTERVAL_MS || 60000;
+const interval = Number(process.env.CACHE_INTERVAL_MS || 60000);
 
 
 let cachedData = {};

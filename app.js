@@ -2,7 +2,6 @@ require('dotenv').config();
 var express = require('express');
 var bodyParser = require('body-parser');
 let app_handler = require("./app_handler");
-let cachedata = require("./cachedata");
 var app = express();
 
 app.use(bodyParser.json());
@@ -27,12 +26,12 @@ app.post('/claim/', function (req, res) {
     let handlers = {
         "get_reward_list": (async function () {
             const data = await app_handler.getRewardListByAddress(req.body.address);
-            return data;
+             res.json(data);
         }),
         "claim_all_rewards": (async function () {
-            const data = await app_handler.claimAllRewards(req.body.address, req.body.gas_limit);
+            const data = await app_handler.claimAllRewards(req.body.address);
             const result = data.length > 0 ? "success" : "fail";
-            return { "result": result, "data": data };
+             res.json({ "result": result, "data": data });
         }),
         "default": (async function () {
             res.json({ "result": "unknown method or method is empty" });
@@ -40,25 +39,9 @@ app.post('/claim/', function (req, res) {
 
     };
 
-    const key = req.body.method;
-    const handler = handlers[key] || handlers["default"];
-    (async function () {
-        let flag = handlers.hasOwnProperty(key);
-        let data = null;
-        if (!flag) {
-            await handler();
-            return;
-        }
-
-        data = await cachedata.getData(key);
-        if (null == data) {
-            data = await handler();
-            await cachedata.putData(key, data);
-        }
-        res.json(data);
-
-
-    })();
+    const handler = handlers[req.body.method] || handlers["default"];
+    handler();
+   
 
 });
 

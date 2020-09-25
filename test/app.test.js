@@ -5,11 +5,8 @@ const request = require('supertest')(app);
 // 断言测测试库
 const assert = require('power-assert');
 const prefix = '/claim';
+
 describe('# test router api merchant', function () {
-    // 同步测试
-    it('post', function () {
-        assert(1 === 1);
-    });
     // 异步测试
     // 异步中，done 在异步结束后执行
     it('get reward list', function (done) {
@@ -42,7 +39,27 @@ describe('# test router api merchant', function () {
             });
     });
 
-    it('get list after claim rewards', function (done) {
+    it('default', function (done) {
+        request
+            .post(prefix) // 接口地址
+            .send({
+                "method": "unknown method"
+            })
+            .expect(200) // 判断状态码
+            .end(function (err, res) { // 请求结束后拿到返回的数据
+                if (err) return done(err);
+                console.log(res.body);
+                done();
+            });
+    });
+
+});
+
+
+
+describe('# test list after claim', function () {
+
+    before(function (done) {
         request
             .post(prefix) // 接口地址
             .send({
@@ -56,6 +73,10 @@ describe('# test router api merchant', function () {
                 done();
             });
 
+        
+    });
+
+    it('get list after claim rewards', function (done) {
         request
             .post(prefix) // 接口地址
             .send({
@@ -70,18 +91,5 @@ describe('# test router api merchant', function () {
             });
     });
 
-    it('default', function (done) {
-        request
-            .post(prefix) // 接口地址
-            .send({
-                "method": "unknown method"
-            })
-            .expect(200) // 判断状态码
-            .end(function (err, res) { // 请求结束后拿到返回的数据
-                if (err) return done(err);
-                console.log(res.body);
-                done();
-            });
-    });
 
 });

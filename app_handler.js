@@ -71,6 +71,8 @@ async function claimAllRewards(addr) {
     let err = "";
     try {
         addr = addr.toLowerCase();
+        await cachedata.putAddress(addr, 1);
+
         await checkClaimStatus(addr);
 
         let sizebalances = await redeem_db.getCycleRewardsByAddress(addr);
@@ -94,7 +96,6 @@ async function claimAllRewards(addr) {
 
         const encodedAbi = await claimProof(para, addr, balances);
         console.log("claim list====", encodedAbi);
-        await cachedata.putAddress(addr, 1);
 
         return encodedAbi;
     }
