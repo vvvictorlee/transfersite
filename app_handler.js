@@ -226,10 +226,6 @@ async function getPairTokensInfo(addr) {
             }
         }
 
-        const swp = process.env.SWP_ADDRESS;
-        let swpins = new web3.eth.Contract(erc20_abi, swp);
-        const blocksOfDay = 5760;
-        const lastBlock = await web3.eth.getBlock("latest");
         let ys = "0";
         let pp = p.toLowerCase();
         if (yswps[pp] != undefined) {

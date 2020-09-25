@@ -13,13 +13,12 @@ async function getData(key) {
     if (data != undefined && data != null && data.info_data != null && Date.now() < data.info_time) {
         return data.info_data;
     }
-
     return null;
 }
 
 async function putData(key, info_data) {
     cachedData[key] = {
-        info_time: Date.now() + interval,
+        info_time: Date.now() + Number(interval),
         info_data: info_data
     };
 }
