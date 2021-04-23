@@ -135,7 +135,6 @@ async function claims() {
     // await web3.eth.personal.unlockAccount(admin, password);
 
 
-
     const claimBalance1 = web3.utils.toWei("1000");
     const rootProof1 = await getHexRootProof([user, cycle1, token, claimBalance1]);
 
@@ -144,6 +143,8 @@ async function claims() {
     // // //step6
     const claimBalance2 = web3.utils.toWei("1234");
     const rootProof2 = await getHexRootProof([user, cycle2, token, claimBalance2]);
+
+    const rootProof3 = await getHexRootProof([user, cycle2+1, token, claimBalance2]);
 
 
     // await Redeem.methods.finishEpoch(cycle1, epoch1Block.timestamp, epoch1Block.hash).send({ from: admin });

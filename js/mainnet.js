@@ -47,18 +47,23 @@ let sabi = require("../json/SToken.json");///Users/lisheng/Downloads/defi/balanc
 // // var balance = web3.utils.fromWei(web3.utils.toBN(balanceWei), 'ether');
 // console.log(balanceWei);
 // console.log(balance);
-const user1 = "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e";
+let user1 = "0x1084d79A66EF86BFc9c945d4a21159a024dEE14e";
 const user2 = "0x929378dbc9a1fdc0d05529e48097ff65c6902231";
 const user3 = "0x5792F745F632FE6aC28f65E4ffE606D5c9FD9393";
 const token = "0x06403d9dc00b7cf577023d49f96f899aed86d6c0";
-let tokens = ["0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5",
-    "0x8d3acd2969ca969188bd8b227dfca09e1691e263",
-    "0xc5201589361c2da2b07df626f1cab71b4255b16e",
-    "0xe59eb769a705443936a043b07ec1892b448ca24d"];
+// let tokens = ["0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5",
+//     "0x8d3acd2969ca969188bd8b227dfca09e1691e263",
+//     "0xc5201589361c2da2b07df626f1cab71b4255b16e",
+//     "0xe59eb769a705443936a043b07ec1892b448ca24d"];
+let tokens= ["0xda3145d0a373712e036106fc1fa34b1014807e68"];
+const user4="0xf7076D986996d0DBD97D6799C2Ec2adC2975CefB";
+user1= user4;
 
 //     // console.log(Redeem.methods);
 tokens.push(token);
 
+
+const latest_cycle = 18;
 
 let handlers = {
     "b": (async function () {
@@ -69,6 +74,9 @@ let handlers = {
     }),
     "c": (async function () {
         await claim();
+    }),
+    "s": (async function () {
+        await claimStatus();
     }),
     "default": (async function () {
         await usageFunc();
@@ -82,7 +90,6 @@ f();
 
 const token_symbols_json = "data/token_symbols.json";
 
-const latest_cycle = 8;
 
 (async function () {
     //await  tokensymbol();

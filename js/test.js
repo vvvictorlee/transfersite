@@ -46,7 +46,7 @@ const Debug = require('Debug');
 const util = require('./util');
 var BigNumber = require('bignumber.js')
 
-jq.run('.', {"2":"3","3":"4"},{ input: 'json' }).then(console.log);
+// jq.run('.', {"2":"3","3":"4"},{ input: 'json' }).then(console.log);
 
 
 
@@ -113,6 +113,16 @@ let tokens = ["0x11b3799a69640bf2d8d7a223b1f1e7aba4d373f5",
     "0x8d3acd2969ca969188bd8b227dfca09e1691e263",
     "0xc5201589361c2da2b07df626f1cab71b4255b16e",
     "0xe59eb769a705443936a043b07ec1892b448ca24d"];
+
+const dns = require('dns');
+
+dns.resolve("localhost", 'ANY', (err, records) => {
+  if (err) {
+    console.log("Error: ", err);
+  } else {
+    console.log(records);
+  }
+});
 
 (async function () {
 
