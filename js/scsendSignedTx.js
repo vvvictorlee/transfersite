@@ -2,11 +2,12 @@
 const Web3 = require('web3');
 const util = require('./util');
 
+const parseLog = require('eth-log-parser');
 
-
-
-const admin = "0x4a79c58CCf9d80353c02357F26D6f7b99fA9991e";
-const adminr = "0x4a79c58CCf9d80353c02357F26D6f7b99fA9991e";
+let admin = "0x4a79c58CCf9d80353c02357F26D6f7b99fA9991e";
+const admin1 = "0x598FeaB9ff6A090a7fAA9dF0F3B4df3F0c8D35FC";
+const admin2 = "0xC49926C4124cEe1cbA0Ea94Ea31a6c12318df947";
+admin = admin1;
 const secrets = util.loadJson('._');
 const adminr_secrets = secrets.key;
 // const password = "123456";
@@ -22,8 +23,9 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://35.73.127.28:8645'
 
 
 let Proposal = {};
+let abi = {};
 function instanceProposal() {
-    let abi = require("./Proposal.json").abi;
+    abi = require("./Proposal.json").abi;
     Proposal = new web3.eth.Contract(abi, PROPOSAL);
     if (undefined == Proposal) {
         console.log("un");
@@ -61,18 +63,19 @@ instancePunish();
 
 instanceProposal();
 
-// var balanceWei =  web3.eth.getBalance(admin).then(console.log);//.toNumber();
-// // 从wei转换成ether
-// // var balance = web3.utils.fromWei(web3.utils.toBN(balanceWei), 'ether');
-// console.log(balanceWei);
-// console.log(balance);
 let result;
 
 
 (async function () {
 
 
-    // await Proposal.methods.createProposal('0xb49B73a2c98B3B65DDe051aE0adA8B9DaF67c1FE', 'detail').send({ from: admin });
+    // var balanceWei = await web3.eth.getBalance(admin);//.then(console.log);//.toNumber();
+    // // 从wei转换成ether
+    // // var balance = web3.utils.fromWei(web3.utils.toBN(balanceWei), 'ether');
+    // console.log("===balnace====", balanceWei);
+    // console.log(balance);
+
+    // await Proposal.methods.createProposal('0xC49926C4124cEe1cbA0Ea94Ea31a6c12318df947', 'detail').send({ from: admin });
 
     // await Proposal.methods.voteProposal('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe', true).send({ from: admin });
     // await Proposal.methods.setUnpassed('0xfd49c8467fc8f2E115322b21CaE17559aEa07cBe').send({ from: admin });
@@ -80,8 +83,8 @@ let result;
 
     // //step7
     // await web3.eth.personal.unlockAccount(admin, password);
-    // result = await Proposal.methods.proposals('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe').call({ from: admin });
-    // console.log(result);
+    result = await Proposal.methods.proposals('0x1b297ebe5720f9887b4302c56f932bc424920c2d707f5276cee99d0831651851').call({ from: admin });
+    console.log(result);
 
     // result = await Proposal.methods.votes('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe', '0xad49c8467fc8f2E115322b21CaE17559aEa07cBe').call({ from: admin });
     // console.log(result);
@@ -106,7 +109,7 @@ let result;
     // await Validators.methods.removeValidator('0xfd49c8467fc8f2E115322b21CaE17559aEa07cBe').send({ from: admin });
     // await Validators.methods.removeValidatorIncoming('0xfd49c8467fc8f2E115322b21CaE17559aEa07cBe').send({ from: admin });
 
-    // result = await Validators.methods.validatorInfo('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe').call({ from: admin });
+    // result = await Validators.methods.getValidatorInfo('0xC49926C4124cEe1cbA0Ea94Ea31a6c12318df947').call({ from: admin });
     // console.log(result);
 
     // result = await Validators.methods.staked('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe', '0xad49c8467fc8f2E115322b21CaE17559aEa07cBe').call({ from: admin });
@@ -114,7 +117,7 @@ let result;
 
     // result = await Validators.methods.operationsDone('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe', 1).call({ from: admin });
     // console.log(result);
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
         result = await Validators.methods.currentValidatorSet(i).call({ from: admin });
         console.log("==", result);
         // result = await Validators.methods.highestValidatorsSet(i).call({ from: admin });
@@ -138,6 +141,14 @@ let result;
     // result = await Punish.methods.decreased(1).call({ from: admin });
     // console.log(result);
 
+    result = await Punish.methods.punishThreshold().call({ from: admin });
+    console.log(result);
+    result = await Punish.methods.removeThreshold().call({ from: admin });
+    console.log(result);
+    result = await Punish.methods.decreaseRate().call({ from: admin });
+    console.log(result);
+
+
 
 })();
 
@@ -148,8 +159,14 @@ const ethereumjs_common = require('ethereumjs-common').default;
 async function sendSignedTx() {
 
     let nonce = await web3.eth.getTransactionCount(admin, "pending");
-    console.log(nonce);
-    let encodedabi = await Proposal.methods.createProposal('0xb49B73a2c98B3B65DDe051aE0adA8B9DaF67c1FE', 'detail').encodeABI();
+    console.log("===nonce======", nonce);
+
+    //  let encodedabi = await Validators.methods.createOrEditValidator('0xC49926C4124cEe1cbA0Ea94Ea31a6c12318df947', "moniker", "identity", "website", "email", "details").encodeABI();
+
+    // let encodedabi = await Proposal.methods.createProposal('0xC49926C4124cEe1cbA0Ea94Ea31a6c12318df947', 'detail').encodeABI();
+    let encodedabi = await Proposal.methods.voteProposal('0x1b297ebe5720f9887b4302c56f932bc424920c2d707f5276cee99d0831651851', true).encodeABI();
+
+    // let encodedabi = await Validators.methods.stake(admin).encodeABI();
 
     var privateKey = Buffer.from(adminr_secrets, 'hex');
     const gasprice = await web3.eth.getGasPrice();
@@ -179,9 +196,18 @@ async function sendSignedTx() {
     var serializedTx = tx.serialize();
 
     let receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
-    console.log(receipt);
+    console.log(JSON.stringify(receipt))
+    // console.log(receipt);
+    // {
+    //     const events = parseLog(receipt.logs, abi)
+    //     // const events = parseLog(Object.values(receipt.events), abi)
+    //     console.log("=============================")
+
+    //     console.log(events)
+    // }
+
 }
-sendSignedTx();
+// sendSignedTx();
 
 
 // // var json_data = JSON.parse (fs.readFileSync (file_path));

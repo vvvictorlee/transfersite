@@ -3,10 +3,11 @@
  *  BigNumber
  *
  *  A wrapper around the BN.js object. We use the BN.js library
- *  because it is used by elliptic, so it is required regardles.
+ *  because it is used by elliptic, so it is required regardless.
  *
  */
-import { BN } from "bn.js";
+import _BN from "bn.js";
+var BN = _BN.BN;
 import { hexlify, isBytes, isHexString } from "@ethersproject/bytes";
 import { Logger } from "@ethersproject/logger";
 import { version } from "./_version";
@@ -21,6 +22,8 @@ export function isBigNumberish(value) {
         (typeof (value) === "bigint") ||
         isBytes(value));
 }
+// Only warn about passing 10 into radix once
+let _warnedToStringRadix = false;
 export class BigNumber {
     constructor(constructorGuard, hex) {
         logger.checkNew(new.target, BigNumber);
@@ -144,15 +147,38 @@ export class BigNumber {
         }
         return null;
     }
+    toBigInt() {
+        try {
+            return BigInt(this.toString());
+        }
+        catch (e) { }
+        return logger.throwError("this platform does not support BigInt", Logger.errors.UNSUPPORTED_OPERATION, {
+            value: this.toString()
+        });
+    }
     toString() {
-        // Lots of people expect this, which we do not support, so check
-        if (arguments.length !== 0) {
-            logger.throwError("bigNumber.toString does not accept parameters", Logger.errors.UNEXPECTED_ARGUMENT, {});
+        // Lots of people expect this, which we do not support, so check (See: #889)
+        if (arguments.length > 0) {
+            if (arguments[0] === 10) {
+                if (!_warnedToStringRadix) {
+                    _warnedToStringRadix = true;
+                    logger.warn("BigNumber.toString does not accept any parameters; base-10 is assumed");
+                }
+            }
+            else if (arguments[0] === 16) {
+                logger.throwError("BigNumber.toString does not accept any parameters; use bigNumber.toHexString()", Logger.errors.UNEXPECTED_ARGUMENT, {});
+            }
+            else {
+                logger.throwError("BigNumber.toString does not accept parameters", Logger.errors.UNEXPECTED_ARGUMENT, {});
+            }
         }
         return toBN(this).toString(10);
     }
     toHexString() {
         return this._hex;
+    }
+    toJSON(key) {
+        return { type: "BigNumber", hex: this.toHexString() };
     }
     static from(value) {
         if (value instanceof BigNumber) {
@@ -176,19 +202,33 @@ export class BigNumber {
             }
             return BigNumber.from(String(value));
         }
-        if (typeof (value) === "bigint") {
-            return BigNumber.from(value.toString());
+        const anyValue = value;
+        if (typeof (anyValue) === "bigint") {
+            return BigNumber.from(anyValue.toString());
         }
-        if (isBytes(value)) {
-            return BigNumber.from(hexlify(value));
+        if (isBytes(anyValue)) {
+            return BigNumber.from(hexlify(anyValue));
         }
-        if (value._hex && isHexString(value._hex)) {
-            return BigNumber.from(value._hex);
-        }
-        if (value.toHexString) {
-            value = value.toHexString();
-            if (typeof (value) === "string") {
-                return BigNumber.from(value);
+        if (anyValue) {
+            // Hexable interface (takes piority)
+            if (anyValue.toHexString) {
+                const hex = anyValue.toHexString();
+                if (typeof (hex) === "string") {
+                    return BigNumber.from(hex);
+                }
+            }
+            else {
+                // For now, handle legacy JSON-ified values (goes away in v6)
+                let hex = anyValue._hex;
+                // New-form JSON
+                if (hex == null && anyValue.type === "BigNumber") {
+                    hex = anyValue.hex;
+                }
+                if (typeof (hex) === "string") {
+                    if (isHexString(hex) || (hex[0] === "-" && isHexString(hex.substring(1)))) {
+                        return BigNumber.from(hex);
+                    }
+                }
             }
         }
         return logger.throwArgumentError("invalid BigNumber value", "value", value);
@@ -254,5 +294,13 @@ function throwFault(fault, operation, value) {
         params.value = value;
     }
     return logger.throwError(fault, Logger.errors.NUMERIC_FAULT, params);
+}
+// value should have no prefix
+export function _base36To16(value) {
+    return (new BN(value, 36)).toString(16);
+}
+// value should have no prefix
+export function _base16To36(value) {
+    return (new BN(value, 16)).toString(36);
 }
 //# sourceMappingURL=bignumber.js.map

@@ -34,7 +34,7 @@ export function isBytes(value) {
     }
     for (let i = 0; i < value.length; i++) {
         const v = value[i];
-        if (v < 0 || v >= 256 || (v % 1)) {
+        if (typeof (v) !== "number" || v < 0 || v >= 256 || (v % 1)) {
             return false;
         }
     }
@@ -320,6 +320,9 @@ export function splitSignature(signature) {
         if (result.recoveryParam == null) {
             if (result.v == null) {
                 logger.throwArgumentError("signature missing v and recoveryParam", "signature", signature);
+            }
+            else if (result.v === 0 || result.v === 1) {
+                result.recoveryParam = result.v;
             }
             else {
                 result.recoveryParam = 1 - (result.v % 2);

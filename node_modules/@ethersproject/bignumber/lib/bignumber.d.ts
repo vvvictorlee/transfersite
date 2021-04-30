@@ -28,8 +28,13 @@ export declare class BigNumber implements Hexable {
     isNegative(): boolean;
     isZero(): boolean;
     toNumber(): number;
+    toBigInt(): bigint;
     toString(): string;
     toHexString(): string;
+    toJSON(key?: string): any;
     static from(value: any): BigNumber;
     static isBigNumber(value: any): value is BigNumber;
 }
+export declare function _base36To16(value: string): string;
+export declare function _base16To36(value: string): string;
+//# sourceMappingURL=bignumber.d.ts.map

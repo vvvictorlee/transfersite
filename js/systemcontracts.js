@@ -126,9 +126,9 @@ let result;
 //step 4 tran
 // transferToken(PROPOSAL, web3.utils.toWei("20000"));
 (async function () {
-    // let accounts = await web3.eth.getAccounts();
+    let accounts = await web3.eth.getAccounts();
 
-    // console.log(accounts);
+    console.log(accounts);
 
     // await web3.eth.personal.unlockAccount(admin, password);
 

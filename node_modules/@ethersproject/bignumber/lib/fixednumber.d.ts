@@ -22,8 +22,11 @@ export declare class FixedNumber {
     subUnsafe(other: FixedNumber): FixedNumber;
     mulUnsafe(other: FixedNumber): FixedNumber;
     divUnsafe(other: FixedNumber): FixedNumber;
+    floor(): FixedNumber;
+    ceiling(): FixedNumber;
     round(decimals?: number): FixedNumber;
     isZero(): boolean;
+    isNegative(): boolean;
     toString(): string;
     toHexString(width?: number): string;
     toUnsafeFloat(): number;
@@ -34,3 +37,4 @@ export declare class FixedNumber {
     static from(value: any, format?: FixedFormat | string): FixedNumber;
     static isFixedNumber(value: any): value is FixedNumber;
 }
+//# sourceMappingURL=fixednumber.d.ts.map
