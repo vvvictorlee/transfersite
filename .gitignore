@@ -3,3 +3,4 @@ secrets.json
 /build
 /node_modules
 /reports
+yarn.lock
