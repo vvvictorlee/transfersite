@@ -2,7 +2,7 @@
 const Web3 = require('web3');
 
 // // // Connect to local Ethereum node
-const web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
+const web3 = new Web3(new Web3.providers.HttpProvider("https://http-testnet2.hoosmartchain.com"));
 
 // const web3 = new Web3(new Web3.providers.WebsocketProvider("ws://192.168.38.227:8546"));
 
@@ -181,16 +181,16 @@ let result;
 
     // result = await Validators.methods.operationsDone('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe', 1).call({ from: accounts[1] });
     // console.log(result);
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
         result = await Validators.methods.currentValidatorSet(i).call({ from: accounts[1] });
         console.log(result);
         result = await Validators.methods.highestValidatorsSet(i).call({ from: accounts[1] });
         console.log(result);
     }
-    result = await Validators.methods.totalStake().call({ from: accounts[1] });
-    console.log(result);
-    result = await Validators.methods.totalJailedHB().call({ from: accounts[1] });
-    console.log(result);
+    // result = await Validators.methods.totalStake().call({ from: accounts[1] });
+    // console.log(result);
+    // result = await Validators.methods.totalJailedHB().call({ from: accounts[1] });
+    // console.log(result);
 
 
     // result = await Punish.methods.punishValidators().call({ from: accounts[1] });

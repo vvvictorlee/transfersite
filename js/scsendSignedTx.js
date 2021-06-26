@@ -17,7 +17,7 @@ const PROPOSAL = "0x000000000000000000000000000000000000F002";
 
 
 // const BN = require('BigNumber.js');
-const web3 = new Web3(new Web3.providers.HttpProvider('http://35.73.127.28:8645'));
+const web3 = new Web3(new Web3.providers.HttpProvider('https://http-testnet2.hoosmartchain.com'));
 // // wei是以太坊上的的最小单位，ether小数点后18位为一个wei
 
 
@@ -65,10 +65,7 @@ instanceProposal();
 
 let result;
 
-
 (async function () {
-
-
     // var balanceWei = await web3.eth.getBalance(admin);//.then(console.log);//.toNumber();
     // // 从wei转换成ether
     // // var balance = web3.utils.fromWei(web3.utils.toBN(balanceWei), 'ether');
@@ -83,8 +80,8 @@ let result;
 
     // //step7
     // await web3.eth.personal.unlockAccount(admin, password);
-    result = await Proposal.methods.proposals('0x1b297ebe5720f9887b4302c56f932bc424920c2d707f5276cee99d0831651851').call({ from: admin });
-    console.log(result);
+    // result = await Proposal.methods.proposals('0x1b297ebe5720f9887b4302c56f932bc424920c2d707f5276cee99d0831651851').call({ from: admin });
+    // console.log(result);
 
     // result = await Proposal.methods.votes('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe', '0xad49c8467fc8f2E115322b21CaE17559aEa07cBe').call({ from: admin });
     // console.log(result);
@@ -109,24 +106,24 @@ let result;
     // await Validators.methods.removeValidator('0xfd49c8467fc8f2E115322b21CaE17559aEa07cBe').send({ from: admin });
     // await Validators.methods.removeValidatorIncoming('0xfd49c8467fc8f2E115322b21CaE17559aEa07cBe').send({ from: admin });
 
-    // result = await Validators.methods.getValidatorInfo('0xC49926C4124cEe1cbA0Ea94Ea31a6c12318df947').call({ from: admin });
-    // console.log(result);
+    result = await Validators.methods.getValidatorInfo('0xC49926C4124cEe1cbA0Ea94Ea31a6c12318df947').call({ from: admin });
+    console.log(result);
 
     // result = await Validators.methods.staked('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe', '0xad49c8467fc8f2E115322b21CaE17559aEa07cBe').call({ from: admin });
     // console.log(result);
 
     // result = await Validators.methods.operationsDone('0xad49c8467fc8f2E115322b21CaE17559aEa07cBe', 1).call({ from: admin });
     // console.log(result);
-    for (let i = 0; i < 2; i++) {
-        result = await Validators.methods.currentValidatorSet(i).call({ from: admin });
-        console.log("==", result);
-        // result = await Validators.methods.highestValidatorsSet(i).call({ from: admin });
-        // console.log(result);
-    }
-    result = await Validators.methods.totalStake().call({ from: admin });
-    console.log(result);
-    result = await Validators.methods.totalJailedHB().call({ from: admin });
-    console.log(result);
+    // for (let i = 0; i < 2; i++) {
+    //     result = await Validators.methods.currentValidatorSet(i).call({ from: admin });
+    //     console.log("==", result);
+    //     // result = await Validators.methods.highestValidatorsSet(i).call({ from: admin });
+    //     // console.log(result);
+    // }
+    // result = await Validators.methods.totalStake().call({ from: admin });
+    // console.log(result);
+    // result = await Validators.methods.totalJailedHB().call({ from: admin });
+    // console.log(result);
 
 
     // result = await Punish.methods.punishValidators().call({ from: admin });
