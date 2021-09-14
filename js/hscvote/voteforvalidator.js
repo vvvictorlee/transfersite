@@ -1,6 +1,6 @@
 
 const Web3 = require('web3');
-const util = require('./util');
+const util = require('../util');
 
 const parseLog = require('eth-log-parser');
 
