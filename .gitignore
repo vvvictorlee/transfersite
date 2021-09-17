@@ -5,3 +5,7 @@ secrets.json
 /reports
 yarn.lock
 ._
+.env
+.env.dev
+.env.test
+.env.prod
