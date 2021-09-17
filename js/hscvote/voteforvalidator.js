@@ -4,10 +4,8 @@ const fs = require('fs');
 const readJSON = (fileName) => JSON.parse(fs.readFileSync(fileName));
 const parseLog = require('eth-log-parser');
 
-let admin = "0x4a79c58CCf9d80353c02357F26D6f7b99fA9991e";
-const admin1 = "0x598FeaB9ff6A090a7fAA9dF0F3B4df3F0c8D35FC";
-const admin2 = "0xC49926C4124cEe1cbA0Ea94Ea31a6c12318df947";
-admin = admin1;
+const { sendSignedTx } = require("./tx.js");
+
 const secrets = readJSON('._');
 
 
