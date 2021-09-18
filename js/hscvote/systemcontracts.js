@@ -206,7 +206,6 @@ let result;
     // console.log(result);
 
     // //step8
-    // await Proposal.methods.claim().send({ from: accounts[1] });
 
     // //step9
     // result = await TToken.methods.balanceOf(accounts[1]).call({ from: accounts[1] });

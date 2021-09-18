@@ -9,5 +9,5 @@ yarn.lock
 .env.dev
 .env.test
 .env.prod
-.env.mainet
+.env.mainnet
 .env.testnet

@@ -1,36 +1,33 @@
+const debug = require("debug");
+const ValidatorLog = debug('Validator');
+// debug.enable("*");
+debug.enable("Validator");
 
 const Web3 = require('web3');
 const fs = require('fs');
-const readJSON = (fileName) => JSON.parse(fs.readFileSync(fileName));
-const parseLog = require('eth-log-parser');
+const path = require('path')
+
+const readJSON = (fileName) => JSON.parse(fs.readFileSync(path.join(__dirname, fileName)));
 
 const { sendSignedTx } = require("./tx.js");
 
-const secrets = readJSON('._');
+const secrets = readJSON('./._');
+const accounts = Object.keys(secrets);
 
+let sender = accounts[0];
 
-// const BN = require('BigNumber.js');
-const web3 = new Web3(new Web3.providers.HttpProvider('http://35.73.127.28:8645'));
-// // wei是以太坊上的的最小单位，ether小数点后18位为一个wei
-
-
-async function setAddress() {
-    console.log("process.argv==", process.argv);
-    console.log("====setAddress=====");
-    // console.log(helperRedeem.methods);
-    await helperRedeem.methods.setRedeemAddress(REDEEM).send({ from: admin });
-}
+const PROVIDER_URL = process.env.PROVIDER_URL || "https://http-testnet.hoosmartchain.com";
+const web3 = new Web3(new Web3.providers.HttpProvider(PROVIDER_URL));// // wei是以太坊上的的最小单位，ether小数点后18位为一个wei
 
 async function usageFunc() {
-    console.log("process.argv==", process.argv);
+    ValidatorLog("process.argv==", process.argv);
     let epochBlock = (await web3.eth.getBlock("latest"));
-    console.log(epochBlock.number, epochBlock.timestamp);
+    ValidatorLog(epochBlock.number, epochBlock.timestamp);
 
 }
 
-
-
-let contracts = {}
+let contract_instances = {}
+let contracts = Object.values(contract_instances);
 const instanceContract = async (contractAddress, abijson) => {
     let abi = require(abijson).abi;
     let contract = new web3.eth.Contract(abi, contractAddress);
@@ -43,15 +40,16 @@ const instanceContract = async (contractAddress, abijson) => {
 }
 const abis = readJSON("./abis.json")
 
-function instanceContracts() {
+const instanceContracts = async () => {
     for (let k of Object.keys(abis)) {
-        let obj = await instanceContract(k, abis[k]);
-        contracts[k] = obj;
+        let obj = await instanceContract(k, "./abis/" + abis[k]);
+        contract_instances[k] = obj;
     }
-}
+    contracts = Object.values(contract_instances);
+
+};
 
 
-instanceContracts();
 
 let result;
 const contract_addresses = Object.keys(abis);
@@ -99,98 +97,126 @@ const unstake = async (sender, address) => {
 };
 
 
-const votes = async (sender, address, flag) => {
+const votes = async (sender, address, id) => {
     const index = 2;
     let result = 0;
-    result = await contracts[index].methods.votes(address, flag).call({ from: sender });
+    result = await contracts[index].methods.proposals(id).call({ from: sender });
+    ValidatorLog(address, "==", result);
+    result = await contracts[index].methods.votes(address, id).call({ from: sender });
+    ValidatorLog(address, "==", result);
 
     return result;
 };
-const pass = async (sender, address, flag) => {
+const pass = async (sender, address) => {
     const index = 2;
     let result = 0;
-    result = await contracts[index].methods.pass(address, flag).call({ from: sender });
-
+    result = await contracts[index].methods.pass(address).call({ from: sender });
+    ValidatorLog(address, "==", result);
     return result;
 };
 
 const staked = async (sender, address) => {
     const index = 0;
     let result = 0;
-    result = await contracts[index].methods.staked(address, address).call({ from: sender });
-
+    result = await contracts[index].methods.getStakingInfo(address).call({ from: sender });
+    ValidatorLog(address, "==", result);
     return result;
 };
-const currentValidatorSet = async (sender, count) => {
+const getActiveValidators = async (sender) => {
     const index = 0;
     let result = 0;
-
-    for (let i = 0; i < count; i++) {
-        result = await contracts[index].methods.currentValidatorSet(i).call({ from: sender });
-        console.log("==", result);
-        // result = await contracts[index].methods.highestValidatorsSet(i).call({ from: admin });
-        // console.log(result);
+    result = await contracts[index].methods.getTopValidators().call({ from: sender });
+    ValidatorLog("getTopValidators==", result);
+    result = await contracts[index].methods.getTotalStakeOfActiveValidators().call({ from: sender });
+    ValidatorLog("getTotalStakeOfActiveValidators==", result);
+    result = await contracts[index].methods.getActiveValidators().call({ from: sender });
+    ValidatorLog("getActiveValidators==", result);
+    let acc = 0;
+    for (let i = 0; i < result.length; i++) {
+        acc = result[i]
+        result = await contracts[index].methods.getValidatorInfo(acc).call({ from: admin });
+        ValidatorLog(acc, "==", result);
+        result = await contracts[index].methods.getValidatorDescription(acc).call({ from: admin });
+        ValidatorLog(acc, "==", result);
+        result = await contracts[index].methods.isActiveValidator(acc).call({ from: admin });
+        ValidatorLog(acc, "==", result);
+        result = await contracts[index].methods.isTopValidator(acc).call({ from: admin });
+        ValidatorLog(acc, "==", result);
     }
 
     return result;
 };
 
-const totalStake = async (sender,) => {
+const totalStake = async (sender) => {
     const index = 0;
     let result = 0;
 
     result = await contracts[index].methods.totalStake().call({ from: sender });
-    console.log(result);
+    ValidatorLog(result);
     result = await contracts[index].methods.totalJailedHB().call({ from: sender });
-    console.log(result);
+    ValidatorLog(result);
 
     return result;
 };
-const punishValidators = async (sender, address) => {
+const punishValidators = async (sender) => {
     const index = 1;
     let result = 0;
-    result = await contracts[index].methods.punishValidators().call({ from: sender });
+    result = await contracts[index].methods.getPunishValidatorsLen().call({ from: sender });
+
+    for (let i = 0; i < result; i++) {
+        result = await contracts[index].methods.punishValidators(i).call({ from: sender });
+        ValidatorLog("==", result);
+        result = await contracts[index].methods.getPunishRecord(result).call({ from: sender });
+        ValidatorLog("==", result);
+    }
+
 
     return result;
 };
-(async function () {
 
-})();
 
 
 let handlers = {
     "createProposal": (async function () {
-        await createProposal();
+        const feeAddr = accounts[1];
+        await createProposal(sender,feeAddr,"");
     }),
     "voteProposal": (async function () {
-        await voteProposal();
+        const feeAddr = accounts[1];
+        await voteProposal(sender,feeAddr,true);
     }),
     "stake": (async function () {
-        await stake();
+        const feeAddr = accounts[1];
+        await stake(sender,feeAddr);
     }),
     "createOrEditValidator": (async function () {
-        await createOrEditValidator();
+        const feeAddr = accounts[1];
+        await createOrEditValidator(sender, feeAddr, "moniker", "identity", "website", "email", "details");
     }),
     "unstake": (async function () {
-        await unstake();
+        const feeAddr = accounts[1];
+        await unstake(sender,feeAddr);
     }),
     "votes": (async function () {
-        await votes();
+        const feeAddr = accounts[1];
+        const id = 0;
+        await votes(sender, feeAddr, id);
     }),
     "pass": (async function () {
-        await pass();
+        const feeAddr = accounts[1];
+        await pass(sender, feeAddr);
     }),
     "staked": (async function () {
-        await staked();
+        await staked(sender, accounts[1]);
     }),
-    "currentValidatorSet": (async function () {
-        await currentValidatorSet();
+    "getActiveValidators": (async function () {
+        await getActiveValidators(sender, 3);
     }),
     "totalStake": (async function () {
-        await totalStake();
+        await totalStake(sender);
     }),
     "punishValidators": (async function () {
-        await punishValidators();
+        await punishValidators(sender);
     }),
     "default": (async function () {
         await usageFunc();
@@ -198,7 +224,10 @@ let handlers = {
 
 };
 
-// console.log(process.argv);
+// ValidatorLog(process.argv);
 const f = handlers[process.argv[2]] || handlers["default"];
-f();
 
+(async function () {
+    await instanceContracts();
+    await f();
+})();
