@@ -2,7 +2,7 @@ const Web3 = require('web3');
 const fs = require('fs');
 require('dotenv').config();
 const debug = require("debug");
-const formula = debug('tx');
+const txlog = debug('tdddx');
 // debug.enable("formula");
 // // // debug.disable("formula");
 // // // const trader = debug('trader');
@@ -16,11 +16,47 @@ const formula = debug('tx');
 // debug.enable(namespaces);
 
 // 
+
+const path = require('path')
+
+const readJSON = (fileName) => JSON.parse(fs.readFileSync(path.join(__dirname, fileName)));
+
+
+const secrets = readJSON('./._');
+const accounts = Object.keys(secrets);
+
 const NETWORK_ID = process.env.CHAIN_ID || 170;
 const CHAIN_ID = process.env.CHAIN_ID || 170;
 const PROVIDER_URL = process.env.PROVIDER_URL || "https://http-testnet.hoosmartchain.com";
+const web3 = new Web3(new Web3.providers.HttpProvider(PROVIDER_URL));// // wei是以太坊上的的最小单位，ether小数点后18位为一个wei
 
-const web3 = new Web3(new Web3.providers.HttpProvider(PROVIDER_URL));
+
+
+let contract_instances = {}
+let contracts = Object.values(contract_instances);
+const instanceContract = async (contractAddress, abijson) => {
+    let abi = require(abijson).abi;
+    let contract = new web3.eth.Contract(abi, contractAddress);
+    if (undefined == contract) {
+        console.error("instanceContract failed", contractAddress);
+        return;
+    }
+
+    return contract;
+}
+const abis = readJSON("./abis.json")
+const contract_addresses = Object.keys(abis);
+
+const instanceContracts = async () => {
+    for (let k of Object.keys(abis)) {
+        let obj = await instanceContract(k, "./abis/" + abis[k]);
+        contract_instances[k] = obj;
+    }
+    contracts = Object.values(contract_instances);
+    return [contracts,contract_addresses,accounts];
+};
+
+
 
 let id;
 
@@ -28,7 +64,9 @@ var Tx = require('ethereumjs-tx').Transaction;
 const ethereumjs_common = require('ethereumjs-common').default;
 const gas_price_buffer = process.env.GAS_PRICE_BUFFER || 1
 const gas_limit_buffer = process.env.GAS_LIMIT_BUFFER || 1.1
-async function sendSignedTx(gas, account, account_secrets, encodedabi, contract_address, isTokenIdOption, msg_value) {
+async function sendSignedTx(gas, account, encodedabi, contract_address_index, isTokenIdOption, msg_value) {
+    let contract_address=contract_addresses[contract_address_index];
+    let account_secrets = secrets[account];
     let isTokenId = isTokenIdOption || false
     let value = msg_value || 0
     let nonce = await web3.eth.getTransactionCount(account, "pending");
@@ -59,16 +97,11 @@ async function sendSignedTx(gas, account, account_secrets, encodedabi, contract_
     let receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
     console.log(JSON.stringify(receipt))
     if (isTokenId) {
-        if (receipt != undefined && Array.isArray(receipt["logs"])
-            && receipt["logs"].length > 0
-            && receipt["logs"][0] != undefined
-            && receipt["logs"][0]["topics"] != undefined
-            && Array.isArray(receipt["logs"][0]["topics"]) && receipt["logs"][0]["topics"].length > 3) {
+        try {
             id = receipt["logs"][0]["topics"][3];
-            //console.log("=====id====", id, web3.utils.hexToNumber(id))
-            // var d2 = new Date().getTime();
-            // console.log("elapse time" + (d2 - d1));
             return id;
+        } catch (error) {
+            console.error(error)
         }
         return 0;
     }
@@ -90,4 +123,4 @@ async function transferHoo(account_secrets, from, to, value) {
 
 // sendSignedTx();
 
-module.exports = { sendSignedTx, transferHoo }
+module.exports = { sendSignedTx, transferHoo,instanceContracts }
